@@ -342,12 +342,25 @@ struct std::hash<Key> {
     }
 };
 
+// Archiv-Tabelle für den Parser.
+// Die Tabelle ist global definiert, damit sowohl arch() als
+// auch clear_tab() auf diese zugreifen können.
+unordered_map<Key, Arch> tab;
+
+// Löschen der gesammten Archiv-Tabelle.
+// Dies ist nötig, um nach einem Parsevorgang die
+// tabelle wieder zurück zu setzen (derzeit nur
+// benötigt für den repl).
+void clear_tab() {
+    tab.clear();
+}
+
 // Archiv mit Position pos und Katalog cat liefern.
 // Wenn es noch nicht existiert, wird es erzeugt und sein
 // Ausschlusskatalog mit cat initialisiert (was für alle neuen
 // Archive außer dem von parse erzeugten "Hauptarchiv" passend ist).
 Arch arch (posA pos, Cat cat) {
-    static unordered_map<Key, Arch> tab;
+    //static unordered_map<Key, Arch> tab;
     Arch& arch = tab[pair(pos, cat)];
     if (!arch) arch = Arch(excl_, cat);
     return arch;

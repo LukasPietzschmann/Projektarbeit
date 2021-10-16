@@ -16,5 +16,8 @@ seq<Expr> parse (const seq<Oper>& opers);
 
 void print (Expr expr, str ind = "");
 
+// Löschen der gesammten Archiv-Tabelle.
+void clear_tab();
+
 #endif
 

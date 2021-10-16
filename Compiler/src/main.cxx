@@ -57,6 +57,7 @@ int repl() {
 
         add_history(inputLine);
         scan_string(inputLine);
+        clear_tab();
         eval_exprs(parse(predef()));
 
         delete[] inputLine;
