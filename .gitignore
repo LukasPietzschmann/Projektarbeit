@@ -34,3 +34,7 @@
 # CMake build directory
 Compiler/build
 Compiler/Build
+Compiler/cmake-build*
+
+# IDE Config Files
+Compiler/.idea/
