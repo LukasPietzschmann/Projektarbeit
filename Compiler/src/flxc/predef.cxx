@@ -131,6 +131,8 @@ seq<Oper> predef () {
     Oper sequ = oper(sequ_eval, x = par(), ";", y = par());
     infix += sequ;
     excl(y, infix + postfix, "BL");
+    // Der rechte operand y importiert alle (All) bisher 
+    // definierten operatoren sowie x.
     impt(y, seq(All, x));
     expt(sequ, seq(x, y));
 

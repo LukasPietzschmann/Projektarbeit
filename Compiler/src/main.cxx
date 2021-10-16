@@ -1,7 +1,16 @@
 #define FLXC_MAIN 2021'10'15
 
-#include <readline/readline.h>
 #include <iostream>
+
+
+/* Readline
+ *
+ * stdio.h muss vor readline.h definiert sein
+ * um Compiler-Errors zu vermeiden. Nicht entfernen!!!
+ */
+#include <cstdio>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 using namespace std;
 
@@ -32,6 +41,7 @@ int main (int argc, char* argv []) {
 int repl() {
 #ifdef HAS_READLINE_LIB
     static char const* prompt = "flx > ";
+    static char const* exit = "exit";
     rl_bind_key('\t', rl_insert);
 
     std::cout << "MOSTflexiPL REPL\n";
@@ -40,7 +50,7 @@ int repl() {
 
     while(true) {
         char* inputLine = readline(prompt);
-        if(!inputLine || std::strcmp(inputLine, "exit") == 0) {
+        if(!inputLine || std::strncmp(inputLine, exit, strlen(exit)) == 0) {
             delete[] inputLine;
             break;
         }
