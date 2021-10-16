@@ -8,6 +8,7 @@ using namespace CH;
 
 extern str scan_str;
 void scan_open (str filename);
+void scan_string(str string);
 void scan_white (posA& pos);
 bool scan_exact (posA& pos, str name);
 bool scan_match (posA& pos, str name, str& word);

@@ -5,7 +5,6 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
-#include <string>
 using namespace std;
 
 #include "scanner.h"
@@ -24,6 +23,12 @@ void scan_open (str filename) {
     scan_str = "";
     char c;
     while (f.get(c)) scan_str += c;
+}
+
+// Gesamten Inhalt aus `string` in `scan_srt` einfügen.
+// Bisher nur vom REPL verwendet.
+void scan_string(str string){
+    scan_str = string;
 }
 
 // Zwischenraum lesen.
