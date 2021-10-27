@@ -8,9 +8,17 @@
  * stdio.h muss vor readline.h definiert sein
  * um Compiler-Errors zu vermeiden. Nicht entfernen!!!
  */
+#ifdef HAS_READLINE_LIB
 #include <cstdio>
 #include <readline/readline.h>
 #include <readline/history.h>
+#endif
+
+#ifdef HAS_CURSES_LIB
+#include <ncurses.h>
+#endif
+
+#include <cxxopts.hpp>
 
 using namespace std;
 
@@ -24,11 +32,32 @@ void eval_exprs(const seq<Expr>&);
 
 // Hauptprogramm.
 int main (int argc, char* argv []) {
-    if(argc == 1)
-        return repl();
+  std::ostream::sync_with_stdio(false);
+  cxxopts::Options options(argv[0], "The MOSTflexiPL programming language");
+  options.add_options()("f,file", "Die auszuführende Datei", cxxopts::value<std::string>())
+                       ("debug-parser", "Visualisiert den Parsvorgang")
+                       ("h,help", "Zeigt diese Nachricht an");
+  options.parse_positional({"file"});
+  options.positional_help("[FILE]").show_positional_help();
+
+  cxxopts::ParseResult result;
+  try {
+     result = options.parse(argc, argv);
+  }catch(cxxopts::option_not_exists_exception){
+    std::cout << options.help() << std::endl;
+    return 1;
+  }
+
+  if(result.count("help")) {
+    std::cout << options.help() << std::endl;
+    return 0;
+  }
+
+  if(!result.count("file"))
+    return repl();
 
     // Quelldatei öffnen und einlesen.
-    str filename = argv[1];
+    str filename = result["file"].as<std::string>().c_str();
     scan_open(filename);
 
     // Vordefinierte Operatoren erzeugen.
