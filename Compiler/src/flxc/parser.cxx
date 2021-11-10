@@ -323,25 +323,6 @@ Cat expand (Expr spec, Expr expr, Cat all) {
     return cat(opers);
 }
 
-// Archiv.
-TYPE(Arch)
-ATTRN(cons_, Arch, Expr)
-ATTRN(comp_, Arch, Expr)
-ATTR1(excl_, Arch, Cat)
-
-// Schlüssel zur Identifizierung von Archiven.
-using Key = pair<posA, Cat>;
-
-template <>
-struct std::hash<Cat> : CH::hash<Cat> {};
-
-template <>
-struct std::hash<Key> {
-    size_t operator() (Key key) const {
-	return key.first - A | std::hash<Cat>()(key.second) << 16;
-    }
-};
-
 // Archiv-Tabelle für den Parser.
 // Die Tabelle ist global definiert, damit sowohl arch() als
 // auch clear_tab() auf diese zugreifen können.
@@ -352,6 +333,7 @@ unordered_map<Key, Arch> tab;
 // tabelle wieder zurück zu setzen (derzeit nur
 // benötigt für den repl).
 void clear_tab() {
+	std::cout << "Alle Archive werden gelöscht" << std::endl;
     tab.clear();
 }
 
@@ -362,7 +344,11 @@ void clear_tab() {
 Arch arch (posA pos, Cat cat) {
     //static unordered_map<Key, Arch> tab;
     Arch& arch = tab[pair(pos, cat)];
-    if (!arch) arch = Arch(excl_, cat);
+    if (!arch) {
+		std::cout << "arch:\t\tNeues Archiv wird erstellt. Position:  " << pos << std::endl;
+		arch = Arch(excl_, cat)(pos_, pos);
+	}else
+		std::cout << "arch:\t\tAuf Archiv wird zugegriffen. Position: " << pos << std::endl;
     return arch;
 }
 
@@ -500,6 +486,8 @@ void combine (Expr cons, Expr comp) {
     // comp als aktuellen Operanden
     // zu einem Duplikat comb von cons hinzufügen.
     // Endposition von comb anpassen und an proceed weiterleiten.
+	std::cout << "combine:\t'" << get_scanned_str_for_expr(comp) << "' wurde in '" << get_scanned_str_for_expr(cons) << "' eingesetzt" << std::endl;
+	std::cout << "combine:\tDaraus resultiert der neue Ausdruck '" << get_scanned_str_for_pos(cons(beg_), comp(end_)) << "'" << std::endl;
     Expr comb = dupl(cons);
     comb(curritem_)(opnd_, comp);
     comb(end_, comp(end_));
@@ -519,6 +507,8 @@ void publish (Expr comp) {
     // Mehrdeutigkeit ausgegeben werden.
 
     // comp zum Archiv hinzufügen.
+	std::cout << "publish:\tVollständiger Ausdruck '" << get_scanned_str_for_expr(comp) << "'";
+	std::cout << " wird ins Archiv an der Stelle " << a(pos_) << " eingesetzt" << std::endl;
     a(comp_, Z, comp);
 
     // Jeden unvollständigen Ausdruck cons des Archivs
@@ -574,6 +564,8 @@ void subscribe (Expr cons) {
     // cons zum Archiv hinzufügen
     // und mit den vollständigen Ausdrücken des Archivs kombinieren.
     // Vgl. auch Anmerkung zur Iteration durch a(cons_) in publish.
+	std::cout << "subscribe:\tUnvollständiger Ausdruck '" << get_scanned_str_for_expr(cons);
+	std::cout << "' wird in das Archiv an der Stelle " << a(pos_) << " eingesetzt" << std::endl;
     a(cons_, Z, cons);
     for (Expr comp : a(comp_)) combine(cons, comp);
 
@@ -634,6 +626,7 @@ bool extend (Expr cons) {
 
     // Gelesenen Text speichern, Endposition des Ausdrucks weitersetzen
     // und Ausdruck an proceed zurückgeben.
+	std::cout << "extend:\t\tUnvollständiger Ausdruck '" << get_scanned_str_for_expr(cons) << "' wird um '" << word << "' erweitert" << std::endl;
     cons(curritem_)(word_, word);
     cons(end_, pos);
     TRLN("after successfull scan", cons)
@@ -801,12 +794,14 @@ namespace iterative {
 queue<pair<Expr, int>> q;
 
 void proceed (Expr cons, int flags) {
+	//std::cout << "proceed:\tAusdruck '" << get_scanned_str_for_expr(cons) << "' in die Queue abgelegt" << std::endl;
     q.push(make_pair(cons, flags));
 }
 
 void process () {
     while (!q.empty()) {
 	auto pair = q.front();
+	//std::cout << "process:\tAusdruck '" << get_scanned_str_for_expr(pair.first) << "' aus der Queue herausgenommen" << std::endl;
 	q.pop();
 	recursive::proceed(pair.first, pair.second);
     }

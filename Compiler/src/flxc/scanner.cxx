@@ -73,3 +73,11 @@ bool scan_match (posA& pos, str name, str& word) {
 bool scan_eof (posA pos) {
     return pos == A + *scan_str;
 }
+
+str get_scanned_str_for_pos(posA start, posA end) {
+	return scan_str(start | end);
+}
+
+str get_scanned_str_for_expr(Expr expr) {
+	return get_scanned_str_for_pos(expr(beg_), expr(end_));
+}

@@ -4,6 +4,28 @@
 #define FLXC_PARSER 2021'06'19
 
 #include "data.h"
+#include "scanner.h"
+
+// Archiv.
+TYPE (Arch)
+
+ATTRN (cons_, Arch, Expr)
+ATTRN (comp_, Arch, Expr)
+ATTR1 (excl_, Arch, Cat)
+ATTR1 (pos_, Arch, posA)
+
+template <>
+struct std::hash<Cat> : CH::hash<Cat> {};
+
+// Schlüssel zur Identifizierung von Archiven.
+using Key = pair<posA, Cat>;
+
+template <>
+struct std::hash<Key> {
+	size_t operator()(Key key) const {
+		return key.first - A | std::hash<Cat>()(key.second) << 16;
+	}
+};
 
 // inline ist wichtig, damit die Objekte All und Self in allen
 // Übersetzungseinheiten gleich sind.
