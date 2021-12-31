@@ -13,32 +13,38 @@ void layouter::unregister_cat(archive& c) {
 	c.unregister_as_listener(this);
 }
 
-void layouter::notify_dimensions_changed(archive& a) const {
-	const auto& layout = [](archive& a) {
-		const auto has_intersections = [&a](const archive::rect& rect_to_test) {
-			for(const archive& window: arch_windows) {
-				if(window == a)
+void layouter::notify_dimensions_changed(archive&) const {
+	const auto& layout = [](archive& archive_to_layout) {
+		const auto has_intersections = [&archive_to_layout](const archive::rect& rect_to_test) {
+			for(archive& current_archive: arch_windows) {
+				if(!current_archive.is_layouted || current_archive == archive_to_layout)
 					continue;
-				if(window.intersects_with(rect_to_test))
+				if(current_archive.intersects_with(rect_to_test))
 					return true;
 			}
 			return false;
 		};
 
-		int desired_x_coord = a.get_pos_in_src() - (a.get_width() / 2);
+		int desired_x_coord = archive_to_layout.get_pos_in_src() - (archive_to_layout.get_width() / 2);
 		if(desired_x_coord < 1)
 			desired_x_coord = 1;
 		uint32_t y_coordinate = 0;
 
-		while(has_intersections({a.get_x_start(), y_coordinate, a.get_width(), a.get_height()}))
+		while(has_intersections({(uint32_t) desired_x_coord, y_coordinate, archive_to_layout.get_width(),
+				archive_to_layout.get_height()}))
 			++y_coordinate;
 
-		a.set_y_start(y_coordinate);
-		a.set_x_start(desired_x_coord);
+		archive_to_layout.set_y_start(y_coordinate);
+		archive_to_layout.set_x_start(desired_x_coord);
 	};
 
 	for(archive& a: arch_windows)
+		a.is_layouted = false;
+
+	for(archive& a: arch_windows) {
 		layout(a);
+		a.is_layouted = true;
+	}
 
 	wclear(stdscr);
 	wnoutrefresh(stdscr);

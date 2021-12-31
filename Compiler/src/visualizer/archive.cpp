@@ -20,7 +20,7 @@ void archive::render() {
 		wclear(m_window);
 		wresize(m_window, m_height, m_width);
 		//TODO wieso get mvderwin(m_window, m_y_start, m_x_start); nicht?
-		mvwin(m_window, getbegy(m_window), m_x_start);
+		mvwin(m_window, m_y_start + 1, m_x_start);
 	}
 
 	box(m_window, ACS_VLINE, ACS_HLINE);

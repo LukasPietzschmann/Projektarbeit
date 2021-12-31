@@ -17,12 +17,14 @@ class archive {
 public:
 	struct rect {
 		rect(uint32_t x, uint32_t y, uint32_t width, uint32_t height) : x(x), y(y), width(width), height(height) {}
-		explicit rect(const archive& c) : x(c.get_x_start()), y(c.get_y_start()), width(c.get_width()), height(c.get_height()) {}
+		explicit rect(const archive& c) :
+				x(c.get_x_start()), y(c.get_y_start()), width(c.get_width()), height(c.get_height()) {}
 
 		uint32_t x, y, width, height;
 	};
 
-	explicit archive(uint32_t pos_in_src, std::vector<CH::str> cons = {}, std::vector<CH::str> comp = {}) : m_pos_in_src(pos_in_src), m_cons(std::move(cons)), m_comp(std::move(comp)) {
+	explicit archive(uint32_t pos_in_src, std::vector<CH::str> cons = {}, std::vector<CH::str> comp = {}) :
+			m_pos_in_src(pos_in_src), m_cons(std::move(cons)), m_comp(std::move(comp)) {
 		invalidate();
 	}
 
@@ -60,6 +62,8 @@ public:
 
 	void register_as_listener(archive_change_listener* listener);
 	void unregister_as_listener(archive_change_listener* listener);
+
+	bool is_layouted {false};
 
 private:
 	WINDOW* m_window {nullptr};
