@@ -52,7 +52,7 @@ bool load_state(const event_iterator& target_event_it) {
 	return true;
 }
 
-int start_vistalizer(const std::string& source_string) {
+int start_vistalizer(const CH::str& source_string) {
 	int width, height;
 
 	initscr();
@@ -77,7 +77,7 @@ int start_vistalizer(const std::string& source_string) {
 
 	src_display = newwin(HEADER_HEIGHT, width - MSG_BUS_WIDTH, 0, 0);
 	wbkgd(src_display, COLOR_PAIR(HEADER_COLOR_PAIR));
-	mvwaddstr(src_display, 0, 0, source_string.c_str());
+	mvwaddstr(src_display, 0, 0, &source_string.elems[0]);
 
 	msg_bus = newwin(height, MSG_BUS_WIDTH, 0, width - MSG_BUS_WIDTH);
 	wbkgd(msg_bus, COLOR_PAIR(MSG_BUS_COLOR_PAIR));

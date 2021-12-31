@@ -17,11 +17,11 @@ void event::exec_on_cat_at_pos(unsigned int pos, Callback callback) const {
 	callback(*it);
 }
 
-const std::string& a_event_with_data::getData() const {
+const CH::str& a_event_with_data::getData() const {
 	return m_data;
 }
 
-a_event_with_data::a_event_with_data(unsigned int position, std::string data) :
+a_event_with_data::a_event_with_data(unsigned int position, CH::str data) :
 		event(position), m_data(std::move(data)) {}
 
 void add_cons_event::exec() const {
@@ -38,8 +38,10 @@ void add_cons_event::undo() const {
 	unlog();
 }
 
-std::string add_cons_event::to_string() const {
-	return "Added cons. expr. " + m_data + " at pos " + std::to_string(m_position);
+CH::str add_cons_event::to_string() const {
+	std::stringstream ss;
+	ss << "Added cons. expr. " << m_data << " at pos " << m_position;
+	return CH::str(ss.str());
 }
 
 void add_comp_event::exec() const {
@@ -56,8 +58,10 @@ void add_comp_event::undo() const {
 	unlog();
 }
 
-std::string add_comp_event::to_string() const {
-	return "Added comp. expr. " + m_data + " at pos " + std::to_string(m_position);
+CH::str add_comp_event::to_string() const {
+	std::stringstream ss;
+	ss << "Added comp. expr. " << m_data << " at pos " << m_position;
+	return CH::str(ss.str());
 }
 
 void create_archive_event::exec() const {
@@ -76,6 +80,8 @@ void create_archive_event::undo() const {
 	unlog();
 }
 
-std::string create_archive_event::to_string() const {
-	return "Created Cat at Pos. " + std::to_string(m_position);
+CH::str create_archive_event::to_string() const {
+	std::stringstream ss;
+	ss << "Created Cat at Pos. " << m_position;
+	return CH::str(ss.str());
 }

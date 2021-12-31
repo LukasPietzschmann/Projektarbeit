@@ -5,7 +5,7 @@
 #include "windows.hpp"
 #include <unordered_map>
 
-class layouter : public archive_change_listener{
+class layouter : public archive_change_listener {
 public:
 	static layouter& the();
 

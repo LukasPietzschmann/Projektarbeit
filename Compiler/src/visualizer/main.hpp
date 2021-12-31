@@ -36,4 +36,4 @@ void setup_colors();
 
 bool load_state(const event_iterator& target_event_it);
 
-int start_vistalizer(const std::string& source_string);
+int start_vistalizer(const CH::str& source_string);

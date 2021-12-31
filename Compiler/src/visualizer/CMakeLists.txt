@@ -1,1 +1,3 @@
 add_library(Visualizer main.hpp main.cpp archive.cpp utils.hpp utils.cpp windows.hpp logger.hpp logger.cpp layouting.cpp layouting.hpp archive_change_listener.hpp event.cpp event.hpp event.cpp main.hpp events.hpp)
+
+include_directories(../libCH)

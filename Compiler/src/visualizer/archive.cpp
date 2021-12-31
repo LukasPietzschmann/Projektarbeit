@@ -30,16 +30,16 @@ void archive::render() {
 		mvwaddch(m_window, i, center, '|');
 
 		if(i - 1 < m_comp.size()) {
-			const std::string& elem = m_comp[i - 1];
-			mvwaddnstr(m_window, i, center - elem.size(), elem.c_str(), elem.size());
+			const auto& elem = m_comp[i - 1];
+			mvwaddnstr(m_window, i, center - *elem, &elem.elems[0], *elem);
 		}
 
 		if(i - 1 < m_cons.size()) {
-			const std::string& elem = m_cons[i - 1];
-			mvwaddnstr(m_window, i, center + 1, elem.c_str(), elem.size());
+			const auto& elem = m_cons[i - 1];
+			mvwaddnstr(m_window, i, center + 1, &elem.elems[0], *elem);
 		}
 	}
-	center_text_hor(m_window, std::to_string(m_pos_in_src), 0);
+	center_text_hor(m_window, CH::str(std::to_string(m_pos_in_src)), 0);
 
 	wnoutrefresh(m_window);
 }
@@ -48,7 +48,7 @@ uint32_t archive::get_pos_in_src() const {
 	return m_pos_in_src;
 }
 
-bool archive::add_cons(const std::string& cons) {
+bool archive::add_cons(const CH::str& cons) {
 	if(std::find(archive::m_cons.begin(), archive::m_cons.end(), cons) != archive::m_cons.end())
 		return false;
 	archive::m_cons.push_back(cons);
@@ -56,7 +56,7 @@ bool archive::add_cons(const std::string& cons) {
 	return true;
 }
 
-bool archive::add_comp(const std::string& comp) {
+bool archive::add_comp(const CH::str& comp) {
 	if(std::find(archive::m_comp.begin(), archive::m_comp.end(), comp) != archive::m_comp.end())
 		return false;
 	archive::m_comp.push_back(comp);
@@ -64,7 +64,7 @@ bool archive::add_comp(const std::string& comp) {
 	return true;
 }
 
-bool archive::remove_cons(const std::string& cons) {
+bool archive::remove_cons(const CH::str& cons) {
 	if(const auto& it = std::find(archive::m_cons.begin(), archive::m_cons.end(), cons); it != archive::m_cons.end()) {
 		archive::m_cons.erase(it);
 		invalidate();
@@ -73,7 +73,7 @@ bool archive::remove_cons(const std::string& cons) {
 	return false;
 }
 
-bool archive::remove_comp(const std::string& comp) {
+bool archive::remove_comp(const CH::str& comp) {
 	if(const auto& it = std::find(archive::m_comp.begin(), archive::m_comp.end(), comp); it != archive::m_comp.end()) {
 		archive::m_comp.erase(it);
 		invalidate();
@@ -128,11 +128,11 @@ void archive::unregister_as_listener(archive_change_listener* listener) {
 }
 
 void archive::invalidate() {
-	static const auto longest_str_len = [](const std::vector<std::string>& strings) {
+	static const auto longest_str_len = [](const std::vector<CH::str>& strings) {
 		unsigned long max = 0;
 		for(const auto& str: strings) {
-			if(str.size() > max)
-				max = str.size();
+			if(*str > max)
+				max = *str;
 		}
 		return max;
 	};

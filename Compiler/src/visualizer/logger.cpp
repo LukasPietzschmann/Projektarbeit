@@ -2,8 +2,8 @@
 
 static uint32_t next_row = 0;
 
-void log(const std::string& event) {
-	mvwaddnstr(msg_bus, next_row++, 0, event.c_str(), event.size());
+void log(const CH::str& event) {
+	mvwaddnstr(msg_bus, next_row++, 0, &event.elems[0], *event);
 	wrefresh(msg_bus);
 }
 
