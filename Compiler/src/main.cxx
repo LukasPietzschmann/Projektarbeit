@@ -26,6 +26,7 @@ using namespace std;
 #include "predef.h"
 #include "parser.h"
 #include "eval.h"
+#include "visualizer/main.hpp"
 
 int repl();
 void eval_exprs(const seq<Expr>&);
@@ -65,6 +66,9 @@ int main (int argc, char* argv []) {
 
     // Parser ausführen.
     eval_exprs(parse(opers));
+	stringstream s;
+	s << scan_str;
+	start_vistalizer(s.str());
 }
 
 int repl() {

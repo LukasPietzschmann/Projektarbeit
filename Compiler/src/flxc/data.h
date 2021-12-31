@@ -147,6 +147,29 @@ ATTR1(left_, Excl, bool)
 ATTR1(top_, Excl, bool)
 ATTR1(right_, Excl, bool)
 
+ATTR (to_str_)
+inline str FUNC (to_str_, Expr expr) {
+	std::function<str(const Sig&)> get_ident = [&get_ident](const Sig& sig)->str {
+		str res;
+		for(const Part& part: sig) {
+			if(part(opt_))
+				res += "[";
+			if(const str& name = part(name_))
+				res += name + " ";
+			else if(const Oper& param = part(par_)) //res += get_ident(param(sig_));
+				res += "_ ";
+			else if(const seq<Sig>& alts = part(alts_)) {
+				for(const Sig& s: alts)
+					res += get_ident(s);
+			}
+			if(part(opt_))
+				res += "]";
+		}
+		return res;
+	};
+
+	return get_ident(expr(oper_)(sig_));
+}
 // Operatorkataloge.
 
 // Die in einem Katalog enthaltenen Operatoren als virtuelles Attribut,

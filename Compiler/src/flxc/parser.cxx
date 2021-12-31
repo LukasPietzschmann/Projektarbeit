@@ -345,6 +345,7 @@ Arch arch (posA pos, Cat cat) {
     //static unordered_map<Key, Arch> tab;
     Arch& arch = tab[pair(pos, cat)];
     if (!arch) {
+		events.push_back(new create_archive_event(pos - A));
 		std::cout << "arch:\t\tNeues Archiv wird erstellt. Position:  " << pos << std::endl;
 		arch = Arch(excl_, cat)(pos_, pos);
 	}else
@@ -509,6 +510,10 @@ void publish (Expr comp) {
     // comp zum Archiv hinzufügen.
 	std::cout << "publish:\tVollständiger Ausdruck '" << get_scanned_str_for_expr(comp) << "'";
 	std::cout << " wird ins Archiv an der Stelle " << a(pos_) << " eingesetzt" << std::endl;
+	stringstream s;
+	s << comp(to_str_);
+	//s << get_scanned_str_for_expr(comp);
+	events.push_back(new add_comp_event(a(pos_) - A, s.str()));
     a(comp_, Z, comp);
 
     // Jeden unvollständigen Ausdruck cons des Archivs
@@ -566,6 +571,9 @@ void subscribe (Expr cons) {
     // Vgl. auch Anmerkung zur Iteration durch a(cons_) in publish.
 	std::cout << "subscribe:\tUnvollständiger Ausdruck '" << get_scanned_str_for_expr(cons);
 	std::cout << "' wird in das Archiv an der Stelle " << a(pos_) << " eingesetzt" << std::endl;
+	stringstream s;
+	s << cons(to_str_);
+	events.push_back(new add_cons_event(a(pos_) - A, s.str()));
     a(cons_, Z, cons);
     for (Expr comp : a(comp_)) combine(cons, comp);
 

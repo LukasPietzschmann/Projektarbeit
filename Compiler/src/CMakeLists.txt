@@ -1,4 +1,5 @@
 add_subdirectory(flxc)
+add_subdirectory(visualizer)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -16,11 +17,12 @@ FetchContent_MakeAvailable(cxxopts)
 include_directories(
     ./libCH
     ./flxc
+    ./visualizer
      ${Readline_INCLUDE_DIR}
 )
 
 add_executable(main main)
-target_link_libraries(main flxc cxxopts)
+target_link_libraries(main flxc Visualizer cxxopts)
 
 if(CURSES_FOUND)
 	include_directories(${CURSES_INCLUDE_DIR})

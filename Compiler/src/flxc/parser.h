@@ -3,8 +3,10 @@
 #ifndef FLXC_PARSER
 #define FLXC_PARSER 2021'06'19
 
+#include <sstream>
 #include "data.h"
 #include "scanner.h"
+#include "../visualizer/events.hpp"
 
 // Archiv.
 TYPE (Arch)
