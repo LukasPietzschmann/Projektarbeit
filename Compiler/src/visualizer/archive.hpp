@@ -9,6 +9,7 @@
 #include <vector>
 #include <seq.ch>
 
+#include "constants.hpp"
 #include "archive_change_listener.hpp"
 #include "utils.hpp"
 #include "windows.hpp"
@@ -32,7 +33,7 @@ public:
 		if(m_window != nullptr) {
 			wclear(m_window);
 			wrefresh(m_window);
-			refresh();
+			werase(m_window);
 		}
 	}
 

@@ -14,13 +14,12 @@ bool archive::intersects_with(const archive::rect& other) const {
 
 void archive::render() {
 	if(m_window == nullptr) {
-		m_window = derwin(stdscr, m_height, m_width, m_y_start + 1, m_x_start);
+		m_window = newwin(m_height, m_width, m_y_start + HEADER_HEIGHT, m_x_start);
 		assert(m_window != nullptr);
 	}else {
 		wclear(m_window);
 		wresize(m_window, m_height, m_width);
-		//TODO wieso get mvderwin(m_window, m_y_start, m_x_start); nicht?
-		mvwin(m_window, m_y_start + 1, m_x_start);
+		mvwin(m_window, m_y_start + HEADER_HEIGHT, m_x_start);
 	}
 
 	box(m_window, ACS_VLINE, ACS_HLINE);
