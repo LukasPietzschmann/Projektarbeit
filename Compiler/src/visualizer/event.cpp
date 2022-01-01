@@ -82,6 +82,6 @@ void create_archive_event::undo() const {
 
 CH::str create_archive_event::to_string() const {
 	std::stringstream ss;
-	ss << "Created Cat at Pos. " << m_position;
+	ss << "Created arch. at Pos. " << m_position;
 	return CH::str(ss.str());
 }
