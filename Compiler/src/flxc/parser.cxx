@@ -333,8 +333,8 @@ unordered_map<Key, Arch> tab;
 // tabelle wieder zurück zu setzen (derzeit nur
 // benötigt für den repl).
 void clear_tab() {
-	std::cout << "Alle Archive werden gelöscht" << std::endl;
-    tab.clear();
+	events.push_back(new message_event("Alle Archive werden gelöscht"));
+	tab.clear();
 }
 
 // Archiv mit Position pos und Katalog cat liefern.
@@ -346,11 +346,15 @@ Arch arch (posA pos, Cat cat) {
     Arch& arch = tab[pair(pos, cat)];
     if (!arch) {
 		events.push_back(new create_archive_event(pos - A));
-		std::cout << "arch:\t\tNeues Archiv wird erstellt. Position:  " << pos << std::endl;
 		arch = Arch(excl_, cat)(pos_, pos);
-	}else
-		std::cout << "arch:\t\tAuf Archiv wird zugegriffen. Position: " << pos << std::endl;
-    return arch;
+	}else {
+		str message;
+		message += "Auf Archiv ";
+		message += std::to_string(pos - A).c_str();
+		message += " wird zugegriffen";
+		events.push_back(new message_event(message));
+	}
+	return arch;
 }
 
 // Notwendig für unordered_set<Part>.
@@ -484,15 +488,24 @@ void combine (Expr cons, Expr comp) {
     // Der Typ von comp muss zum Typ von par passen.
     // Das ist momentan immer der Fall.
 
-    // comp als aktuellen Operanden
-    // zu einem Duplikat comb von cons hinzufügen.
-    // Endposition von comb anpassen und an proceed weiterleiten.
-	std::cout << "combine:\t'" << get_scanned_str_for_expr(comp) << "' wurde in '" << get_scanned_str_for_expr(cons) << "' eingesetzt" << std::endl;
-	std::cout << "combine:\tDaraus resultiert der neue Ausdruck '" << get_scanned_str_for_pos(cons(beg_), comp(end_)) << "'" << std::endl;
-    Expr comb = dupl(cons);
-    comb(curritem_)(opnd_, comp);
-    comb(end_, comp(end_));
-    proceed(comb, flag);
+	// comp als aktuellen Operanden
+	// zu einem Duplikat comb von cons hinzufügen.
+	// Endposition von comb anpassen und an proceed weiterleiten.
+	str message;
+	message += get_scanned_str_for_expr(comp);
+	message += " wurde in ";
+	message += get_scanned_str_for_expr(cons);
+	message += " eingesetzt";
+	str message2;
+	message2 += "Daraus resultiert ";
+	message += get_scanned_str_for_pos(cons(beg_), comp(end_));
+	//events.push_back(new message_event(message));
+	//events.push_back(new message_event(message2));
+
+	Expr comb = dupl(cons);
+	comb(curritem_)(opnd_, comp);
+	comb(end_, comp(end_));
+	proceed(comb, flag);
 }
 
 // Vollständigen Ausdruck comp zum passenden Archiv hinzufügen und
@@ -508,10 +521,7 @@ void publish (Expr comp) {
     // Mehrdeutigkeit ausgegeben werden.
 
     // comp zum Archiv hinzufügen.
-	std::cout << "publish:\tVollständiger Ausdruck '" << get_scanned_str_for_expr(comp) << "'";
-	std::cout << " wird ins Archiv an der Stelle " << a(pos_) << " eingesetzt" << std::endl;
-	//s << get_scanned_str_for_expr(comp);
-	events.push_back(new add_comp_event(a(pos_) - A, comp(to_str_)));
+	events.push_back(new add_comp_event(a(pos_) - A, get_scanned_str_for_expr(comp)));
     a(comp_, Z, comp);
 
     // Jeden unvollständigen Ausdruck cons des Archivs
@@ -567,9 +577,7 @@ void subscribe (Expr cons) {
     // cons zum Archiv hinzufügen
     // und mit den vollständigen Ausdrücken des Archivs kombinieren.
     // Vgl. auch Anmerkung zur Iteration durch a(cons_) in publish.
-	std::cout << "subscribe:\tUnvollständiger Ausdruck '" << get_scanned_str_for_expr(cons);
-	std::cout << "' wird in das Archiv an der Stelle " << a(pos_) << " eingesetzt" << std::endl;
-	events.push_back(new add_cons_event(a(pos_) - A, cons(to_str_)));
+	events.push_back(new add_cons_event(a(pos_) - A, get_scanned_str_for_expr(cons)));
     a(cons_, Z, cons);
     for (Expr comp : a(comp_)) combine(cons, comp);
 
@@ -628,13 +636,20 @@ bool extend (Expr cons) {
 	word = name;
     }
 
-    // Gelesenen Text speichern, Endposition des Ausdrucks weitersetzen
-    // und Ausdruck an proceed zurückgeben.
-	std::cout << "extend:\t\tUnvollständiger Ausdruck '" << get_scanned_str_for_expr(cons) << "' wird um '" << word << "' erweitert" << std::endl;
-    cons(curritem_)(word_, word);
-    cons(end_, pos);
-    TRLN("after successfull scan", cons)
-    return true;
+	// Gelesenen Text speichern, Endposition des Ausdrucks weitersetzen
+	// und Ausdruck an proceed zurückgeben.
+	str message;
+	message += "Unvollständiger Ausdruck ";
+	message += get_scanned_str_for_expr(cons);
+	message += " wird um ";
+	message += word;
+	message += " erweitert";
+	// events.push_back(new message_event(message));
+
+	cons(curritem_)(word_, word);
+	cons(end_, pos);
+	TRLN("after successfull scan", cons)
+	return true;
 }
 
 // Prolog- oder Epilogfunktion des aktuellen Signaturteils des Ausdrucks
