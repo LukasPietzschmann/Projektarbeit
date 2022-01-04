@@ -13,6 +13,9 @@ bool archive::intersects_with(const archive::rect& other) const {
 }
 
 void archive::render() {
+	if(!m_dirty)
+		return;
+
 	if(m_window == nullptr) {
 		m_window = newwin(m_height, m_width, m_y_start + HEADER_HEIGHT, m_x_start);
 		assert(m_window != nullptr);
@@ -51,6 +54,7 @@ bool archive::add_cons(const CH::str& cons) {
 	if(std::find(archive::m_cons.begin(), archive::m_cons.end(), cons) != archive::m_cons.end())
 		return false;
 	archive::m_cons.push_back(cons);
+	m_dirty = true;
 	invalidate();
 	return true;
 }
@@ -59,6 +63,7 @@ bool archive::add_comp(const CH::str& comp) {
 	if(std::find(archive::m_comp.begin(), archive::m_comp.end(), comp) != archive::m_comp.end())
 		return false;
 	archive::m_comp.push_back(comp);
+	m_dirty = true;
 	invalidate();
 	return true;
 }
@@ -66,6 +71,7 @@ bool archive::add_comp(const CH::str& comp) {
 bool archive::remove_cons(const CH::str& cons) {
 	if(const auto& it = std::find(archive::m_cons.begin(), archive::m_cons.end(), cons); it != archive::m_cons.end()) {
 		archive::m_cons.erase(it);
+		m_dirty = true;
 		invalidate();
 		return true;
 	}
@@ -75,18 +81,25 @@ bool archive::remove_cons(const CH::str& cons) {
 bool archive::remove_comp(const CH::str& comp) {
 	if(const auto& it = std::find(archive::m_comp.begin(), archive::m_comp.end(), comp); it != archive::m_comp.end()) {
 		archive::m_comp.erase(it);
+		m_dirty = true;
 		invalidate();
 		return true;
 	}
 	return false;
 }
 
-void archive::set_y_start(uint32_t yStart) {
-	m_y_start = yStart;
+void archive::set_y_start(uint32_t y_start) {
+	if(m_y_start == y_start)
+		return;
+	m_y_start = y_start;
+	m_dirty = true;
 }
 
-void archive::set_x_start(uint32_t xStart) {
-	m_x_start = xStart;
+void archive::set_x_start(uint32_t x_start) {
+	if(m_x_start == x_start)
+		return;
+	m_x_start = x_start;
+	m_dirty = true;
 }
 
 uint32_t archive::get_width() const {
@@ -136,26 +149,18 @@ void archive::invalidate() {
 		return max;
 	};
 
-	uint32_t new_height, new_width;
-
 	const auto cons_len = longest_str_len(m_cons);
 	const auto comp_len = longest_str_len(m_comp);
 
-	if(cons_len > comp_len)
-		new_width = cons_len * 2 + 11;
-	else
-		new_width = comp_len * 2 + 11;
+	uint32_t new_width = std::max(cons_len, comp_len) * 2 + 11;
 
 	if(new_width % 2 == 0)
 		++new_width;
-	new_height = std::max(m_comp.size(), m_cons.size()) + 2;
 
-	if(m_height != new_height || m_width != new_width) {
-		m_height = new_height;
-		m_width = new_width;
-		for(const archive_change_listener* listener: m_listeners)
-			listener->notify_dimensions_changed(*this);
-	}
+	m_height = std::max(m_comp.size(), m_cons.size()) + 2;;
+	m_width = new_width;
+	for(const archive_change_listener* listener: m_listeners)
+		listener->notify_dimensions_changed(*this);
 }
 bool archive::operator==(const archive& other) const {
 	return this == &other;

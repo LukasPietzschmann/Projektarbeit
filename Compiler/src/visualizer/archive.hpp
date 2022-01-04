@@ -50,8 +50,8 @@ public:
 	bool remove_cons(const CH::str& cons);
 	bool remove_comp(const CH::str& comp);
 
-	void set_y_start(uint32_t yStart);
-	void set_x_start(uint32_t xStart);
+	void set_y_start(uint32_t y_start);
+	void set_x_start(uint32_t x_start);
 
 	uint32_t get_width() const;
 	uint32_t get_height() const;
@@ -73,6 +73,8 @@ private:
 	uint32_t m_y_start {0};
 	uint32_t m_x_start {0};
 	uint32_t m_pos_in_src;
+
+	bool m_dirty {true};
 
 	std::vector<CH::str> m_cons, m_comp;
 
