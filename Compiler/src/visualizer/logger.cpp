@@ -3,9 +3,9 @@
 static uint32_t next_row = 0;
 
 void log(const CH::str& event) {
-	if(const int width = getmaxx(msg_bus); *event > width) {
+	if(*event > MSG_BUS_WIDTH) {
 		std::string str(&event.elems[0]);
-		str = str.substr(0, str.size() - ((*event - width) + 4));
+		str = str.substr(0, str.size() - ((*event - MSG_BUS_WIDTH) + 4));
 		str += "...";
 		mvwaddnstr(msg_bus, next_row++, 0, str.c_str(), str.size());
 	}else
