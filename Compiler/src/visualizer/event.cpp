@@ -17,11 +17,11 @@ void event::exec_on_cat_at_pos(unsigned int pos, Callback callback) const {
 	callback(*it);
 }
 
-const CH::str& a_event_with_data::getData() const {
+const CH::str& event_with_data::getData() const {
 	return m_data;
 }
 
-a_event_with_data::a_event_with_data(unsigned int position, CH::str data) :
+event_with_data::event_with_data(unsigned int position, CH::str data) :
 		event(position), m_data(std::move(data)) {}
 
 void add_cons_event::exec() const {
@@ -85,3 +85,16 @@ CH::str create_archive_event::to_string() const {
 	ss << "Created arch. at Pos. " << m_position;
 	return CH::str(ss.str());
 }
+
+void message_event::exec() const {
+	log(to_string());
+}
+
+void message_event::undo() const {
+	unlog();
+}
+
+CH::str message_event::to_string() const {
+	return m_data;
+}
+message_event::message_event(const CH::str& data) : event_with_data(0, data) {}
