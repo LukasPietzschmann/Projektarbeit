@@ -341,18 +341,12 @@ void clear_tab() {
 // Wenn es noch nicht existiert, wird es erzeugt und sein
 // Ausschlusskatalog mit cat initialisiert (was für alle neuen
 // Archive außer dem von parse erzeugten "Hauptarchiv" passend ist).
-Arch arch (posA pos, Cat cat) {
-    //static unordered_map<Key, Arch> tab;
-    Arch& arch = tab[pair(pos, cat)];
-    if (!arch) {
-		events.push_back(new create_archive_event(pos - A));
+Arch arch(posA pos, Cat cat) {
+	//static unordered_map<Key, Arch> tab;
+	Arch& arch = tab[pair(pos, cat)];
+	if(!arch) {
 		arch = Arch(excl_, cat)(pos_, pos);
-	}else {
-		str message;
-		message += "Auf Archiv ";
-		message += std::to_string(pos - A).c_str();
-		message += " wird zugegriffen";
-		events.push_back(new message_event(message));
+		events.push_back(new create_archive_event(pos - A));
 	}
 	return arch;
 }
@@ -521,7 +515,7 @@ void publish (Expr comp) {
     // Mehrdeutigkeit ausgegeben werden.
 
     // comp zum Archiv hinzufügen.
-	events.push_back(new add_comp_event(a(pos_) - A, get_scanned_str_for_expr(comp)));
+	events.push_back(new add_comp_event(a(pos_) - A, comp));
     a(comp_, Z, comp);
 
     // Jeden unvollständigen Ausdruck cons des Archivs
@@ -577,7 +571,7 @@ void subscribe (Expr cons) {
     // cons zum Archiv hinzufügen
     // und mit den vollständigen Ausdrücken des Archivs kombinieren.
     // Vgl. auch Anmerkung zur Iteration durch a(cons_) in publish.
-	events.push_back(new add_cons_event(a(pos_) - A, get_scanned_str_for_expr(cons)));
+	events.push_back(new add_cons_event(a(pos_) - A, cons));
     a(cons_, Z, cons);
     for (Expr comp : a(comp_)) combine(cons, comp);
 

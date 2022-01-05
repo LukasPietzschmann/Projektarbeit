@@ -6,9 +6,12 @@
 #include <ncurses.h>
 #include <string>
 #include <utility>
+#include <map>
 #include <vector>
 #include <seq.ch>
 
+#include "../flxc/data.h"
+#include "../flxc/scanner.h"
 #include "constants.hpp"
 #include "archive_change_listener.hpp"
 #include "utils.hpp"
@@ -24,8 +27,7 @@ public:
 		uint32_t x, y, width, height;
 	};
 
-	explicit archive(uint32_t pos_in_src, std::vector<CH::str> cons = {}, std::vector<CH::str> comp = {}) :
-			m_pos_in_src(pos_in_src), m_cons(std::move(cons)), m_comp(std::move(comp)) {
+	explicit archive(uint32_t pos_in_src) : m_pos_in_src(pos_in_src) {
 		invalidate();
 	}
 
@@ -45,10 +47,10 @@ public:
 
 	uint32_t get_pos_in_src() const;
 
-	bool add_cons(const CH::str& cons);
-	bool add_comp(const CH::str& comp);
-	bool remove_cons(const CH::str& cons);
-	bool remove_comp(const CH::str& comp);
+	void add_cons(long id, const Expr& cons);
+	void add_comp(long id, const Expr& comp);
+	bool remove_cons_with_id(long id);
+	bool remove_comp_with_id(long id);
 
 	void set_y_start(uint32_t y_start);
 	void set_x_start(uint32_t x_start);
@@ -67,6 +69,16 @@ public:
 	bool is_layouted {false};
 
 private:
+	struct archive_element {
+		explicit archive_element(const Expr& expr, bool is_highlighted = false) :
+				expr(expr), is_highlighted(is_highlighted) {};
+
+		Expr expr;
+		bool is_highlighted;
+
+		CH::str as_string() const;
+	};
+
 	WINDOW* m_window {nullptr};
 	uint32_t m_width {0};
 	uint32_t m_height {0};
@@ -76,7 +88,7 @@ private:
 
 	bool m_dirty {true};
 
-	std::vector<CH::str> m_cons, m_comp;
+	std::map<long, archive_element> m_cons {}, m_comp {};
 
 	t_id m_id {-1};
 

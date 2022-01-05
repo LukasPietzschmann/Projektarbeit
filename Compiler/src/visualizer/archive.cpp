@@ -28,17 +28,24 @@ void archive::render() {
 	box(m_window, ACS_VLINE, ACS_HLINE);
 
 	uint32_t center = m_width / 2;
+
+	auto comp_it = m_comp.begin();
+	auto cons_it = m_cons.begin();
 	for(int i = 1; i < m_height - 1; ++i) {
 		mvwaddch(m_window, i, center, '|');
 
-		if(i - 1 < m_comp.size()) {
-			const auto& elem = m_comp[i - 1];
-			mvwaddnstr(m_window, i, center - *elem, &elem.elems[0], *elem);
+		if(comp_it != m_comp.end()) {
+			const auto& elem = comp_it->second;
+			const auto& string = elem.as_string();
+			mvwaddnstr(m_window, i, center - *string, &string.elems[0], *string);
+			++comp_it;
 		}
 
-		if(i - 1 < m_cons.size()) {
-			const auto& elem = m_cons[i - 1];
-			mvwaddnstr(m_window, i, center + 1, &elem.elems[0], *elem);
+		if(cons_it != m_cons.end()) {
+			const auto& elem = cons_it->second;
+			const auto& string = elem.as_string();
+			mvwaddnstr(m_window, i, center + 1, &string.elems[0], *string);
+			++cons_it;
 		}
 	}
 	center_text_hor(m_window, CH::str(std::to_string(m_pos_in_src)), 0);
@@ -50,42 +57,34 @@ uint32_t archive::get_pos_in_src() const {
 	return m_pos_in_src;
 }
 
-bool archive::add_cons(const CH::str& cons) {
-	if(std::find(archive::m_cons.begin(), archive::m_cons.end(), cons) != archive::m_cons.end())
+void archive::add_cons(long id, const Expr& cons) {
+	m_cons.try_emplace(id, cons);
+	m_dirty = true;
+	invalidate();
+}
+
+void archive::add_comp(long id, const Expr& comp) {
+	m_comp.try_emplace(id, comp);
+	m_dirty = true;
+	invalidate();
+}
+
+bool archive::remove_cons_with_id(long id) {
+	if(m_cons.erase(id) == 0)
 		return false;
-	archive::m_cons.push_back(cons);
+
 	m_dirty = true;
 	invalidate();
 	return true;
 }
 
-bool archive::add_comp(const CH::str& comp) {
-	if(std::find(archive::m_comp.begin(), archive::m_comp.end(), comp) != archive::m_comp.end())
+bool archive::remove_comp_with_id(long id) {
+	if(m_comp.erase(id) == 0)
 		return false;
-	archive::m_comp.push_back(comp);
+
 	m_dirty = true;
 	invalidate();
 	return true;
-}
-
-bool archive::remove_cons(const CH::str& cons) {
-	if(const auto& it = std::find(archive::m_cons.begin(), archive::m_cons.end(), cons); it != archive::m_cons.end()) {
-		archive::m_cons.erase(it);
-		m_dirty = true;
-		invalidate();
-		return true;
-	}
-	return false;
-}
-
-bool archive::remove_comp(const CH::str& comp) {
-	if(const auto& it = std::find(archive::m_comp.begin(), archive::m_comp.end(), comp); it != archive::m_comp.end()) {
-		archive::m_comp.erase(it);
-		m_dirty = true;
-		invalidate();
-		return true;
-	}
-	return false;
 }
 
 void archive::set_y_start(uint32_t y_start) {
@@ -140,11 +139,12 @@ void archive::unregister_as_listener(archive_change_listener* listener) {
 }
 
 void archive::invalidate() {
-	static const auto longest_str_len = [](const std::vector<CH::str>& strings) {
+	static const auto longest_str_len = [](const std::map<long, archive_element>& elements) {
 		unsigned long max = 0;
-		for(const auto& str: strings) {
-			if(*str > max)
-				max = *str;
+		for(const auto&[id, elem]: elements) {
+			const auto& string = elem.as_string();
+			if(*string > max)
+				max = *string;
 		}
 		return max;
 	};
@@ -164,4 +164,8 @@ void archive::invalidate() {
 }
 bool archive::operator==(const archive& other) const {
 	return this == &other;
+}
+
+CH::str archive::archive_element::as_string() const {
+	return get_scanned_str_for_expr(expr);
 }
