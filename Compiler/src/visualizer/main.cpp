@@ -83,11 +83,11 @@ int start_vistalizer(const CH::str& source_string) {
 	wbkgd(msg_bus, COLOR_PAIR(MSG_BUS_COLOR_PAIR));
 	scrollok(msg_bus, true);
 
-	refresh();
-	wrefresh(footer);
-	wrefresh(src_display);
-	wrefresh(msg_bus);
-
+	wnoutrefresh(stdscr);
+	wnoutrefresh(footer);
+	wnoutrefresh(src_display);
+	wnoutrefresh(msg_bus);
+	doupdate();
 	/*events.push_back(new create_archive_event(10));
 	events.push_back(new add_comp_event(10, "test"));
 	events.push_back(new add_cons_event(10, "test2"));

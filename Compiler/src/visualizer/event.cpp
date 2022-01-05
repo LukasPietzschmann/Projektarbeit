@@ -26,16 +26,16 @@ event_with_data::event_with_data(unsigned int position, const Expr& data) :
 
 void add_cons_event::exec() const {
 	exec_on_cat_at_pos(m_position, [this](archive& c) {
+		log(to_string());
 		c.add_cons(m_id, m_data);
 	});
-	log(to_string());
 }
 
 void add_cons_event::undo() const {
 	exec_on_cat_at_pos(m_position, [this](archive& c) {
+		unlog();
 		c.remove_cons_with_id(m_id);
 	});
-	unlog();
 }
 
 CH::str add_cons_event::to_string() const {
@@ -46,16 +46,16 @@ CH::str add_cons_event::to_string() const {
 
 void add_comp_event::exec() const {
 	exec_on_cat_at_pos(m_position, [this](archive& c) {
+		log(to_string());
 		c.add_comp(m_id, m_data);
 	});
-	log(to_string());
 }
 
 void add_comp_event::undo() const {
 	exec_on_cat_at_pos(m_position, [this](archive& c) {
+		unlog();
 		c.remove_comp_with_id(m_id);
 	});
-	unlog();
 }
 
 CH::str add_comp_event::to_string() const {
@@ -65,8 +65,8 @@ CH::str add_comp_event::to_string() const {
 }
 
 void create_archive_event::exec() const {
-	layouter::the().register_new_cat(arch_windows.emplace_back(m_position));
 	log(to_string());
+	layouter::the().register_new_cat(arch_windows.emplace_back(m_position));
 }
 
 void create_archive_event::undo() const {
@@ -75,9 +75,9 @@ void create_archive_event::undo() const {
 	});
 
 	assert(it != arch_windows.end());
+	unlog();
 	layouter::the().unregister_cat(*it);
 	arch_windows.erase(it);
-	unlog();
 }
 
 CH::str create_archive_event::to_string() const {

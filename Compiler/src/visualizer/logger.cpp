@@ -10,7 +10,7 @@ void log(const CH::str& event) {
 		mvwaddnstr(msg_bus, next_row++, 0, str.c_str(), str.size());
 	}else
 		mvwaddnstr(msg_bus, next_row++, 0, &event.elems[0], *event);
-	wrefresh(msg_bus);
+	wnoutrefresh(msg_bus);
 }
 
 void unlog() {
@@ -19,5 +19,5 @@ void unlog() {
 
 	wmove(msg_bus, --next_row, 0);
 	wclrtoeol(msg_bus);
-	wrefresh(msg_bus);
+	wnoutrefresh(msg_bus);
 }
