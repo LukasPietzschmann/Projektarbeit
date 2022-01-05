@@ -28,6 +28,7 @@ void setup_colors() {
 	init_pair(FOOTER_COLOR_PAIR, COLOR_BLACK, COLOR_RED);
 	init_pair(HEADER_COLOR_PAIR, COLOR_WHITE, COLOR_GREY);
 	init_pair(MSG_BUS_COLOR_PAIR, COLOR_WHITE, COLOR_DARK_GREY);
+	init_pair(HIGHLIGHT_EXPR_COLOR_PAR, COLOR_GREEN, COLOR_BLACK);
 }
 
 bool load_state(const event_iterator& target_event_it) {

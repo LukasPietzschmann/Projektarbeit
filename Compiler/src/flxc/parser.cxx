@@ -485,20 +485,17 @@ void combine (Expr cons, Expr comp) {
 	// comp als aktuellen Operanden
 	// zu einem Duplikat comb von cons hinzufügen.
 	// Endposition von comb anpassen und an proceed weiterleiten.
-	str message;
-	message += get_scanned_str_for_expr(comp);
-	message += " wurde in ";
-	message += get_scanned_str_for_expr(cons);
-	message += " eingesetzt";
-	str message2;
-	message2 += "Daraus resultiert ";
-	message += get_scanned_str_for_pos(cons(beg_), comp(end_));
-	//events.push_back(new message_event(message));
-	//events.push_back(new message_event(message2));
-
 	Expr comb = dupl(cons);
 	comb(curritem_)(opnd_, comp);
 	comb(end_, comp(end_));
+
+	events.push_back(new event_group({
+			new expr_gets_used_event(comp(beg_) - A, cons),
+			new expr_gets_used_event(comp(beg_) - A, comp)}));
+	events.push_back(new event_group({
+			new expr_no_longer_gets_used_event(comp(beg_) - A, cons),
+			new expr_no_longer_gets_used_event(comp(beg_) - A, comp)
+	}));
 	proceed(comb, flag);
 }
 
@@ -632,13 +629,8 @@ bool extend (Expr cons) {
 
 	// Gelesenen Text speichern, Endposition des Ausdrucks weitersetzen
 	// und Ausdruck an proceed zurückgeben.
-	str message;
-	message += "Unvollständiger Ausdruck ";
-	message += get_scanned_str_for_expr(cons);
-	message += " wird um ";
-	message += word;
-	message += " erweitert";
-	// events.push_back(new message_event(message));
+	events.push_back(new expr_gets_used_event(cons(end_) - A, cons));
+	events.push_back(new expr_no_longer_gets_used_event(cons(end_) - A, cons));
 
 	cons(curritem_)(word_, word);
 	cons(end_, pos);

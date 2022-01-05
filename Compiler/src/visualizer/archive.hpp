@@ -52,6 +52,9 @@ public:
 	bool remove_cons_with_id(long id);
 	bool remove_comp_with_id(long id);
 
+	bool set_expr_active(const Expr& expr);
+	bool set_expr_inactive(const Expr& elements);
+
 	void set_y_start(uint32_t y_start);
 	void set_x_start(uint32_t x_start);
 

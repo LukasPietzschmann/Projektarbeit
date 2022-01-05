@@ -4,7 +4,10 @@
 #include "logger.hpp"
 #include "windows.hpp"
 #include "../flxc/data.h"
+#include <initializer_list>
 #include <sstream>
+#include <memory>
+#include <vector>
 
 class event {
 public:
@@ -22,7 +25,7 @@ protected:
 	unsigned int m_position;
 
 	template <typename Callback>
-	void exec_on_cat_at_pos(unsigned int pos, Callback callback) const;
+	void exec_on_archive_at_pos(unsigned int pos, Callback callback) const;
 
 private:
 	static long m_next_id;
@@ -61,6 +64,22 @@ public:
 	CH::str to_string() const override;
 };
 
+class expr_gets_used_event : public event_with_data {
+public:
+	using event_with_data::event_with_data;
+	void exec() const override;
+	void undo() const override;
+	str to_string() const override;
+};
+
+class expr_no_longer_gets_used_event : public event_with_data {
+public:
+	using event_with_data::event_with_data;
+	void exec() const override;
+	void undo() const override;
+	str to_string() const override;
+};
+
 class message_event : public event {
 public:
 	using event::event;
@@ -70,4 +89,15 @@ public:
 	CH::str to_string() const override;
 private:
 	CH::str m_message;
+};
+
+class event_group : public event {
+public:
+	using event::event;
+	explicit event_group(std::initializer_list<event*>);
+	void exec() const override;
+	void undo() const override;
+	str to_string() const override;
+private:
+	std::vector<std::unique_ptr<event>> m_events;
 };

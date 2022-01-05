@@ -9,7 +9,7 @@ unsigned int event::getPosition() const {
 }
 
 template <typename Callback>
-void event::exec_on_cat_at_pos(unsigned int pos, Callback callback) const {
+void event::exec_on_archive_at_pos(unsigned int pos, Callback callback) const {
 	const auto& it = std::find_if(arch_windows.begin(), arch_windows.end(), [&pos](const archive& c) {
 		return c.get_pos_in_src() == pos;
 	});
@@ -25,14 +25,14 @@ event_with_data::event_with_data(unsigned int position, const Expr& data) :
 		event(position), m_data(data) {}
 
 void add_cons_event::exec() const {
-	exec_on_cat_at_pos(m_position, [this](archive& c) {
+	exec_on_archive_at_pos(m_position, [this](archive& c) {
 		log(to_string());
 		c.add_cons(m_id, m_data);
 	});
 }
 
 void add_cons_event::undo() const {
-	exec_on_cat_at_pos(m_position, [this](archive& c) {
+	exec_on_archive_at_pos(m_position, [this](archive& c) {
 		unlog();
 		c.remove_cons_with_id(m_id);
 	});
@@ -45,14 +45,14 @@ CH::str add_cons_event::to_string() const {
 }
 
 void add_comp_event::exec() const {
-	exec_on_cat_at_pos(m_position, [this](archive& c) {
+	exec_on_archive_at_pos(m_position, [this](archive& c) {
 		log(to_string());
 		c.add_comp(m_id, m_data);
 	});
 }
 
 void add_comp_event::undo() const {
-	exec_on_cat_at_pos(m_position, [this](archive& c) {
+	exec_on_archive_at_pos(m_position, [this](archive& c) {
 		unlog();
 		c.remove_comp_with_id(m_id);
 	});
@@ -86,6 +86,30 @@ CH::str create_archive_event::to_string() const {
 	return CH::str(ss.str());
 }
 
+void expr_gets_used_event::exec() const {
+	exec_on_archive_at_pos(m_position, [this](archive& a) {
+		a.set_expr_active(m_data);
+	});
+}
+
+void expr_gets_used_event::undo() const {}
+
+CH::str expr_gets_used_event::to_string() const {
+	return {""};
+}
+
+void expr_no_longer_gets_used_event::exec() const {
+	exec_on_archive_at_pos(m_position, [this](archive& a) {
+		a.set_expr_inactive(m_data);
+	});
+}
+
+void expr_no_longer_gets_used_event::undo() const {}
+
+CH::str expr_no_longer_gets_used_event::to_string() const {
+	return {""};
+}
+
 void message_event::exec() const {
 	log(to_string());
 }
@@ -99,3 +123,23 @@ CH::str message_event::to_string() const {
 }
 
 message_event::message_event(const CH::str& data) : event(0), m_message(data) {}
+
+event_group::event_group(std::initializer_list<event*> events) : event(0) {
+	m_events.reserve(events.size());
+	for(auto* e: events)
+		m_events.push_back(std::unique_ptr<event>(e));
+}
+
+void event_group::exec() const {
+	for(const auto& event: m_events)
+		event->exec();
+}
+
+void event_group::undo() const {
+	for(const auto& event: m_events)
+		event->undo();
+}
+
+str event_group::to_string() const {
+	return {""};
+}

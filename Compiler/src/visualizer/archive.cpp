@@ -37,14 +37,22 @@ void archive::render() {
 		if(comp_it != m_comp.end()) {
 			const auto& elem = comp_it->second;
 			const auto& string = elem.as_string();
+			if(elem.is_highlighted)
+				wattron(m_window, COLOR_PAIR(HIGHLIGHT_EXPR_COLOR_PAR));
 			mvwaddnstr(m_window, i, center - *string, &string.elems[0], *string);
+			if(elem.is_highlighted)
+				wattroff(m_window, COLOR_PAIR(HIGHLIGHT_EXPR_COLOR_PAR));
 			++comp_it;
 		}
 
 		if(cons_it != m_cons.end()) {
 			const auto& elem = cons_it->second;
 			const auto& string = elem.as_string();
+			if(elem.is_highlighted)
+				wattron(m_window, COLOR_PAIR(HIGHLIGHT_EXPR_COLOR_PAR));
 			mvwaddnstr(m_window, i, center + 1, &string.elems[0], *string);
+			if(elem.is_highlighted)
+				wattroff(m_window, COLOR_PAIR(HIGHLIGHT_EXPR_COLOR_PAR));
 			++cons_it;
 		}
 	}
@@ -85,6 +93,38 @@ bool archive::remove_comp_with_id(long id) {
 	m_dirty = true;
 	invalidate();
 	return true;
+}
+
+bool archive::set_expr_active(const Expr& expr) {
+	const auto& do_in = [&](map<long, archive::archive_element>& elements) {
+		for(auto&[id, element]: elements) {
+			if(element.expr != expr)
+				continue;
+			element.is_highlighted = true;
+			m_dirty = true;
+			invalidate();
+			return true;
+		}
+		return false;
+	};
+
+	return do_in(m_comp) || do_in(m_cons);
+}
+
+bool archive::set_expr_inactive(const Expr& expr) {
+	const auto& do_in = [&](map<long, archive::archive_element>& elements) {
+		for(auto&[id, element]: elements) {
+			if(element.expr != expr)
+				continue;
+			element.is_highlighted = false;
+			m_dirty = true;
+			invalidate();
+			return true;
+		}
+		return false;
+	};
+
+	return do_in(m_comp) || do_in(m_cons);
 }
 
 void archive::set_y_start(uint32_t y_start) {
