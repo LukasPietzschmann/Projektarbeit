@@ -66,7 +66,7 @@ int main (int argc, char* argv []) {
 
     // Parser ausführen.
     eval_exprs(parse(opers));
-	start_vistalizer(scan_str);
+	start_visualizer(scan_str);
 }
 
 int repl() {

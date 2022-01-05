@@ -53,7 +53,7 @@ bool load_state(const event_iterator& target_event_it) {
 	return true;
 }
 
-int start_vistalizer(const CH::str& source_string) {
+int start_visualizer(const CH::str& source_string) {
 	int width, height;
 
 	initscr();
@@ -89,17 +89,6 @@ int start_vistalizer(const CH::str& source_string) {
 	wnoutrefresh(src_display);
 	wnoutrefresh(msg_bus);
 	doupdate();
-	/*events.push_back(new create_archive_event(10));
-	events.push_back(new add_comp_event(10, "test"));
-	events.push_back(new add_cons_event(10, "test2"));
-	events.push_back(new add_comp_event(10, "test3"));
-	events.push_back(new add_comp_event(10, "test4"));
-	events.push_back(new add_cons_event(10, "test5"));
-	events.push_back(new create_archive_event(2));
-	events.push_back(new add_comp_event(2, "test3"));*/
-
-	current_event_it = events.begin() - 1;
-	load_state(current_event_it);
 
 	while(char c = wgetch(footer)) {
 		if(c == 'q')
