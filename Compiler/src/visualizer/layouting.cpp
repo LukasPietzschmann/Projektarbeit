@@ -46,7 +46,7 @@ void layouter::notify_dimensions_changed(archive&) const {
 		a.is_layouted = true;
 	}
 
-	wclear(stdscr);
+	werase(stdscr);
 	wnoutrefresh(stdscr);
 
 	for(auto& window: arch_windows)

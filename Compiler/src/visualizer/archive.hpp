@@ -33,7 +33,7 @@ public:
 
 	~archive() {
 		if(m_window != nullptr) {
-			wclear(m_window);
+			werase(m_window);
 			wrefresh(m_window);
 			werase(m_window);
 		}

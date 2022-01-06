@@ -20,7 +20,7 @@ void archive::render() {
 		m_window = newwin(m_height, m_width, m_y_start + HEADER_HEIGHT, m_x_start);
 		assert(m_window != nullptr);
 	}else {
-		wclear(m_window);
+		werase(m_window);
 		wresize(m_window, m_height, m_width);
 		mvwin(m_window, m_y_start + HEADER_HEIGHT, m_x_start);
 	}
