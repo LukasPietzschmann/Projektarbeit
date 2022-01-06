@@ -18,12 +18,13 @@ vll auch ausgeschlossene operatoren (excl_)
 */
 
 using event_iterator = std::vector<event*>::iterator;
-extern event_iterator current_event_it;
+extern event_iterator next_event_it;
 
 void handleSignal(int sig);
 
 void setup_colors();
 
-bool load_state(const event_iterator& target_event_it);
+bool step_forward();
+bool step_backward();
 
-int start_vistalizer(const CH::str& source_string);
+int start_visualizer(const CH::str& source_string);

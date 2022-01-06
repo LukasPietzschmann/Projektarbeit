@@ -13,7 +13,7 @@ WINDOW* msg_bus;
 
 std::vector<archive> arch_windows;
 std::vector<event*> events;
-event_iterator current_event_it;
+event_iterator next_event_it;
 
 void handleSignal(int sig) {
 	endwin();
@@ -31,24 +31,22 @@ void setup_colors() {
 	init_pair(HIGHLIGHT_EXPR_COLOR_PAR, COLOR_GREEN, COLOR_BLACK);
 }
 
-bool load_state(const event_iterator& target_event_it) {
-	if(target_event_it == events.end() || target_event_it == events.begin() - 2)
+bool step_forward() {
+	if(next_event_it == events.end())
 		return false;
 
-	const long distance = std::distance(current_event_it, target_event_it);
+	if((*(next_event_it++))->exec() == event::did_nothing)
+		step_forward();
 
-	if(distance == 0)
-		return true;
+	return true;
+}
 
-	if(distance > 0) {// vorwärts
-		for(auto it = current_event_it + 1; it != target_event_it + 1; ++it)
-			(*it)->exec();
-	}else if(distance < 0) {// rückwärts
-		for(auto it = current_event_it; it != target_event_it; --it)
-			(*it)->undo();
-	}
+bool step_backward() {
+	if(next_event_it == events.begin())
+		return false;
 
-	current_event_it = target_event_it;
+	if((*(--next_event_it))->undo() == event::did_nothing)
+		step_backward();
 
 	return true;
 }
@@ -90,15 +88,17 @@ int start_visualizer(const CH::str& source_string) {
 	wnoutrefresh(msg_bus);
 	doupdate();
 
+	next_event_it = events.begin();
+
 	while(char c = wgetch(footer)) {
 		if(c == 'q')
 			break;
 
 		bool worked = false;
 		if(c == 'n')
-			worked = load_state(current_event_it + 1);
+			worked = step_forward();
 		else if(c == 'p')
-			worked = load_state(current_event_it - 1);
+			worked = step_backward();
 
 		if(!worked) {
 			beep();
