@@ -87,6 +87,7 @@ private:
 	uint32_t m_height {0};
 	uint32_t m_y_start {0};
 	uint32_t m_x_start {0};
+	uint32_t m_divider_x_pos {0};
 	uint32_t m_pos_in_src;
 
 	bool m_dirty {true};

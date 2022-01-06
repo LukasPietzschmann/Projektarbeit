@@ -27,19 +27,17 @@ void archive::render() {
 
 	box(m_window, ACS_VLINE, ACS_HLINE);
 
-	uint32_t center = m_width / 2;
-
 	auto comp_it = m_comp.begin();
 	auto cons_it = m_cons.begin();
 	for(int i = 1; i < m_height - 1; ++i) {
-		mvwaddch(m_window, i, center, '|');
+		mvwaddch(m_window, i, m_divider_x_pos, '|');
 
 		if(comp_it != m_comp.end()) {
 			const auto& elem = comp_it->second;
 			const auto& string = elem.as_string();
 			if(elem.is_highlighted)
 				wattron(m_window, HIGHLIGHT_EXPR_ATTR);
-			mvwaddnstr(m_window, i, center - *string, &string.elems[0], *string);
+			mvwaddnstr(m_window, i, m_divider_x_pos - *string, &string.elems[0], *string);
 			if(elem.is_highlighted)
 				wattroff(m_window, HIGHLIGHT_EXPR_ATTR);
 			++comp_it;
@@ -50,13 +48,13 @@ void archive::render() {
 			const auto& string = elem.as_string();
 			if(elem.is_highlighted)
 				wattron(m_window, HIGHLIGHT_EXPR_ATTR);
-			mvwaddnstr(m_window, i, center + 1, &string.elems[0], *string);
+			mvwaddnstr(m_window, i, m_divider_x_pos + 1, &string.elems[0], *string);
 			if(elem.is_highlighted)
 				wattroff(m_window, HIGHLIGHT_EXPR_ATTR);
 			++cons_it;
 		}
 	}
-	center_text_hor(m_window, CH::str(std::to_string(m_pos_in_src)), 0);
+	mvwaddstr(m_window, 0, m_pos_in_src, std::to_string(m_pos_in_src).c_str());
 
 	wnoutrefresh(m_window);
 }
@@ -189,10 +187,11 @@ void archive::invalidate() {
 		return max;
 	};
 
-	const auto cons_len = longest_str_len(m_cons);
-	const auto comp_len = longest_str_len(m_comp);
+	const auto cons_len = std::max((unsigned long) 1, longest_str_len(m_cons));
+	const auto comp_len = std::max((unsigned long) 1, longest_str_len(m_comp));
 
-	uint32_t new_width = std::max(cons_len, comp_len) * 2 + 11;
+	uint32_t new_width = comp_len + 5 + cons_len + 5;
+	m_divider_x_pos = comp_len + 5;
 
 	if(new_width % 2 == 0)
 		++new_width;
@@ -202,6 +201,7 @@ void archive::invalidate() {
 	for(const archive_change_listener* listener: m_listeners)
 		listener->notify_dimensions_changed(*this);
 }
+
 bool archive::operator==(const archive& other) const {
 	return this == &other;
 }
