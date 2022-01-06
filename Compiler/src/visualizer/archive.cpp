@@ -38,10 +38,10 @@ void archive::render() {
 			const auto& elem = comp_it->second;
 			const auto& string = elem.as_string();
 			if(elem.is_highlighted)
-				wattron(m_window, COLOR_PAIR(HIGHLIGHT_EXPR_COLOR_PAR));
+				wattron(m_window, HIGHLIGHT_EXPR_ATTR);
 			mvwaddnstr(m_window, i, center - *string, &string.elems[0], *string);
 			if(elem.is_highlighted)
-				wattroff(m_window, COLOR_PAIR(HIGHLIGHT_EXPR_COLOR_PAR));
+				wattroff(m_window, HIGHLIGHT_EXPR_ATTR);
 			++comp_it;
 		}
 
@@ -49,10 +49,10 @@ void archive::render() {
 			const auto& elem = cons_it->second;
 			const auto& string = elem.as_string();
 			if(elem.is_highlighted)
-				wattron(m_window, COLOR_PAIR(HIGHLIGHT_EXPR_COLOR_PAR));
+				wattron(m_window, HIGHLIGHT_EXPR_ATTR);
 			mvwaddnstr(m_window, i, center + 1, &string.elems[0], *string);
 			if(elem.is_highlighted)
-				wattroff(m_window, COLOR_PAIR(HIGHLIGHT_EXPR_COLOR_PAR));
+				wattroff(m_window, HIGHLIGHT_EXPR_ATTR);
 			++cons_it;
 		}
 	}
