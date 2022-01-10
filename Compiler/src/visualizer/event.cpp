@@ -13,7 +13,8 @@ void event::exec_on_archive_at_pos(unsigned int pos, Callback callback) const {
 	const auto& it = std::find_if(arch_windows.begin(), arch_windows.end(), [&pos](const archive& c) {
 		return c.get_pos_in_src() == pos;
 	});
-	assert(it != arch_windows.end());
+	if(it == arch_windows.end())
+		return;
 	callback(*it);
 }
 

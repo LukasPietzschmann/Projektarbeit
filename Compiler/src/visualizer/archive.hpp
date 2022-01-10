@@ -73,11 +73,12 @@ public:
 
 private:
 	struct archive_element {
-		explicit archive_element(const Expr& expr, bool is_highlighted = false) :
-				expr(expr), is_highlighted(is_highlighted) {};
+		explicit archive_element(const Expr& expr, bool is_prototyp = false, bool is_highlighted = false) :
+				expr(expr), is_highlighted(is_highlighted), is_prototyp(is_prototyp) {};
 
 		Expr expr;
 		bool is_highlighted;
+		bool is_prototyp;
 
 		CH::str as_string() const;
 	};

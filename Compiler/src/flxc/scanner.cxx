@@ -79,7 +79,5 @@ str get_scanned_str_for_pos(posA start, posA end) {
 }
 
 str get_scanned_str_for_expr(Expr expr) {
-	if(expr(beg_) == expr(end_))
-		return expr(to_str_) + " (Prototyp)";
 	return get_scanned_str_for_pos(expr(beg_), expr(end_));
 }

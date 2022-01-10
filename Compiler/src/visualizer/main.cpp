@@ -29,6 +29,7 @@ void setup_colors() {
 	init_pair(HEADER_COLOR_PAIR, COLOR_WHITE, COLOR_GREY);
 	init_pair(MSG_BUS_COLOR_PAIR, COLOR_WHITE, COLOR_DARK_GREY);
 	init_pair(HIGHLIGHT_EXPR_COLOR_PAR, COLOR_GREEN, COLOR_BLACK);
+	init_pair(MUTED_COLOR_PAIR, COLOR_LIGHT_GREY, COLOR_BLACK);
 }
 
 bool step_forward() {

@@ -64,7 +64,8 @@ uint32_t archive::get_pos_in_src() const {
 }
 
 void archive::add_cons(long id, const Expr& cons) {
-	m_cons.try_emplace(id, cons);
+	bool is_proto = cons(beg_) == cons(end_);
+	m_cons.try_emplace(id, cons, is_proto);
 	m_dirty = true;
 	invalidate();
 }
@@ -207,5 +208,7 @@ bool archive::operator==(const archive& other) const {
 }
 
 CH::str archive::archive_element::as_string() const {
+	if(is_prototyp)
+		return expr(to_str_) + " (Prototyp)";
 	return get_scanned_str_for_expr(expr);
 }
