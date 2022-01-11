@@ -11,6 +11,12 @@ WINDOW* footer;
 WINDOW* src_display;
 WINDOW* msg_bus;
 
+int screen_center;
+int src_str_center;
+int src_str_len;
+int width;
+int height;
+
 std::vector<archive> arch_windows;
 std::vector<event*> events;
 event_iterator next_event_it;
@@ -22,6 +28,7 @@ void handleSignal(int sig) {
 
 void setup_colors() {
 	start_color();
+	init_color(COLOR_LIGHT_GREY, 224, 224, 224);
 	init_color(COLOR_GREY, 179, 179, 179);
 	init_color(COLOR_DARK_GREY, 74, 74, 74);
 	init_pair(STD_COLOR_PAIR, COLOR_WHITE, COLOR_BLACK);
@@ -53,7 +60,8 @@ bool step_backward() {
 }
 
 int start_visualizer(const CH::str& source_string) {
-	int width, height;
+	src_str_len = *source_string;
+	src_str_center = src_str_len / 2;
 
 	initscr();
 
@@ -66,6 +74,7 @@ int start_visualizer(const CH::str& source_string) {
 	setup_colors();
 	curs_set(0);
 	getmaxyx(stdscr, height, width);
+	screen_center = width / 2;
 	wresize(stdscr, height - (FOOTER_HEIGHT + HEADER_HEIGHT), width - MSG_BUS_WIDTH);
 	mvwin(stdscr, 1, 0);
 
@@ -77,7 +86,7 @@ int start_visualizer(const CH::str& source_string) {
 
 	src_display = newwin(HEADER_HEIGHT, width - MSG_BUS_WIDTH, 0, 0);
 	wbkgd(src_display, COLOR_PAIR(HEADER_COLOR_PAIR));
-	mvwaddstr(src_display, 0, 0, &source_string.elems[0]);
+	mvwaddstr(src_display, 0, width / 2 - *source_string / 2, &source_string.elems[0]);
 
 	msg_bus = newwin(height, MSG_BUS_WIDTH, 0, width - MSG_BUS_WIDTH);
 	wbkgd(msg_bus, COLOR_PAIR(MSG_BUS_COLOR_PAIR));

@@ -54,8 +54,13 @@ void archive::render() {
 			++cons_it;
 		}
 	}
-	mvwaddstr(m_window, 0, m_pos_in_src, std::to_string(m_pos_in_src).c_str());
+	const std::string& pos_in_src_str = std::to_string(m_pos_in_src);
+	int pos = screen_center + (-src_str_center + m_pos_in_src) - m_x_start;
 
+	if(pos >= m_width)
+		pos -= (pos - m_width) + pos_in_src_str.size();
+
+	mvwaddstr(m_window, 0, pos, pos_in_src_str.c_str());
 	wnoutrefresh(m_window);
 }
 

@@ -24,10 +24,9 @@ void layouter::notify_dimensions_changed(archive&) const {
 			}
 			return false;
 		};
-
-		int desired_x_coord = archive_to_layout.get_pos_in_src() - (archive_to_layout.get_width() / 2);
-		if(desired_x_coord < 1)
-			desired_x_coord = 1;
+		int desired_x_coord = archive_to_layout.get_pos_in_src() + (screen_center - src_str_center);
+		if(desired_x_coord < screen_center)
+			desired_x_coord -= archive_to_layout.get_width();
 		uint32_t y_coordinate = 0;
 
 		while(has_intersections({(uint32_t) desired_x_coord, y_coordinate, archive_to_layout.get_width(),

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <cassert>
 #include <memory>
 #include <ncurses.h>
@@ -12,8 +13,9 @@
 
 #include "../flxc/data.h"
 #include "../flxc/scanner.h"
-#include "constants.hpp"
 #include "archive_change_listener.hpp"
+#include "constants.hpp"
+#include "coordinates.hpp"
 #include "utils.hpp"
 #include "windows.hpp"
 
