@@ -9,7 +9,7 @@ vll auch ausgeschlossene operatoren (excl_)
 
 WINDOW* footer;
 WINDOW* src_display;
-WINDOW* queue_display;
+WINDOW* queue_display_pad;
 
 int screen_center;
 int src_str_center;
@@ -26,7 +26,7 @@ void handleSignal(int sig) {
 	events.clear();
 	delwin(footer);
 	delwin(src_display);
-	delwin(queue_display);
+	delwin(queue_display_pad);
 	endwin();
 	exit(sig);
 }
@@ -39,7 +39,7 @@ void setup_colors() {
 	init_pair(STD_COLOR_PAIR, COLOR_WHITE, COLOR_BLACK);
 	init_pair(FOOTER_COLOR_PAIR, COLOR_BLACK, COLOR_RED);
 	init_pair(HEADER_COLOR_PAIR, COLOR_WHITE, COLOR_GREY);
-	init_pair(MSG_BUS_COLOR_PAIR, COLOR_WHITE, COLOR_DARK_GREY);
+	init_pair(QUEUE_COLOR_PAIR, COLOR_WHITE, COLOR_DARK_GREY);
 	init_pair(HIGHLIGHT_EXPR_COLOR_PAR, COLOR_GREEN, COLOR_BLACK);
 	init_pair(MUTED_COLOR_PAIR, COLOR_LIGHT_GREY, COLOR_BLACK);
 }
@@ -81,7 +81,7 @@ int start_visualizer(const CH::str& source_string) {
 	getmaxyx(stdscr, height, width);
 	screen_center = width / 2;
 	wresize(stdscr, height - (FOOTER_HEIGHT + HEADER_HEIGHT), width - QUEUE_WIDTH);
-	mvwin(stdscr, 1, 0);
+	mvwin(stdscr, HEADER_HEIGHT, 0);
 
 	bkgd(COLOR_PAIR(STD_COLOR_PAIR));
 
@@ -93,18 +93,18 @@ int start_visualizer(const CH::str& source_string) {
 	wbkgd(src_display, COLOR_PAIR(HEADER_COLOR_PAIR));
 	mvwaddstr(src_display, 0, width / 2 - *source_string / 2, &source_string.elems[0]);
 
-	queue_display = newwin(height, QUEUE_WIDTH, 0, width - QUEUE_WIDTH);
-	wbkgd(queue_display, COLOR_PAIR(MSG_BUS_COLOR_PAIR));
+	queue_display_pad = newpad(height * 2, width * 2);
+	wbkgd(queue_display_pad, COLOR_PAIR(QUEUE_COLOR_PAIR));
 
 	wnoutrefresh(stdscr);
+	pnoutrefresh(queue_display_pad, 0, 0, 0, width - QUEUE_WIDTH, height - 1, width - 1);
+	wnoutrefresh(stdscr);
 	wnoutrefresh(footer);
-	wnoutrefresh(src_display);
-	wnoutrefresh(queue_display);
 	doupdate();
 
 	next_event_it = events.begin();
 
-	while(char c = wgetch(footer)) {
+	while(char c = getch()) {
 		if(c == 'q')
 			break;
 
@@ -113,6 +113,13 @@ int start_visualizer(const CH::str& source_string) {
 			worked = step_forward();
 		else if(c == 'p')
 			worked = step_backward();
+		else if(c == 'w') {
+			expr_queue::the().scroll_y(-1);
+			worked = true;
+		}else if(c == 's') {
+			expr_queue::the().scroll_y(1);
+			worked = true;
+		}
 
 		if(!worked) {
 			beep();

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "constants.hpp"
-
 #include <cassert>
 #include <ncurses.h>
 #include <vector>
 
 #include "archive.hpp"
+#include "constants.hpp"
 #include "event.hpp"
+#include "expr_queue.hpp"
 #include "utils.hpp"
 
 /*

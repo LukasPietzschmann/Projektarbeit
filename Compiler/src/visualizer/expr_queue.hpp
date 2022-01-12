@@ -3,6 +3,7 @@
 #include <ncurses.h>
 #include "../flxc/data.h"
 #include "constants.hpp"
+#include "coordinates.hpp"
 #include "windows.hpp"
 
 class expr_queue {
@@ -19,7 +20,10 @@ public:
 
 	void push(const Expr& expr);
 	bool pop();
+
+	void scroll_y(int delta);
 private:
 	expr_queue() = default;
 	uint32_t m_size {0};
+	int m_scroll_y {0};
 };
