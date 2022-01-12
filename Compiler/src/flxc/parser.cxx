@@ -629,8 +629,6 @@ bool extend (Expr cons) {
 
 	// Gelesenen Text speichern, Endposition des Ausdrucks weitersetzen
 	// und Ausdruck an proceed zurückgeben.
-	events.push_back(new expr_gets_used_event(cons(end_) - A, cons));
-	events.push_back(new expr_no_longer_gets_used_event(cons(end_) - A, cons));
 
 	cons(curritem_)(word_, word);
 	cons(end_, pos);
