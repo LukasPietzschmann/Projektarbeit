@@ -1,7 +1,6 @@
 #pragma once
 
 #include "layouting.hpp"
-#include "logger.hpp"
 #include "windows.hpp"
 #include "../flxc/data.h"
 #include <algorithm>
@@ -22,8 +21,6 @@ public:
 
 	virtual event_exec_result exec() = 0;
 	virtual event_exec_result undo() = 0;
-
-	virtual CH::str to_string() const = 0;
 
 	unsigned int getPosition() const;
 
@@ -52,7 +49,6 @@ public:
 	using event_with_data::event_with_data;
 	event_exec_result exec() override;
 	event_exec_result undo() override;
-	CH::str to_string() const override;
 };
 
 class add_comp_event : public event_with_data {
@@ -60,7 +56,6 @@ public:
 	using event_with_data::event_with_data;
 	event_exec_result exec() override;
 	event_exec_result undo() override;
-	CH::str to_string() const override;
 };
 
 class create_archive_event : public event {
@@ -68,7 +63,6 @@ public:
 	using event::event;
 	event_exec_result exec() override;
 	event_exec_result undo() override;
-	CH::str to_string() const override;
 };
 
 class expr_gets_used_event : public event_with_data {
@@ -76,7 +70,6 @@ public:
 	using event_with_data::event_with_data;
 	event_exec_result exec() override;
 	event_exec_result undo() override;
-	str to_string() const override;
 };
 
 class expr_no_longer_gets_used_event : public event_with_data {
@@ -84,18 +77,6 @@ public:
 	using event_with_data::event_with_data;
 	event_exec_result exec() override;
 	event_exec_result undo() override;
-	str to_string() const override;
-};
-
-class message_event : public event {
-public:
-	using event::event;
-	explicit message_event(const CH::str& message);
-	event_exec_result exec() override;
-	event_exec_result undo() override;
-	CH::str to_string() const override;
-private:
-	CH::str m_message;
 };
 
 class event_group : public event {
@@ -104,7 +85,6 @@ public:
 	explicit event_group(std::initializer_list<event*>);
 	event_exec_result exec() override;
 	event_exec_result undo() override;
-	str to_string() const override;
 private:
 	std::vector<std::unique_ptr<event>> m_events;
 };

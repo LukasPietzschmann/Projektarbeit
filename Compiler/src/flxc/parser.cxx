@@ -333,7 +333,6 @@ unordered_map<Key, Arch> tab;
 // tabelle wieder zurück zu setzen (derzeit nur
 // benötigt für den repl).
 void clear_tab() {
-	events.push_back(new message_event("Alle Archive werden gelöscht"));
 	tab.clear();
 }
 

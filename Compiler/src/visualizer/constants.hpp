@@ -2,7 +2,6 @@
 
 #define FOOTER_HEIGHT 1
 #define HEADER_HEIGHT 1
-#define MSG_BUS_WIDTH 0
 
 #define COLOR_GREY 50
 #define COLOR_DARK_GREY 51

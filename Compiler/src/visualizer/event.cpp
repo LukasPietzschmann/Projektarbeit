@@ -27,7 +27,6 @@ event_with_data::event_with_data(unsigned int position, const Expr& data) :
 
 event::event_exec_result add_cons_event::exec() {
 	exec_on_archive_at_pos(m_position, [this](archive& c) {
-		log(to_string());
 		c.add_cons(m_id, m_data);
 	});
 	return did_something;
@@ -35,21 +34,13 @@ event::event_exec_result add_cons_event::exec() {
 
 event::event_exec_result add_cons_event::undo() {
 	exec_on_archive_at_pos(m_position, [this](archive& c) {
-		unlog();
 		c.remove_cons_with_id(m_id);
 	});
 	return did_something;
 }
 
-CH::str add_cons_event::to_string() const {
-	std::stringstream ss;
-	ss << "Added cons. expr. at pos " << m_position;
-	return CH::str(ss.str());
-}
-
 event::event_exec_result add_comp_event::exec() {
 	exec_on_archive_at_pos(m_position, [this](archive& c) {
-		log(to_string());
 		c.add_comp(m_id, m_data);
 	});
 	return did_something;
@@ -57,20 +48,12 @@ event::event_exec_result add_comp_event::exec() {
 
 event::event_exec_result add_comp_event::undo() {
 	exec_on_archive_at_pos(m_position, [this](archive& c) {
-		unlog();
 		c.remove_comp_with_id(m_id);
 	});
 	return did_something;
 }
 
-CH::str add_comp_event::to_string() const {
-	std::stringstream ss;
-	ss << "Added comp. expr. at pos " << m_position;
-	return CH::str(ss.str());
-}
-
 event::event_exec_result create_archive_event::exec() {
-	log(to_string());
 	layouter::the().register_new_cat(arch_windows.emplace_back(m_position));
 	return did_something;
 }
@@ -81,16 +64,9 @@ event::event_exec_result create_archive_event::undo() {
 	});
 
 	assert(it != arch_windows.end());
-	unlog();
 	layouter::the().unregister_cat(*it);
 	arch_windows.erase(it);
 	return did_something;
-}
-
-CH::str create_archive_event::to_string() const {
-	std::stringstream ss;
-	ss << "Created arch. at Pos. " << m_position;
-	return CH::str(ss.str());
 }
 
 event::event_exec_result expr_gets_used_event::exec() {
@@ -109,10 +85,6 @@ event::event_exec_result expr_gets_used_event::undo() {
 	return res ? did_something : did_nothing;
 }
 
-CH::str expr_gets_used_event::to_string() const {
-	return {""};
-}
-
 event::event_exec_result expr_no_longer_gets_used_event::exec() {
 	bool res;
 	exec_on_archive_at_pos(m_position, [this, &res](archive& a) {
@@ -128,26 +100,6 @@ event::event_exec_result expr_no_longer_gets_used_event::undo() {
 	});
 	return res ? did_something : did_nothing;
 }
-
-CH::str expr_no_longer_gets_used_event::to_string() const {
-	return {""};
-}
-
-event::event_exec_result message_event::exec() {
-	log(to_string());
-	return did_something;
-}
-
-event::event_exec_result message_event::undo() {
-	unlog();
-	return did_something;
-}
-
-CH::str message_event::to_string() const {
-	return m_message;
-}
-
-message_event::message_event(const CH::str& data) : event(0), m_message(data) {}
 
 event_group::event_group(std::initializer_list<event*> events) : event(0) {
 	m_events.reserve(events.size());
@@ -167,8 +119,4 @@ event::event_exec_result event_group::undo() {
 	for(const auto& event: m_events)
 		is_one_false = is_one_false || event->undo() == did_nothing;
 	return is_one_false ? did_nothing : did_something;
-}
-
-str event_group::to_string() const {
-	return {""};
 }
