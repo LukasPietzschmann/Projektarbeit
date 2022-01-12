@@ -3,6 +3,7 @@
 #include "layouting.hpp"
 #include "windows.hpp"
 #include "../flxc/data.h"
+#include "expr_queue.hpp"
 #include <algorithm>
 #include <initializer_list>
 #include <functional>
@@ -75,6 +76,22 @@ public:
 class expr_no_longer_gets_used_event : public event_with_data {
 public:
 	using event_with_data::event_with_data;
+	event_exec_result exec() override;
+	event_exec_result undo() override;
+};
+
+class add_expr_to_queue : public event_with_data {
+public:
+	using event_with_data::event_with_data;
+	explicit add_expr_to_queue(const Expr& expr);
+	event_exec_result exec() override;
+	event_exec_result undo() override;
+};
+
+class remove_expr_from_queue : public event_with_data {
+public:
+	using event_with_data::event_with_data;
+	explicit remove_expr_from_queue(const Expr& expr);
 	event_exec_result exec() override;
 	event_exec_result undo() override;
 };

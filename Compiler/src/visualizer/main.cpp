@@ -9,6 +9,7 @@ vll auch ausgeschlossene operatoren (excl_)
 
 WINDOW* footer;
 WINDOW* src_display;
+WINDOW* queue_display;
 
 int screen_center;
 int src_str_center;
@@ -74,22 +75,26 @@ int start_visualizer(const CH::str& source_string) {
 	curs_set(0);
 	getmaxyx(stdscr, height, width);
 	screen_center = width / 2;
-	wresize(stdscr, height - (FOOTER_HEIGHT + HEADER_HEIGHT), width);
+	wresize(stdscr, height - (FOOTER_HEIGHT + HEADER_HEIGHT), width - QUEUE_WIDTH);
 	mvwin(stdscr, 1, 0);
 
 	bkgd(COLOR_PAIR(STD_COLOR_PAIR));
 
-	footer = newwin(FOOTER_HEIGHT, width, height - FOOTER_HEIGHT, 0);
+	footer = newwin(FOOTER_HEIGHT, width - QUEUE_WIDTH, height - FOOTER_HEIGHT, 0);
 	wbkgd(footer, COLOR_PAIR(FOOTER_COLOR_PAIR));
 	center_text_hor(footer, "q: quit    n: next    p: previous", 0);
 
-	src_display = newwin(HEADER_HEIGHT, width, 0, 0);
+	src_display = newwin(HEADER_HEIGHT, width - QUEUE_WIDTH, 0, 0);
 	wbkgd(src_display, COLOR_PAIR(HEADER_COLOR_PAIR));
 	mvwaddstr(src_display, 0, width / 2 - *source_string / 2, &source_string.elems[0]);
+
+	queue_display = newwin(height, QUEUE_WIDTH, 0, width - QUEUE_WIDTH);
+	wbkgd(queue_display, COLOR_PAIR(MSG_BUS_COLOR_PAIR));
 
 	wnoutrefresh(stdscr);
 	wnoutrefresh(footer);
 	wnoutrefresh(src_display);
+	wnoutrefresh(queue_display);
 	doupdate();
 
 	next_event_it = events.begin();

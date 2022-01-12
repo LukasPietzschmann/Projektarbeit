@@ -2,6 +2,7 @@
 
 #define FOOTER_HEIGHT 1
 #define HEADER_HEIGHT 1
+#define QUEUE_WIDTH 25
 
 #define COLOR_GREY 50
 #define COLOR_DARK_GREY 51

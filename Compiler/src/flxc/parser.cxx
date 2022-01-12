@@ -797,6 +797,7 @@ queue<pair<Expr, int>> q;
 
 void proceed (Expr cons, int flags) {
 	//std::cout << "proceed:\tAusdruck '" << get_scanned_str_for_expr(cons) << "' in die Queue abgelegt" << std::endl;
+    events.push_back(new add_expr_to_queue(cons));
     q.push(make_pair(cons, flags));
 }
 
@@ -804,6 +805,7 @@ void process () {
     while (!q.empty()) {
 	auto pair = q.front();
 	//std::cout << "process:\tAusdruck '" << get_scanned_str_for_expr(pair.first) << "' aus der Queue herausgenommen" << std::endl;
+	events.push_back(new remove_expr_from_queue(pair.first));
 	q.pop();
 	recursive::proceed(pair.first, pair.second);
     }
