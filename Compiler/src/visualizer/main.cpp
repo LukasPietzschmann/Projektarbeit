@@ -22,6 +22,11 @@ std::vector<event*> events;
 event_iterator next_event_it;
 
 void handleSignal(int sig) {
+	arch_windows.clear();
+	events.clear();
+	delwin(footer);
+	delwin(src_display);
+	delwin(queue_display);
 	endwin();
 	exit(sig);
 }
@@ -115,6 +120,6 @@ int start_visualizer(const CH::str& source_string) {
 		}
 	}
 
-	endwin();
+	handleSignal(0);
 	return 0;
 }
