@@ -161,6 +161,10 @@ uint32_t archive::get_x_start() const {
 	return m_x_start;
 }
 
+uint32_t archive::get_divider_x_pos() const {
+	return m_divider_x_pos;
+}
+
 archive::t_id archive::id() {
 	static t_id next_id = 0;
 

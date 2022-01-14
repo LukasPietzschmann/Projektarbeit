@@ -64,6 +64,7 @@ public:
 	uint32_t get_height() const;
 	uint32_t get_y_start() const;
 	uint32_t get_x_start() const;
+	uint32_t get_divider_x_pos() const;
 
 	using t_id = long;
 	t_id id();
