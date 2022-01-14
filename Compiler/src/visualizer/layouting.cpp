@@ -46,10 +46,9 @@ void layouter::notify_dimensions_changed(archive&) const {
 		a.is_layouted = true;
 	}
 
-	werase(main_viewport);
+	main_viewport->clear();
 	for(auto& window: arch_windows)
 		window.render();
 
-	refresh_main_viewport();
-	doupdate();
+	main_viewport->refresh();
 }

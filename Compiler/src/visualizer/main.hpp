@@ -8,6 +8,7 @@
 #include "constants.hpp"
 #include "event.hpp"
 #include "expr_queue.hpp"
+#include "scrollable.hpp"
 #include "utils.hpp"
 
 /*

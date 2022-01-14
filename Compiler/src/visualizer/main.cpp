@@ -1,24 +1,15 @@
 #include "main.hpp"
 
-/*
-operator catalog sichtbar machen (katalog nummer) Katalog der in Key drin steckt
-katalog übersicht im unteren bereich (matrix darstellung, zeilenweise untereinander sämtliche operatoren die in irgend einem Katalog auftauchen, nach rechts rüber katalog 1 katalog 2 katalog drei)
-
-vll auch ausgeschlossene operatoren (excl_)
-*/
-
 WINDOW* footer;
 WINDOW* src_display;
 WINDOW* queue_display_pad;
-WINDOW* main_viewport;
+scrollable* main_viewport;
 
 int screen_center;
 int src_str_center;
 int src_str_len;
 int width;
 int height;
-
-int viewport_scroll_y {0};
 
 std::vector<archive> arch_windows;
 std::vector<event*> events;
@@ -84,9 +75,10 @@ int start_visualizer(const CH::str& source_string) {
 	getmaxyx(stdscr, height, width);
 	screen_center = width / 2;
 
-	main_viewport = newpad(height * 2, width - QUEUE_WIDTH);
-	wbkgd(main_viewport, COLOR_PAIR(STD_COLOR_PAIR));
-	stdscr = main_viewport;
+	main_viewport = new scrollable(width - (QUEUE_WIDTH + 1), height - (HEADER_HEIGHT + FOOTER_HEIGHT), 0, HEADER_HEIGHT);
+	wbkgd(**main_viewport, COLOR_PAIR(STD_COLOR_PAIR));
+	stdscr = **main_viewport;
+	main_viewport->refresh();
 
 	footer = newwin(FOOTER_HEIGHT, width - QUEUE_WIDTH, height - FOOTER_HEIGHT, 0);
 	wbkgd(footer, COLOR_PAIR(FOOTER_COLOR_PAIR));
@@ -99,7 +91,6 @@ int start_visualizer(const CH::str& source_string) {
 	queue_display_pad = newpad(height * 2, width * 2);
 	wbkgd(queue_display_pad, COLOR_PAIR(QUEUE_COLOR_PAIR));
 
-	pnoutrefresh(main_viewport, 0, 0, HEADER_HEIGHT, 0, height - (HEADER_HEIGHT + FOOTER_HEIGHT), width - QUEUE_WIDTH);
 	pnoutrefresh(queue_display_pad, 0, 0, 0, width - QUEUE_WIDTH, height - 1, width - 1);
 	wnoutrefresh(src_display);
 	wnoutrefresh(footer);
@@ -117,13 +108,11 @@ int start_visualizer(const CH::str& source_string) {
 			worked = step_forward();
 		else if(c == 'p')
 			worked = step_backward();
-		else if(c == 66) { // arrow down
-			++viewport_scroll_y;
-			refresh_main_viewport();
-		}else if(c == 65) { // arrow up
-			--viewport_scroll_y;
-			refresh_main_viewport();
-		}else if(c == 'w')
+		else if(c == 66) // arrow down
+			main_viewport->scroll_y(1);
+		else if(c == 65) // arrow up
+			main_viewport->scroll_y(-1);
+		else if(c == 'w')
 			expr_queue::the().scroll_y(-1);
 		else if(c == 's')
 			expr_queue::the().scroll_y(1);
