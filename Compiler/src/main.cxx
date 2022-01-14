@@ -44,7 +44,7 @@ int main (int argc, char* argv []) {
   cxxopts::ParseResult result;
   try {
      result = options.parse(argc, argv);
-  }catch(const cxxopts::option_not_exists_exception&){
+  }catch(const cxxopts::OptionException&){
     std::cout << options.help() << std::endl;
     return 1;
   }
