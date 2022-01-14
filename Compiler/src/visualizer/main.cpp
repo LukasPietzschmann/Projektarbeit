@@ -96,9 +96,9 @@ int start_visualizer(const CH::str& source_string) {
 	queue_display_pad = newpad(height * 2, width * 2);
 	wbkgd(queue_display_pad, COLOR_PAIR(QUEUE_COLOR_PAIR));
 
-	wnoutrefresh(stdscr);
 	pnoutrefresh(queue_display_pad, 0, 0, 0, width - QUEUE_WIDTH, height - 1, width - 1);
 	wnoutrefresh(stdscr);
+	wnoutrefresh(src_display);
 	wnoutrefresh(footer);
 	doupdate();
 
