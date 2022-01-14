@@ -10,12 +10,15 @@ vll auch ausgeschlossene operatoren (excl_)
 WINDOW* footer;
 WINDOW* src_display;
 WINDOW* queue_display_pad;
+WINDOW* main_viewport;
 
 int screen_center;
 int src_str_center;
 int src_str_len;
 int width;
 int height;
+
+int viewport_scroll_y {0};
 
 std::vector<archive> arch_windows;
 std::vector<event*> events;
@@ -80,10 +83,10 @@ int start_visualizer(const CH::str& source_string) {
 	curs_set(0);
 	getmaxyx(stdscr, height, width);
 	screen_center = width / 2;
-	wresize(stdscr, height - (FOOTER_HEIGHT + HEADER_HEIGHT), width - QUEUE_WIDTH);
-	mvwin(stdscr, HEADER_HEIGHT, 0);
 
-	bkgd(COLOR_PAIR(STD_COLOR_PAIR));
+	main_viewport = newpad(height * 2, width - QUEUE_WIDTH);
+	wbkgd(main_viewport, COLOR_PAIR(STD_COLOR_PAIR));
+	stdscr = main_viewport;
 
 	footer = newwin(FOOTER_HEIGHT, width - QUEUE_WIDTH, height - FOOTER_HEIGHT, 0);
 	wbkgd(footer, COLOR_PAIR(FOOTER_COLOR_PAIR));
@@ -96,8 +99,8 @@ int start_visualizer(const CH::str& source_string) {
 	queue_display_pad = newpad(height * 2, width * 2);
 	wbkgd(queue_display_pad, COLOR_PAIR(QUEUE_COLOR_PAIR));
 
+	pnoutrefresh(main_viewport, 0, 0, HEADER_HEIGHT, 0, height - (HEADER_HEIGHT + FOOTER_HEIGHT), width - QUEUE_WIDTH);
 	pnoutrefresh(queue_display_pad, 0, 0, 0, width - QUEUE_WIDTH, height - 1, width - 1);
-	wnoutrefresh(stdscr);
 	wnoutrefresh(src_display);
 	wnoutrefresh(footer);
 	doupdate();
@@ -105,21 +108,26 @@ int start_visualizer(const CH::str& source_string) {
 	next_event_it = events.begin();
 
 	while(char c = getch()) {
+		refresh();
 		if(c == 'q')
 			break;
 
-		bool worked = false;
+		bool worked = true;
 		if(c == 'n')
 			worked = step_forward();
 		else if(c == 'p')
 			worked = step_backward();
-		else if(c == 'w') {
+		else if(c == 66) { // arrow down
+			++viewport_scroll_y;
+			refresh_main_viewport();
+		}else if(c == 65) { // arrow up
+			--viewport_scroll_y;
+			refresh_main_viewport();
+		}else if(c == 'w')
 			expr_queue::the().scroll_y(-1);
-			worked = true;
-		}else if(c == 's') {
+		else if(c == 's')
 			expr_queue::the().scroll_y(1);
-			worked = true;
-		}
+		doupdate();
 
 		if(!worked) {
 			beep();

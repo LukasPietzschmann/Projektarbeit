@@ -61,7 +61,7 @@ void archive::render() {
 		pos -= (pos - m_width) + pos_in_src_str.size();
 
 	mvwaddstr(m_window, 0, pos, pos_in_src_str.c_str());
-	wnoutrefresh(m_window);
+	overwrite(m_window, main_viewport);
 }
 
 uint32_t archive::get_pos_in_src() const {

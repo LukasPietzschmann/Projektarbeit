@@ -46,11 +46,10 @@ void layouter::notify_dimensions_changed(archive&) const {
 		a.is_layouted = true;
 	}
 
-	werase(stdscr);
-	wnoutrefresh(stdscr);
-
+	werase(main_viewport);
 	for(auto& window: arch_windows)
 		window.render();
 
+	refresh_main_viewport();
 	doupdate();
 }

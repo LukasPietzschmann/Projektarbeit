@@ -5,7 +5,6 @@ void expr_queue::push(const Expr& expr) {
 	if(*expr_str >= QUEUE_WIDTH)
 		expr_str = expr_str(A | A + (QUEUE_WIDTH - 2));
 	mvwaddnstr(queue_display_pad, m_size++, 0, &expr_str.elems[0], *expr_str);
-	refresh();
 	prefresh(queue_display_pad, m_scroll_y, 0, 0, width - QUEUE_WIDTH, height - 1, width - 1);
 }
 
