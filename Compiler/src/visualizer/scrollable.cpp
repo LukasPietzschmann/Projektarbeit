@@ -24,13 +24,24 @@ WINDOW* scrollable::operator*() const {
 	return m_pad;
 }
 
-void scrollable::project_here(WINDOW* win) {
+void scrollable::project_window(WINDOW* win) {
 	assert(win != nullptr);
 	overwrite(win, m_pad);
 	int height = getmaxy(win);
 	int y_start = getbegy(win);
-	if(int bottom = y_start + height; bottom > m_max_y)
-		m_max_y = bottom;
+	m_max_y = std::max(y_start + height, m_max_y);
+}
+
+void scrollable::add_string(const CH::str& string, int x, int y) {
+	mvwaddnstr(m_pad, y, x, &string.elems[0], *string);
+	m_max_y = std::max(y, m_max_y);
+}
+
+void scrollable::del_line(int x, int y) {
+	wmove(m_pad, y, x);
+	wclrtobot(m_pad);
+	if(y == m_max_y)
+		--m_max_y;
 }
 
 void scrollable::clear() {
@@ -49,10 +60,18 @@ void scrollable::refresh() {
 		had_segments = true;
 
 	for(int i = 0; had_segments && i < m_height * 4; ++i)
-		mvaddch(i, m_width - 1, ' ');
+		mvwaddch(m_pad, i, m_width - 1, ' ');
 
 	for(int i = 0; i < segments_to_draw; ++i)
-		mvaddch(m_scroll_y * 2 + i, m_width - 1, '|');
+		mvwaddch(m_pad, m_scroll_y * 2 + i, m_width - 1, '|');
 
-	prefresh(m_pad, m_scroll_y, 0, m_y_start, m_x_start, m_y_start + (m_height - 1), m_x_start + m_width);
+	prefresh(m_pad, m_scroll_y, 0, m_y_start, m_x_start, m_y_start + m_height, m_x_start + m_width);
+}
+
+uint32_t scrollable::get_width() const {
+	return m_width;
+}
+
+uint32_t scrollable::get_height() const {
+	return m_height;
 }

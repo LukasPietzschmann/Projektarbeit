@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <ncurses.h>
 #include <cassert>
+#include <seq.ch>
 
 class scrollable {
 public:
@@ -11,10 +12,15 @@ public:
 
 	void scroll_y(int delta);
 
-	void project_here(WINDOW* win);
+	void project_window(WINDOW* win);
+	void add_string(const CH::str& string, int x, int y);
+	void del_line(int x, int y);
 
 	void clear();
 	void refresh();
+
+	uint32_t get_width() const;
+	uint32_t get_height() const;
 
 	WINDOW* operator*() const;
 

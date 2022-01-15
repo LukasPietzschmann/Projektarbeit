@@ -2,7 +2,7 @@
 
 WINDOW* footer;
 WINDOW* src_display;
-WINDOW* queue_display_pad;
+scrollable* queue_display;
 scrollable* main_viewport;
 
 int main_viewport_center;
@@ -74,7 +74,8 @@ int start_visualizer(const CH::str& source_string) {
 	curs_set(0);
 	getmaxyx(stdscr, height, width);
 
-	main_viewport = new scrollable(width - (QUEUE_WIDTH + 1), height - (HEADER_HEIGHT + FOOTER_HEIGHT), 0, HEADER_HEIGHT);
+	main_viewport = new scrollable(width - QUEUE_WIDTH - 1, height - HEADER_HEIGHT - FOOTER_HEIGHT - 1, 0,
+			HEADER_HEIGHT);
 	wbkgd(**main_viewport, COLOR_PAIR(STD_COLOR_PAIR));
 	stdscr = **main_viewport;
 	main_viewport->refresh();
@@ -87,12 +88,12 @@ int start_visualizer(const CH::str& source_string) {
 
 	src_display = newwin(HEADER_HEIGHT, width - QUEUE_WIDTH, 0, 0);
 	wbkgd(src_display, COLOR_PAIR(HEADER_COLOR_PAIR));
-	mvwaddstr(src_display, 0, width / 2 - *source_string / 2, &source_string.elems[0]);
+	mvwaddstr(src_display, 0, getmaxx(src_display) / 2 - *source_string / 2, &source_string.elems[0]);
 
-	queue_display_pad = newpad(height * 2, width * 2);
-	wbkgd(queue_display_pad, COLOR_PAIR(QUEUE_COLOR_PAIR));
+	queue_display = new scrollable(QUEUE_WIDTH - 1, height - 1, width - QUEUE_WIDTH, 0);
+	wbkgd(**queue_display, COLOR_PAIR(QUEUE_COLOR_PAIR));
+	queue_display->refresh();
 
-	pnoutrefresh(queue_display_pad, 0, 0, 0, width - QUEUE_WIDTH, height - 1, width - 1);
 	wnoutrefresh(src_display);
 	wnoutrefresh(footer);
 	doupdate();
@@ -114,9 +115,9 @@ int start_visualizer(const CH::str& source_string) {
 		else if(c == 65) // arrow up
 			main_viewport->scroll_y(-1);
 		else if(c == 'w')
-			expr_queue::the().scroll_y(-1);
+			queue_display->scroll_y(-1);
 		else if(c == 's')
-			expr_queue::the().scroll_y(1);
+			queue_display->scroll_y(1);
 		doupdate();
 
 		if(!worked) {
