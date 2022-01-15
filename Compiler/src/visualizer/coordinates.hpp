@@ -2,6 +2,6 @@
 
 extern int width;
 extern int height;
-extern int screen_center;
+extern int main_viewport_center;
 extern int src_str_center;
 extern int src_str_len;

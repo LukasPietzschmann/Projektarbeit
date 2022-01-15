@@ -5,7 +5,7 @@ WINDOW* src_display;
 WINDOW* queue_display_pad;
 scrollable* main_viewport;
 
-int screen_center;
+int main_viewport_center;
 int src_str_center;
 int src_str_len;
 int width;
@@ -73,12 +73,13 @@ int start_visualizer(const CH::str& source_string) {
 	setup_colors();
 	curs_set(0);
 	getmaxyx(stdscr, height, width);
-	screen_center = width / 2;
 
 	main_viewport = new scrollable(width - (QUEUE_WIDTH + 1), height - (HEADER_HEIGHT + FOOTER_HEIGHT), 0, HEADER_HEIGHT);
 	wbkgd(**main_viewport, COLOR_PAIR(STD_COLOR_PAIR));
 	stdscr = **main_viewport;
 	main_viewport->refresh();
+
+	main_viewport_center = main_viewport->get_width() / 2;
 
 	footer = newwin(FOOTER_HEIGHT, width - QUEUE_WIDTH, height - FOOTER_HEIGHT, 0);
 	wbkgd(footer, COLOR_PAIR(FOOTER_COLOR_PAIR));
