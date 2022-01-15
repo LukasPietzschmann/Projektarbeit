@@ -20,7 +20,8 @@ void handleSignal(int sig) {
 	events.clear();
 	delwin(footer);
 	delwin(src_display);
-	delwin(queue_display_pad);
+	delete queue_display;
+	delete main_viewport;
 	endwin();
 	exit(sig);
 }
