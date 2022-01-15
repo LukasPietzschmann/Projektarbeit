@@ -24,16 +24,13 @@ WINDOW* scrollable::operator*() const {
 	return m_pad;
 }
 
-void scrollable::project_window(WINDOW* win) {
-	assert(win != nullptr);
-	overwrite(win, m_pad);
-	int height = getmaxy(win);
-	int y_start = getbegy(win);
-	m_max_y = std::max(y_start + height, m_max_y);
-}
-
 void scrollable::add_string(const CH::str& string, int x, int y) {
 	mvwaddnstr(m_pad, y, x, &string.elems[0], *string);
+	m_max_y = std::max(y, m_max_y);
+}
+
+void scrollable::add_char(char c, int x, int y) {
+	mvwaddch(m_pad, y, x, c);
 	m_max_y = std::max(y, m_max_y);
 }
 

@@ -12,8 +12,8 @@ public:
 
 	void scroll_y(int delta);
 
-	void project_window(WINDOW* win);
 	void add_string(const CH::str& string, int x, int y);
+	void add_char(char c, int x, int y);
 	void del_line(int x, int y);
 
 	void clear();

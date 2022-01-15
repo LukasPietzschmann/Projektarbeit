@@ -33,14 +33,6 @@ public:
 		invalidate();
 	}
 
-	~archive() {
-		if(m_window != nullptr) {
-			werase(m_window);
-			wrefresh(m_window);
-			werase(m_window);
-		}
-	}
-
 	bool operator==(const archive& other) const;
 
 	bool intersects_with(const archive& other) const;
@@ -86,15 +78,12 @@ private:
 		CH::str as_string() const;
 	};
 
-	WINDOW* m_window {nullptr};
 	uint32_t m_width {0};
 	uint32_t m_height {0};
 	uint32_t m_y_start {0};
 	uint32_t m_x_start {0};
 	uint32_t m_divider_x_pos {0};
 	uint32_t m_pos_in_src;
-
-	bool m_dirty {true};
 
 	std::map<long, archive_element> m_cons {}, m_comp {};
 
