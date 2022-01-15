@@ -14,26 +14,26 @@ bool archive::intersects_with(const archive::rect& other) const {
 
 void archive::render() {
 	for(int i = 0; i < m_height; ++i) {
-		main_viewport->add_char('|', m_x_start, i + m_y_start);
-		main_viewport->add_char('|', m_width + m_x_start, i + m_y_start);
+		mvsaddch(main_viewport, i + m_y_start, m_x_start, '|');
+		mvsaddch(main_viewport, i + m_y_start, m_width + m_x_start, '|');
 	}
 
 	for(int i = 0; i <= m_width; ++i) {
-		main_viewport->add_char('-', i + m_x_start, m_y_start);
-		main_viewport->add_char('-', i + m_x_start, m_height + m_y_start - 1);
+		mvsaddch(main_viewport, m_y_start, i + m_x_start, '-');
+		mvsaddch(main_viewport, m_height + m_y_start - 1, i + m_x_start, '-');
 	}
 
 	auto comp_it = m_comp.begin();
 	auto cons_it = m_cons.begin();
 	for(int i = 1; i < m_height - 1; ++i) {
-		main_viewport->add_string("|", m_divider_x_pos + m_x_start, i + m_y_start);
+		mvsaddch(main_viewport, i + m_y_start, m_divider_x_pos + m_x_start, '|');
 
 		if(comp_it != m_comp.end()) {
 			const auto& elem = comp_it->second;
 			const auto& string = elem.as_string();
 			if(elem.is_highlighted)
 				attron(HIGHLIGHT_EXPR_ATTR);
-			main_viewport->add_string(string, m_divider_x_pos + 1 + m_x_start, i + m_y_start);
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start, string);
 			if(elem.is_highlighted)
 				attroff(HIGHLIGHT_EXPR_ATTR);
 			++comp_it;
@@ -44,7 +44,7 @@ void archive::render() {
 			const auto& string = elem.as_string();
 			if(elem.is_highlighted)
 				attron(HIGHLIGHT_EXPR_ATTR);
-			main_viewport->add_string(string, m_divider_x_pos - *string + m_x_start, i + m_y_start);
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - *string + m_x_start, string);
 			if(elem.is_highlighted)
 				attroff(HIGHLIGHT_EXPR_ATTR);
 			++cons_it;
@@ -56,7 +56,7 @@ void archive::render() {
 	if(pos >= m_width)
 		pos -= (pos - m_width) + *pos_in_src_str;
 
-	main_viewport->add_string(pos_in_src_str, pos + m_x_start, m_y_start);
+	mvsaddstr(main_viewport, m_y_start, pos + m_x_start, pos_in_src_str);
 }
 
 uint32_t archive::get_pos_in_src() const {

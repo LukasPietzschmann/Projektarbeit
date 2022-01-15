@@ -5,6 +5,9 @@
 #include <cassert>
 #include <seq.ch>
 
+#define mvsaddstr(scrollable, y, x, str) scrollable->add_string(str, x, y)
+#define mvsaddch(scrollable, y, x, chr) scrollable->add_char(chr, x, y)
+
 class scrollable {
 public:
 	scrollable(uint32_t width, uint32_t height, uint32_t x_start, uint32_t y_start);
