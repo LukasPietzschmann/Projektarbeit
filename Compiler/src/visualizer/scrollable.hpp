@@ -33,6 +33,6 @@ private:
 	uint32_t m_x_start;
 	uint32_t m_y_start;
 	WINDOW* m_pad;
-	int m_scroll_y {0};
-	int m_max_y {0};
+	uint32_t m_scroll_y {0};
+	uint32_t m_max_y {0};
 };
