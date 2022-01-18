@@ -33,9 +33,13 @@ void archive::render() {
 			const auto& string = elem.as_string();
 			if(elem.is_highlighted)
 				attron(HIGHLIGHT_EXPR_ATTR);
+			if(elem.is_ambiguous)
+				attron(COLOR_PAIR(AMBIGUOUS_COLOR_PAIR));
 			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start, string);
 			if(elem.is_highlighted)
 				attroff(HIGHLIGHT_EXPR_ATTR);
+			if(elem.is_ambiguous)
+				attroff(COLOR_PAIR(AMBIGUOUS_COLOR_PAIR));
 			++comp_it;
 		}
 
@@ -70,7 +74,14 @@ void archive::add_cons(long id, const Expr& cons) {
 }
 
 void archive::add_comp(long id, const Expr& comp) {
-	m_comp.try_emplace(id, comp);
+	bool is_comp_ambiguous = false;
+	for(auto&[id, element]: m_comp) {
+		if(element.expr(end_) != comp(end_))
+			continue;
+		element.is_ambiguous = true;
+		is_comp_ambiguous = true;
+	}
+	m_comp.try_emplace(id, comp, false, false, is_comp_ambiguous);
 	invalidate();
 }
 
@@ -83,9 +94,21 @@ bool archive::remove_cons_with_id(long id) {
 }
 
 bool archive::remove_comp_with_id(long id) {
-	if(m_comp.erase(id) == 0)
+	const auto& it = m_comp.find(id);
+	if(it == m_comp.end())
 		return false;
 
+	if(it->second.is_ambiguous) {
+		for(auto &[e_id, elem]: m_comp) {
+			if(e_id == id)
+				continue;
+			if(elem.expr(end_) != it->second.expr(end_))
+				continue;
+			elem.is_ambiguous = false;
+		}
+	}
+
+	m_comp.erase(it);
 	invalidate();
 	return true;
 }
