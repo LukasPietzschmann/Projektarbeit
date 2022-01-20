@@ -12,10 +12,14 @@ scrollable::~scrollable() {
 }
 
 void scrollable::scroll_y(int delta) {
-	if(m_max_y < m_height)
+	if(m_scroll_y == 0 && delta < 0)
 		return;
-	if(m_scroll_y + delta > m_max_y - m_height)
-		return;
+	if(!(m_scroll_y + m_height > m_max_y && delta < 0)) {
+		if(m_max_y < m_height)
+			return;
+		if(m_scroll_y + delta > m_max_y - m_height)
+			return;
+	}
 	m_scroll_y += delta;
 	refresh();
 }
@@ -49,18 +53,17 @@ void scrollable::clear() {
 void scrollable::refresh() {
 	static bool had_segments = false;
 
-	uint32_t internal_scroll;
 	uint32_t segments_y_start;
 	uint32_t number_of_segments_to_draw;
 
-	if(m_max_y > m_height) {
-		internal_scroll = std::clamp(m_scroll_y, (uint32_t) 0, m_max_y - m_height);
-		number_of_segments_to_draw = std::max((uint32_t) 1, m_height * m_height / m_max_y);
-		segments_y_start = (m_height - number_of_segments_to_draw) * internal_scroll / (m_max_y - m_height);
+	if(uint32_t internal_max_x = std::max(m_max_y, m_scroll_y + m_height); internal_max_x > m_height) {
+		number_of_segments_to_draw = std::max((uint32_t) 1, m_height * m_height / internal_max_x);
+		segments_y_start = (m_height - number_of_segments_to_draw) *
+				std::clamp(m_scroll_y, (uint32_t) 0, internal_max_x - m_height) / (internal_max_x - m_height);
 		had_segments = true;
 	}else {
 		number_of_segments_to_draw = 0;
-		had_segments = false;
+		had_segments = true;
 	}
 
 	for(int i = 0; had_segments && i < m_height * 4; ++i)
