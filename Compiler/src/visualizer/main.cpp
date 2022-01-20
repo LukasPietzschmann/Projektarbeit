@@ -70,6 +70,7 @@ int start_visualizer(const CH::str& source_string) {
 	signal(SIGABRT, handleSignal);
 	signal(SIGKILL, handleSignal);
 
+	cbreak();
 	timeout(-1);
 	noecho();
 	setup_colors();
