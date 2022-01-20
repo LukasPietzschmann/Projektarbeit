@@ -29,10 +29,10 @@ public:
 
 private:
 	uint32_t m_width;
-	uint32_t m_height;
+	uint32_t m_screen_height;
 	uint32_t m_x_start;
 	uint32_t m_y_start;
 	WINDOW* m_pad;
 	uint32_t m_scroll_y {0};
-	uint32_t m_max_y {0};
+	uint32_t m_content_height {0};
 };
