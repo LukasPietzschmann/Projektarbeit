@@ -20,7 +20,7 @@ public:
 	void del_line(int x, int y);
 
 	void clear();
-	void refresh();
+	void prepare_refresh();
 
 	uint32_t get_width() const;
 	uint32_t get_height() const;

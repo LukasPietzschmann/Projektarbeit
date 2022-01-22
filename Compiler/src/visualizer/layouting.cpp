@@ -51,5 +51,5 @@ void layouter::notify_dimensions_changed(archive&) const {
 	for(auto& window: arch_windows)
 		window.render();
 
-	main_viewport->refresh();
+	main_viewport->prepare_refresh();
 }

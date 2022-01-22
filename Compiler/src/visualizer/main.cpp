@@ -81,7 +81,7 @@ int start_visualizer(const CH::str& source_string) {
 			HEADER_HEIGHT);
 	wbkgd(**main_viewport, COLOR_PAIR(STD_COLOR_PAIR));
 	stdscr = **main_viewport;
-	main_viewport->refresh();
+	main_viewport->prepare_refresh();
 
 	main_viewport_center = main_viewport->get_width() / 2;
 
@@ -95,7 +95,7 @@ int start_visualizer(const CH::str& source_string) {
 
 	queue_display = new scrollable(QUEUE_WIDTH - 1, height - 1, width - QUEUE_WIDTH, 0);
 	wbkgd(**queue_display, COLOR_PAIR(QUEUE_COLOR_PAIR));
-	queue_display->refresh();
+	queue_display->prepare_refresh();
 
 	wnoutrefresh(src_display);
 	wnoutrefresh(footer);
