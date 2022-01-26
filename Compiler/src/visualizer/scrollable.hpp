@@ -35,4 +35,5 @@ private:
 	WINDOW* m_pad;
 	uint32_t m_scroll_y {0};
 	uint32_t m_content_height {0};
+	uint32_t m_content_start_y {0};
 };

@@ -14,10 +14,10 @@ scrollable::~scrollable() {
 void scrollable::scroll_y(int delta) {
 	if(m_scroll_y == 0 && delta < 0)
 		return;
-	if(!(m_scroll_y + m_screen_height > m_content_height && delta < 0)) {
-		if(m_content_height < m_screen_height)
+	if(!(m_scroll_y + m_screen_height > m_content_height + m_content_start_y && delta < 0)) {
+		if(m_content_height + m_content_start_y < m_screen_height)
 			return;
-		if(m_scroll_y + delta > m_content_height - m_screen_height)
+		if(m_scroll_y + delta > (m_content_height + m_content_start_y) - m_screen_height)
 			return;
 	}
 	m_scroll_y += delta;
@@ -30,24 +30,30 @@ WINDOW* scrollable::operator*() const {
 
 void scrollable::add_string(const CH::str& string, int x, int y) {
 	mvwaddnstr(m_pad, y, x, &string.elems[0], *string);
-	m_content_height = std::max((uint32_t) y, m_content_height);
+	m_content_height = std::max((uint32_t) y, m_content_height) - m_content_start_y;
 }
 
 void scrollable::add_char(char c, int x, int y) {
 	mvwaddch(m_pad, y, x, c);
-	m_content_height = std::max((uint32_t) y, m_content_height);
+	m_content_height = std::max((uint32_t) y, m_content_height) - m_content_start_y;
 }
 
 void scrollable::del_line(int x, int y) {
 	wmove(m_pad, y, x);
-	wclrtobot(m_pad);
-	if(y == m_content_height)
+	//wclrtobot(m_pad);
+	wclrtoeol(m_pad);
+	if(y == m_content_height + m_content_start_y)
 		--m_content_height;
+	else if(y == m_content_start_y) {
+		++m_content_start_y;
+		--m_content_height;
+	}
 }
 
 void scrollable::clear() {
 	werase(m_pad);
 	m_content_height = 0;
+	m_content_start_y = 0;
 }
 
 void scrollable::prepare_refresh() {
@@ -56,8 +62,9 @@ void scrollable::prepare_refresh() {
 	uint32_t segments_y_start;
 	uint32_t number_of_segments_to_draw;
 
-	if(uint32_t internal_max_x = std::max(m_content_height, m_scroll_y + m_screen_height); internal_max_x >
-			m_screen_height) {
+	if(uint32_t internal_max_x = std::max(m_content_height + m_content_start_y, m_scroll_y + m_screen_height);
+			internal_max_x >
+					m_screen_height) {
 		number_of_segments_to_draw = std::max((uint32_t) 1, m_screen_height * m_screen_height / internal_max_x);
 		segments_y_start = (m_screen_height - number_of_segments_to_draw) *
 				std::clamp(m_scroll_y, (uint32_t) 0, internal_max_x - m_screen_height) /
@@ -65,7 +72,7 @@ void scrollable::prepare_refresh() {
 		had_segments = true;
 	}else {
 		number_of_segments_to_draw = 0;
-		had_segments = true;
+		had_segments = false;
 	}
 
 	for(int i = 0; had_segments && i < m_screen_height * 4; ++i)
@@ -74,7 +81,8 @@ void scrollable::prepare_refresh() {
 	for(int i = 0; i < number_of_segments_to_draw; ++i)
 		mvwaddch(m_pad, segments_y_start + i + m_scroll_y, m_width - 1, '|');
 
-	pnoutrefresh(m_pad, m_scroll_y, 0, m_y_start, m_x_start, m_y_start + m_screen_height, m_x_start + m_width);
+	pnoutrefresh(m_pad, m_scroll_y + m_content_start_y, 0, m_y_start, m_x_start, m_y_start + m_screen_height,
+			m_x_start + m_width);
 }
 
 uint32_t scrollable::get_width() const {

@@ -23,5 +23,6 @@ public:
 
 private:
 	expr_queue() = default;
-	uint32_t m_size {0};
+	int m_y_begin {0};
+	int m_y_end {0};
 };
