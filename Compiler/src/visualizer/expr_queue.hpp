@@ -18,8 +18,8 @@ public:
 	expr_queue& operator=(const expr_queue&) = delete;
 	expr_queue& operator=(expr_queue&&) = default;
 
-	void push(const Expr& expr);
-	bool pop();
+	void push_back(const Expr& expr);
+	bool pop_front();
 
 private:
 	expr_queue() = default;

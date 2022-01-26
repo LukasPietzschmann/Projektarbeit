@@ -104,22 +104,22 @@ event::event_exec_result expr_no_longer_gets_used_event::undo() {
 add_expr_to_queue::add_expr_to_queue(const Expr& expr) : event_with_data(0, expr) {}
 
 event::event_exec_result add_expr_to_queue::exec() {
-	expr_queue::the().push(m_data);
+	expr_queue::the().push_back(m_data);
 	return event::did_something;
 }
 
 event::event_exec_result add_expr_to_queue::undo() {
-	return expr_queue::the().pop() ? event::did_something : event::did_nothing;
+	return expr_queue::the().pop_front() ? event::did_something : event::did_nothing;
 }
 
 remove_expr_from_queue::remove_expr_from_queue(const Expr& expr) : event_with_data(0, expr) {}
 
 event::event_exec_result remove_expr_from_queue::exec() {
-	return expr_queue::the().pop() ? event::did_something : event::did_nothing;
+	return expr_queue::the().pop_front() ? event::did_something : event::did_nothing;
 }
 
 event::event_exec_result remove_expr_from_queue::undo() {
-	expr_queue::the().push(m_data);
+	expr_queue::the().push_back(m_data);
 	return event::did_something;
 }
 
