@@ -3,6 +3,7 @@
 #include <cassert>
 #include <ncurses.h>
 #include <vector>
+#include <csignal>
 
 #include "archive.hpp"
 #include "constants.hpp"
