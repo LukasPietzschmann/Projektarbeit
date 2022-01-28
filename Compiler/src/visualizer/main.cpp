@@ -76,11 +76,12 @@ int start_visualizer(const CH::str& source_string) {
 	setup_colors();
 	curs_set(0);
 	getmaxyx(stdscr, height, width);
+	wresize(stdscr, 0, 0);
+	wnoutrefresh(stdscr);
 
 	main_viewport = new scrollable(width - QUEUE_WIDTH - 1, height - HEADER_HEIGHT - FOOTER_HEIGHT - 1, 0,
 			HEADER_HEIGHT);
 	wbkgd(**main_viewport, COLOR_PAIR(STD_COLOR_PAIR));
-	stdscr = **main_viewport;
 	main_viewport->prepare_refresh();
 
 	main_viewport_center = main_viewport->get_width() / 2;
@@ -104,7 +105,6 @@ int start_visualizer(const CH::str& source_string) {
 	next_event_it = events.begin();
 
 	while(char c = getch()) {
-		refresh();
 		if(c == 'q')
 			break;
 
