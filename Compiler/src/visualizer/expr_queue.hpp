@@ -19,6 +19,8 @@ public:
 	expr_queue& operator=(expr_queue&&) = default;
 
 	void push_back(const Expr& expr);
+	bool pop_back();
+	void push_front(const Expr& expr);
 	bool pop_front();
 
 private:
