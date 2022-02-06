@@ -30,7 +30,12 @@ WINDOW* scrollable::operator*() const {
 
 void scrollable::add_string(const CH::str& string, int x, int y) {
 	mvwaddnstr(m_pad, y, x, &string.elems[0], *string);
-	m_content_height = std::max((uint32_t) y, m_content_height) - m_content_start_y;
+	if(y < m_content_start_y) {
+		const int diff = m_content_start_y - y;
+		m_content_start_y -= diff;
+		m_content_height += diff;
+	}else if(y >= m_content_height + m_content_start_y)
+		m_content_height = y - m_content_start_y;
 }
 
 void scrollable::add_char(char c, int x, int y) {
@@ -62,7 +67,7 @@ void scrollable::prepare_refresh() {
 	uint32_t segments_y_start;
 	uint32_t number_of_segments_to_draw;
 
-	if(uint32_t internal_max_x = std::max(m_content_height + m_content_start_y, m_scroll_y + m_screen_height);
+	if(uint32_t internal_max_x = std::max(m_content_height, m_scroll_y + m_screen_height);
 			internal_max_x >
 					m_screen_height) {
 		number_of_segments_to_draw = std::max((uint32_t) 1, m_screen_height * m_screen_height / internal_max_x);
@@ -81,7 +86,7 @@ void scrollable::prepare_refresh() {
 	for(int i = 0; i < number_of_segments_to_draw; ++i)
 		mvwaddch(m_pad, segments_y_start + i + m_scroll_y, m_width - 1, '|');
 
-	pnoutrefresh(m_pad, m_scroll_y, 0, m_y_start, m_x_start, m_y_start + m_screen_height,
+	pnoutrefresh(m_pad, m_scroll_y + m_content_start_y, 0, m_y_start, m_x_start, m_y_start + m_screen_height,
 			m_x_start + m_width);
 }
 
