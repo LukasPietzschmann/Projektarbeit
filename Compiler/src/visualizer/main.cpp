@@ -40,22 +40,24 @@ void setup_colors() {
 	init_pair(AMBIGUOUS_COLOR_PAIR, COLOR_BLACK, COLOR_RED);
 }
 
-bool step_forward() {
+bool step_one_event_forward() {
 	if(next_event_it == events.end())
 		return false;
 
+	// Hatte das aktuelle event keine Auswirkung, wird direkt das Nächste ausgeführt
 	if((*(next_event_it++))->exec() == event::did_nothing)
-		step_forward();
+		step_one_event_forward();
 
 	return true;
 }
 
-bool step_backward() {
+bool step_one_event_backward() {
 	if(next_event_it == events.begin())
 		return false;
 
+	// Hatte das aktuelle event keine Auswirkung, wird direkt das Nächste ausgeführt
 	if((*(--next_event_it))->undo() == event::did_nothing)
-		step_backward();
+		step_one_event_backward();
 
 	return true;
 }
@@ -76,6 +78,7 @@ int start_visualizer(const CH::str& source_string) {
 	setup_colors();
 	curs_set(0);
 	getmaxyx(stdscr, height, width);
+	//Wird der stdsrc nicht minimal klein gemacht, verdeckt er den Rest
 	wresize(stdscr, 0, 0);
 	wnoutrefresh(stdscr);
 
@@ -109,18 +112,21 @@ int start_visualizer(const CH::str& source_string) {
 			break;
 
 		bool worked = true;
-		if(c == 'n')
-			worked = step_forward();
-		else if(c == 'p')
-			worked = step_backward();
-		else if(c == 66) // arrow down
-			main_viewport->scroll_y(1);
-		else if(c == 65) // arrow up
-			main_viewport->scroll_y(-1);
-		else if(c == 'w')
-			queue_display->scroll_y(-1);
-		else if(c == 's')
-			queue_display->scroll_y(1);
+		switch(c) {
+			case 'n': worked = step_one_event_forward();
+				break;
+			case 'p': worked = step_one_event_backward();
+				break;
+			case 66: main_viewport->scroll_y(1); // arrow down
+				break;
+			case 65: main_viewport->scroll_y(-1); // arrow up
+				break;
+			case 's': queue_display->scroll_y(1);
+				break;
+			case 'w': queue_display->scroll_y(-1);
+				break;
+		}
+		//`doupdate` hier nötig, da alle aufgerufenen Funktionen in der Regel nu `wnoutrefresh` verwenden
 		doupdate();
 
 		if(!worked) {
