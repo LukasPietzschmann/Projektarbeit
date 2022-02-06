@@ -62,7 +62,7 @@ void scrollable::clear() {
 }
 
 void scrollable::prepare_refresh() {
-	static bool had_segments = false;
+	static bool clear_scrollbar = false;
 
 	uint32_t segments_y_start;
 	uint32_t number_of_segments_to_draw;
@@ -74,14 +74,17 @@ void scrollable::prepare_refresh() {
 		segments_y_start = (m_screen_height - number_of_segments_to_draw) *
 				std::clamp(m_scroll_y, (uint32_t) 0, internal_max_x - m_screen_height) /
 				(internal_max_x - m_screen_height);
-		had_segments = true;
+		clear_scrollbar = true;
 	}else {
 		number_of_segments_to_draw = 0;
-		had_segments = false;
+		if(!clear_scrollbar)
+			clear_scrollbar = true;
 	}
 
-	for(int i = 0; had_segments && i < m_screen_height * 4; ++i)
+	for(int i = 0; clear_scrollbar && i < m_screen_height * 4; ++i)
 		mvwaddch(m_pad, i, m_width - 1, ' ');
+
+	clear_scrollbar = false;
 
 	for(int i = 0; i < number_of_segments_to_draw; ++i)
 		mvwaddch(m_pad, segments_y_start + i + m_scroll_y, m_width - 1, '|');
