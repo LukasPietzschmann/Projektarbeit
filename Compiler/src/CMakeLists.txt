@@ -4,7 +4,7 @@ add_subdirectory(visualizer)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
 find_package(Readline)
-find_package(Curses)
+find_package(Curses REQUIRED)
 
 include(FetchContent)
 FetchContent_Declare(
