@@ -4,20 +4,15 @@
 #include <ncurses.h>
 #include <vector>
 #include <csignal>
+#include <panel.h>
 
 #include "archive.hpp"
 #include "constants.hpp"
 #include "event.hpp"
 #include "expr_queue.hpp"
+#include "popup.hpp"
 #include "scrollable.hpp"
 #include "utils.hpp"
-
-/*
-operator catalog sichtbar machen (katalog nummer) Katalog der in Key drin steckt
-katalog übersicht im unteren bereich (matrix darstellung, zeilenweise untereinander sämtliche operatoren die in irgend einem Katalog auftauchen, nach rechts rüber katalog 1 katalog 2 katalog drei)
-
-vll auch ausgeschlossene operatoren (excl_)
-*/
 
 using event_iterator = std::vector<event*>::iterator;
 extern event_iterator next_event_it;

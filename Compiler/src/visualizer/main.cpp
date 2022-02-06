@@ -4,6 +4,7 @@ WINDOW* footer;
 WINDOW* src_display;
 scrollable* queue_display;
 scrollable* main_viewport;
+popup* opers_popup;
 
 int main_viewport_center;
 int src_str_center;
@@ -91,7 +92,7 @@ int start_visualizer(const CH::str& source_string) {
 
 	footer = newwin(FOOTER_HEIGHT, width - QUEUE_WIDTH, height - FOOTER_HEIGHT, 0);
 	wbkgd(footer, COLOR_PAIR(FOOTER_COLOR_PAIR));
-	center_text_hor(footer, "q: quit    n: next    p: previous", 0);
+	center_text_hor(footer, "q: quit    n: next    p: previous    o: toggle opers", 0);
 
 	src_display = newwin(HEADER_HEIGHT, width - QUEUE_WIDTH, 0, 0);
 	wbkgd(src_display, COLOR_PAIR(HEADER_COLOR_PAIR));
@@ -107,11 +108,22 @@ int start_visualizer(const CH::str& source_string) {
 
 	next_event_it = events.begin();
 
+	WINDOW* popup_win = newwin(POPUP_HEIGHT, POPUP_WIDTH, 5, main_viewport_center - POPUP_WIDTH / 2);
+	box(popup_win, ACS_VLINE, ACS_HLINE);
+	wbkgd(popup_win, COLOR_PAIR(POPUP_COLOR_PAIR));
+	opers_popup = new popup(popup_win);
+	mvpaddstr(opers_popup, 0, 0, "Das ist ein Popup :>)");
+
 	while(char c = getch()) {
 		if(c == 'q')
 			break;
 
 		bool worked = true;
+
+		if(c == 'o' && !opers_popup->toggle())
+			main_viewport->prepare_refresh();
+		if(opers_popup->is_currently_shown())
+			goto skip_input_check_if_popup_is_shown;
 		switch(c) {
 			case 'n': worked = step_one_event_forward();
 				break;
@@ -126,6 +138,8 @@ int start_visualizer(const CH::str& source_string) {
 			case 'w': queue_display->scroll_y(-1);
 				break;
 		}
+
+		skip_input_check_if_popup_is_shown:
 		//`doupdate` hier nötig, da alle aufgerufenen Funktionen in der Regel nu `wnoutrefresh` verwenden
 		doupdate();
 

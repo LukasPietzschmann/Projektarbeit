@@ -26,7 +26,7 @@ target_link_libraries(main flxc Visualizer cxxopts)
 
 if(CURSES_FOUND)
 	include_directories(${CURSES_INCLUDE_DIR})
-	target_link_libraries(main ${CURSES_LIBRARIES})
+	target_link_libraries(main ${CURSES_LIBRARIES} panel)
 	add_compile_definitions(HAS_CURSES_LIB)
 endif(CURSES_FOUND)
 
