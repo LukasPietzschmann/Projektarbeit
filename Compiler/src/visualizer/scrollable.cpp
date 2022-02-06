@@ -14,10 +14,10 @@ scrollable::~scrollable() {
 void scrollable::scroll_y(int delta) {
 	if(m_scroll_y == 0 && delta < 0)
 		return;
-	if(!(m_scroll_y + m_screen_height > m_content_height + m_content_start_y && delta < 0)) {
-		if(m_content_height + m_content_start_y < m_screen_height)
+	if(!(m_scroll_y + m_screen_height > m_content_height && delta < 0)) {
+		if(m_content_height < m_screen_height)
 			return;
-		if(m_scroll_y + delta > (m_content_height + m_content_start_y) - m_screen_height)
+		if(m_scroll_y + delta > m_content_height - m_screen_height)
 			return;
 	}
 	m_scroll_y += delta;
@@ -45,7 +45,6 @@ void scrollable::add_char(char c, int x, int y) {
 
 void scrollable::del_line(int x, int y) {
 	wmove(m_pad, y, x);
-	//wclrtobot(m_pad);
 	wclrtoeol(m_pad);
 	if(y == m_content_height + m_content_start_y)
 		--m_content_height;
