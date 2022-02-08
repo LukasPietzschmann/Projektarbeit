@@ -87,7 +87,7 @@ void scrollable::prepare_refresh() {
 	clear_scrollbar = false;
 
 	for(int i = 0; i < number_of_segments_to_draw; ++i)
-		mvwaddch(m_pad, segments_y_start + i + m_scroll_y, m_width - 1, '|');
+		mvwaddch(m_pad, segments_y_start + i + m_scroll_y + m_content_start_y, m_width - 1, '|');
 
 	pnoutrefresh(m_pad, m_scroll_y + m_content_start_y, 0, m_y_start, m_x_start, m_y_start + m_screen_height,
 			m_x_start + m_width);
