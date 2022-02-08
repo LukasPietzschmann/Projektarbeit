@@ -37,6 +37,7 @@ int main (int argc, char* argv []) {
   cxxopts::Options options(argv[0], "The MOSTflexiPL programming language");
   options.add_options()("f,file", "Die auszuführende Datei", cxxopts::value<std::string>())
                        ("debug-parser", "Visualisiert den Parsvorgang")
+                       ("skip-to-event", "Überspringt alle Events mit index kleiner n", cxxopts::value<int>())
                        ("h,help", "Zeigt diese Nachricht an");
   options.parse_positional({"file"});
   options.positional_help("[FILE]").show_positional_help();
@@ -66,8 +67,13 @@ int main (int argc, char* argv []) {
 
     // Parser ausführen.
     eval_exprs(parse(opers));
-	if(result.count("debug-parser"))
-		start_visualizer(scan_str);
+	if(result.count("debug-parser")) {
+		int event_to_skip_to = 0;
+		if(result.count("skip-to-event"))
+			event_to_skip_to = result["skip-to-event"].as<int>();
+		start_visualizer(scan_str, event_to_skip_to);
+	}else if(result.count("skip-to-event"))
+		std::cout << "debug-parser muss gesetzt sein, um skip-to-event verwenden zu können" << std::endl;
 }
 
 int repl() {

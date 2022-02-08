@@ -16,6 +16,7 @@
 
 using event_iterator = std::vector<event*>::iterator;
 extern event_iterator next_event_it;
+extern uint64_t current_event_index;
 
 /**
  * Wird das Programm unerwartet durch ein Signal beendet,
@@ -41,4 +42,4 @@ bool step_one_event_forward();
  */
 bool step_one_event_backward();
 
-int start_visualizer(const CH::str& source_string);
+int start_visualizer(const CH::str& source_string, int event_to_skip_to);

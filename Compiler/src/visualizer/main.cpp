@@ -15,6 +15,7 @@ int height;
 std::vector<archive> arch_windows;
 std::vector<event*> events;
 event_iterator next_event_it;
+uint64_t current_event_index;
 
 void handleSignal(int sig) {
 	arch_windows.clear();
@@ -45,6 +46,7 @@ bool step_one_event_forward() {
 	if(next_event_it == events.end())
 		return false;
 
+	++current_event_index;
 	// Hatte das aktuelle event keine Auswirkung, wird direkt das Nächste ausgeführt
 	if((*(next_event_it++))->exec() == event::did_nothing)
 		step_one_event_forward();
@@ -56,6 +58,7 @@ bool step_one_event_backward() {
 	if(next_event_it == events.begin())
 		return false;
 
+	--current_event_index;
 	// Hatte das aktuelle event keine Auswirkung, wird direkt das Nächste ausgeführt
 	if((*(--next_event_it))->undo() == event::did_nothing)
 		step_one_event_backward();
@@ -63,7 +66,9 @@ bool step_one_event_backward() {
 	return true;
 }
 
-int start_visualizer(const CH::str& source_string) {
+int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
+	assert(event_to_scip_to >= 0);
+
 	src_str_len = *source_string;
 	src_str_center = src_str_len / 2;
 
@@ -104,14 +109,19 @@ int start_visualizer(const CH::str& source_string) {
 
 	wnoutrefresh(src_display);
 	wnoutrefresh(footer);
-	doupdate();
-
-	next_event_it = events.begin();
 
 	WINDOW* popup_win = newwin(POPUP_HEIGHT, POPUP_WIDTH, 5, main_viewport_center - POPUP_WIDTH / 2);
 	box(popup_win, ACS_VLINE, ACS_HLINE);
 	wbkgd(popup_win, COLOR_PAIR(POPUP_COLOR_PAIR));
 	opers_popup = new popup(popup_win);
+
+	next_event_it = events.begin();
+	current_event_index = 0;
+
+	for(int i = 0; i < event_to_scip_to; ++i)
+		step_one_event_forward();
+
+	doupdate();
 
 	while(char c = getch()) {
 		if(c == 'q')
@@ -139,6 +149,11 @@ int start_visualizer(const CH::str& source_string) {
 		}
 
 		skip_input_check_if_popup_is_shown:
+
+		wmove(src_display, 0, 0);
+		wprintw(src_display, "Event: %3d", current_event_index);
+		wnoutrefresh(src_display);
+
 		//`doupdate` hier nötig, da alle aufgerufenen Funktionen in der Regel nu `wnoutrefresh` verwenden
 		doupdate();
 
