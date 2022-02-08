@@ -2,7 +2,7 @@
 
 scrollable::scrollable(uint32_t width, uint32_t height, uint32_t x_start, uint32_t y_start) :
 		m_width(width), m_screen_height(height), m_x_start(x_start), m_y_start(y_start) {
-	m_pad = newpad(height * 4, width * 4);
+	m_pad = newpad(height * 100, width * 4);
 	prepare_refresh();
 }
 
