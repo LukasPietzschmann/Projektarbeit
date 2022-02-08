@@ -25,6 +25,7 @@ public:
 
 private:
 	expr_queue() = default;
+	CH::str expr_to_str(const Expr& expr);
 	int m_y_begin {0};
 	int m_y_end {0};
 };

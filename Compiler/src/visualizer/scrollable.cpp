@@ -66,15 +66,16 @@ void scrollable::prepare_refresh() {
 	uint32_t segments_y_start;
 	uint32_t number_of_segments_to_draw;
 
-	if(uint32_t internal_max_x = std::max(m_content_height, m_scroll_y + m_screen_height);
-			internal_max_x >
-					m_screen_height) {
-		number_of_segments_to_draw = std::max((uint32_t) 1, m_screen_height * m_screen_height / internal_max_x);
-		segments_y_start = (m_screen_height - number_of_segments_to_draw) *
-				std::clamp(m_scroll_y, (uint32_t) 0, internal_max_x - m_screen_height) /
-				(internal_max_x - m_screen_height);
+	uint32_t view_y = m_scroll_y; //oder m_scroll_y + m_content_start_y
+
+	if(m_content_height > m_screen_height) {
+		number_of_segments_to_draw = std::max((uint32_t) 1, m_screen_height * m_screen_height / m_content_height);
+		view_y = std::clamp(view_y, (uint32_t) 0, m_content_height - m_screen_height);
+		segments_y_start =
+				(m_screen_height - number_of_segments_to_draw) * view_y / (m_content_height - m_screen_height);
 		clear_scrollbar = true;
 	}else {
+		segments_y_start = 0;
 		number_of_segments_to_draw = 0;
 		if(!clear_scrollbar)
 			clear_scrollbar = true;

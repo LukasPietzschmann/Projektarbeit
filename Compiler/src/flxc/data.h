@@ -28,6 +28,8 @@ using Par = Oper;
 // Teil einer Operatorsignatur.
 TYPE(Part)
 
+ATTR1 (currpart_, Expr, Part)
+
 // Operatorsignatur.
 using Sig = seq<Part>;
 
@@ -147,20 +149,52 @@ ATTR1(left_, Excl, bool)
 ATTR1(top_, Excl, bool)
 ATTR1(right_, Excl, bool)
 
+ATTR (to_str_from_currpart_)
+inline str FUNC (to_str_from_currpart_, Expr expr) {
+	std::function<str(const Sig&, bool)> get_ident = [&get_ident, &expr](const Sig& sig, bool skip)->str {
+		str res;
+		bool ab_jetzt = !skip;
+		for(const Part& part: sig) {
+			if(expr(currpart_) == part) {
+				ab_jetzt = true;
+			}
+			if(part(opt_) && ab_jetzt)
+				res += "[";
+			if(const str& name = part(name_)) {
+				if(ab_jetzt)
+					res += name + " ";
+			}
+			else if(const Oper& param = part(par_)){ //res += get_ident(param(sig_));
+				if(ab_jetzt)
+					res += "_ ";
+			}
+			else if(const seq<Sig>& alts = part(alts_)) {
+					for(const Sig& s: alts)
+						res += get_ident(s, !ab_jetzt);
+			}
+			if(part(opt_) && ab_jetzt)
+				res += "]";
+		}
+		return res;
+	};
+
+	return get_ident(expr(oper_)(sig_), true);
+}
+
 ATTR (to_str_)
 inline str FUNC (to_str_, Expr expr) {
-	std::function<str(const Sig&)> get_ident = [&get_ident](const Sig& sig)->str {
+	std::function<str(const Sig&)> get_ident = [&get_ident, &expr](const Sig& sig)->str {
 		str res;
 		for(const Part& part: sig) {
 			if(part(opt_))
 				res += "[";
 			if(const str& name = part(name_))
-				res += name + " ";
+					res += name + " ";
 			else if(const Oper& param = part(par_)) //res += get_ident(param(sig_));
-				res += "_ ";
+					res += "_ ";
 			else if(const seq<Sig>& alts = part(alts_)) {
-				for(const Sig& s: alts)
-					res += get_ident(s);
+					for(const Sig& s: alts)
+						res += get_ident(s);
 			}
 			if(part(opt_))
 				res += "]";
@@ -170,6 +204,7 @@ inline str FUNC (to_str_, Expr expr) {
 
 	return get_ident(expr(oper_)(sig_));
 }
+
 // Operatorkataloge.
 
 // Die in einem Katalog enthaltenen Operatoren als virtuelles Attribut,

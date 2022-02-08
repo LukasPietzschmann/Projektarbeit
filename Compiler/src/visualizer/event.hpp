@@ -1,15 +1,17 @@
 #pragma once
 
-#include "layouting.hpp"
-#include "windows.hpp"
-#include "../flxc/data.h"
-#include "expr_queue.hpp"
 #include <algorithm>
 #include <initializer_list>
 #include <functional>
 #include <sstream>
 #include <memory>
 #include <vector>
+
+#include "../flxc/data.h"
+#include "layouting.hpp"
+#include "windows.hpp"
+#include "expr_queue.hpp"
+#include "oper_store.hpp"
 
 class event {
 public:

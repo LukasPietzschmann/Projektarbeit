@@ -2,8 +2,7 @@
 
 #include <panel.h>
 
-#define mvpaddstr(popup, y, x, str) mvwaddstr(**popup, y + 1, x + 1, str)
-#define mvpaddch(popup, y, x, chr) mvwaddch(**popup, y + 1, x + 1, chr)
+#define mvpaddnstr(popup, y, x, str, len) mvwaddnstr(**popup, y + 1, x + 1, str, len)
 
 class popup {
 public:

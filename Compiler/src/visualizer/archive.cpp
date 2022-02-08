@@ -229,5 +229,5 @@ bool archive::operator==(const archive& other) const {
 CH::str archive::archive_element::as_string() const {
 	if(is_prototyp)
 		return expr(to_str_);
-	return get_scanned_str_for_expr(expr);
+	return get_scanned_str_for_expr(expr) + expr(to_str_from_currpart_);
 }

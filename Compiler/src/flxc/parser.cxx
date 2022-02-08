@@ -143,7 +143,6 @@ Item search (Par par, Expr expr) {
 }
 
 // Aktuelles Signaturteil und aktueller Eintrag eines Ausdrucks.
-ATTR1(currpart_, Expr, Part)
 ATTR1(curritem_, Expr, Item)
 
 // Befindet sich ein Signaturteil garantiert, eventuell oder

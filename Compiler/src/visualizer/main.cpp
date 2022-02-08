@@ -112,7 +112,6 @@ int start_visualizer(const CH::str& source_string) {
 	box(popup_win, ACS_VLINE, ACS_HLINE);
 	wbkgd(popup_win, COLOR_PAIR(POPUP_COLOR_PAIR));
 	opers_popup = new popup(popup_win);
-	mvpaddstr(opers_popup, 0, 0, "Das ist ein Popup :>)");
 
 	while(char c = getch()) {
 		if(c == 'q')
