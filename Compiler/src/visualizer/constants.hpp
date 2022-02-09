@@ -3,7 +3,7 @@
 #define FOOTER_HEIGHT 1
 #define HEADER_HEIGHT 1
 #define QUEUE_WIDTH 25
-#define POPUP_WIDTH 50
+#define POPUP_WIDTH 60
 #define POPUP_HEIGHT 10
 
 #define COLOR_GREY 50
