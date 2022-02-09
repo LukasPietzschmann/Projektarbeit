@@ -104,8 +104,8 @@ event::event_exec_result expr_no_longer_gets_used_event::undo() {
 add_expr_to_queue::add_expr_to_queue(const Expr& expr) : event_with_data(0, expr) {}
 
 event::event_exec_result add_expr_to_queue::exec() {
-	expr_queue::the().push_back(m_data);
 	oper_store::the().insert_prototyp(m_data);
+	expr_queue::the().push_back(m_data);
 	return event::did_something;
 }
 
