@@ -33,7 +33,11 @@ bool expr_queue::pop_front() {
 }
 
 CH::str expr_queue::expr_to_str(const Expr& expr) {
+	const auto& id_or_error = oper_store::the().get_id_from_oper(expr(oper_));
+	const CH::str& id_prefix = id_or_error.has_value() ? CH::str(std::to_string(*id_or_error) + ": ") : "?: ";
+
 	if(expr(beg_) == expr(end_))
-		return expr(to_str_);
-	return get_scanned_str_for_expr(expr) + expr(to_str_from_currpart_);
+		return id_prefix + " " + expr(to_str_);
+
+	return id_prefix + " " + get_scanned_str_for_expr(expr) + expr(to_str_from_currpart_);
 }

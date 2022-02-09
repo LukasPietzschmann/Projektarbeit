@@ -16,6 +16,7 @@
 #include "archive_change_listener.hpp"
 #include "constants.hpp"
 #include "coordinates.hpp"
+#include "oper_store.hpp"
 #include "windows.hpp"
 
 class archive {
