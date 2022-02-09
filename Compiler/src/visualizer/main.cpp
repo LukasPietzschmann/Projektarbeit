@@ -122,34 +122,47 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 
 	doupdate();
 
+	int multiplier = 0;
 	while(char c = getch()) {
 		if(c == 'q')
 			break;
 
 		bool worked = true;
 
+		if(c >= '0' && c <= '9') {
+			multiplier *= 10;
+			multiplier += c - 48;
+			continue;
+		}
+
+		multiplier = std::max(1, multiplier);
+
 		if(c == 'o' && !opers_popup->toggle())
 			main_viewport->prepare_refresh();
 		switch(c) {
-			case 'n': worked = step_one_event_forward();
+			case 'n':
+				for(int i = 0; i < multiplier; ++i)
+					worked = step_one_event_forward();
 				break;
-			case 'p': worked = step_one_event_backward();
+			case 'p':
+				for(int i = 0; i < multiplier; ++i)
+					worked = step_one_event_backward();
 				break;
 			case 66: // arrow down
 				if(opers_popup->is_currently_shown())
-					(**opers_popup)->scroll_y(1);
+					(**opers_popup)->scroll_y(multiplier * 1);
 				else
-					main_viewport->scroll_y(1);
+					main_viewport->scroll_y(multiplier * 1);
 				break;
 			case 65: // arrow up
 				if(opers_popup->is_currently_shown())
-					(**opers_popup)->scroll_y(-1);
+					(**opers_popup)->scroll_y(multiplier * -1);
 				else
-					main_viewport->scroll_y(-1);
+					main_viewport->scroll_y(multiplier * -1);
 				break;
-			case 's': queue_display->scroll_y(1);
+			case 's': queue_display->scroll_y(multiplier * 1);
 				break;
-			case 'w': queue_display->scroll_y(-1);
+			case 'w': queue_display->scroll_y(multiplier * -1);
 				break;
 		}
 
@@ -169,6 +182,8 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 			beep();
 			flash();
 		}
+
+		multiplier = 0;
 	}
 
 	handleSignal(0);
