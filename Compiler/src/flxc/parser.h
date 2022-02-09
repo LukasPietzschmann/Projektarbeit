@@ -5,6 +5,7 @@
 
 #include "data.h"
 #include "scanner.h"
+#include "../visualizer/event.hpp"
 #include "../visualizer/events.hpp"
 
 // Archiv.

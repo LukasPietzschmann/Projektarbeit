@@ -1,9 +1,11 @@
 #pragma once
 
 #include <ncurses.h>
-#include "../flxc/data.h"
+
+#include "../libCH/seq.ch"
 #include "constants.hpp"
 #include "coordinates.hpp"
+#include "scrollable.hpp"
 #include "windows.hpp"
 
 class expr_queue {

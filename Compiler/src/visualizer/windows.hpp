@@ -1,10 +1,12 @@
 #pragma once
 
-#include "archive.hpp"
-#include "scrollable.hpp"
-#include "popup.hpp"
 #include <ncurses.h>
 #include <vector>
+
+#include "archive.hpp"
+
+class scrollable;
+class popup;
 
 extern std::vector<archive> arch_windows;
 

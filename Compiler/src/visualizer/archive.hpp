@@ -1,18 +1,15 @@
 #pragma once
 
 #include <algorithm>
-#include <cmath>
 #include <cassert>
-#include <memory>
-#include <ncurses.h>
-#include <string>
-#include <utility>
 #include <map>
+#include <ncurses.h>
+#include <utility>
 #include <vector>
-#include <seq.ch>
 
 #include "../flxc/data.h"
 #include "../flxc/scanner.h"
+#include "../libCH/seq.ch"
 #include "archive_change_listener.hpp"
 #include "constants.hpp"
 #include "coordinates.hpp"

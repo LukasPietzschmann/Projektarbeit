@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "event.hpp"
+
+class event;
 
 extern std::vector<event*> events;
