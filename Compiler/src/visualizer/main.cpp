@@ -110,9 +110,8 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 	wnoutrefresh(src_display);
 	wnoutrefresh(footer);
 
-	WINDOW* popup_win = newwin(POPUP_HEIGHT, POPUP_WIDTH, 5, main_viewport_center - POPUP_WIDTH / 2);
-	box(popup_win, ACS_VLINE, ACS_HLINE);
-	wbkgd(popup_win, COLOR_PAIR(POPUP_COLOR_PAIR));
+	auto* popup_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_center - POPUP_WIDTH / 2, 5);
+	wbkgd(**popup_win, COLOR_PAIR(POPUP_COLOR_PAIR));
 	opers_popup = new popup(popup_win);
 
 	next_event_it = events.begin();
@@ -131,16 +130,22 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 
 		if(c == 'o' && !opers_popup->toggle())
 			main_viewport->prepare_refresh();
-		if(opers_popup->is_currently_shown())
-			goto skip_input_check_if_popup_is_shown;
 		switch(c) {
 			case 'n': worked = step_one_event_forward();
 				break;
 			case 'p': worked = step_one_event_backward();
 				break;
-			case 66: main_viewport->scroll_y(1); // arrow down
+			case 66: // arrow down
+				if(opers_popup->is_currently_shown())
+					(**opers_popup)->scroll_y(1);
+				else
+					main_viewport->scroll_y(1);
 				break;
-			case 65: main_viewport->scroll_y(-1); // arrow up
+			case 65: // arrow up
+				if(opers_popup->is_currently_shown())
+					(**opers_popup)->scroll_y(-1);
+				else
+					main_viewport->scroll_y(-1);
 				break;
 			case 's': queue_display->scroll_y(1);
 				break;
@@ -148,11 +153,14 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 				break;
 		}
 
-		skip_input_check_if_popup_is_shown:
-
 		wmove(src_display, 0, 0);
 		wprintw(src_display, "Event: %3d", current_event_index);
 		wnoutrefresh(src_display);
+
+		// das muss als letztes vor `doupdate` ausgeführt werden, damit das popup,
+		// falls es denn angezeigt wird, nicht vom rest überlagert wird
+		if(opers_popup->is_currently_shown())
+			opers_popup->prepare_refresh();
 
 		//`doupdate` hier nötig, da alle aufgerufenen Funktionen in der Regel nu `wnoutrefresh` verwenden
 		doupdate();

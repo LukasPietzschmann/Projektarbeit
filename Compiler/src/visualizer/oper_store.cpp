@@ -18,7 +18,7 @@ bool oper_store::insert_prototyp(const Expr& expr) {
 	if(*entry >= POPUP_WIDTH)
 		entry = entry(A | A + (POPUP_WIDTH - 5)) + "...";
 
-	mvpaddnstr(opers_popup, next_id_and_line, 0, &entry.elems[0], *entry);
+	mvpaddstr(opers_popup, next_id_and_line, 0, entry);
 	++next_id_and_line;
 
 	return true;

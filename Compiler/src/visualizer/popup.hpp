@@ -2,11 +2,13 @@
 
 #include <panel.h>
 
-#define mvpaddnstr(popup, y, x, str, len) mvwaddnstr(**popup, y + 1, x + 1, str, len)
+#include "scrollable.hpp"
+
+#define mvpaddstr(popup, y, x, str) mvsaddstr((**popup), y, x, str)
 
 class popup {
 public:
-	explicit popup(WINDOW* window);
+	explicit popup(scrollable* window);
 	~popup();
 
 	void show();
@@ -14,10 +16,12 @@ public:
 	bool toggle();
 	bool is_currently_shown() const;
 
-	WINDOW* operator*();
+	void prepare_refresh() const;
+
+	scrollable* operator*();
 
 private:
 	PANEL* m_panel;
-	WINDOW* m_origin_win;
+	scrollable* m_origin_win;
 	bool m_is_currently_shown {false};
 };
