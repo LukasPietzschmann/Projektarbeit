@@ -77,3 +77,26 @@ Cat intersect (Cat cat1, Cat cat2, seq<Oper>& diff) {
     }
     return cat(inter);
 }
+
+str expr_to_str_int_(const Expr& expr, const Sig& sig, bool skip) {
+	str res;
+	for(const Part& part: sig) {
+		if(expr(currpart_) == part)
+			skip = false;
+		if(part(opt_) && !skip)
+			res += "[";
+		if(const str& name = part(name_)) {
+			if(!skip)
+				res += name + " ";
+		}else if(const Oper& param = part(par_)) { //res += get_ident(param(sig_));
+			if(!skip)
+				res += "_ ";
+		}else if(const seq<Sig>& alts = part(alts_)) {
+			for(const Sig& s: alts)
+				res += expr_to_str_int_(expr, s, skip);
+		}
+		if(part(opt_) && !skip)
+			res += "]";
+	}
+	return res;
+}
