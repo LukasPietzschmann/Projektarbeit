@@ -65,11 +65,14 @@ public:
 
 private:
 	struct archive_element {
-		explicit archive_element(const Expr& expr, bool is_prototyp = false, bool is_highlighted = false,
+		explicit archive_element(const Expr& expr, bool is_comp, bool is_prototyp = false,
+				bool is_highlighted = false,
 				bool is_ambiguous = false) :
-				expr(expr), is_highlighted(is_highlighted), is_ambiguous(is_ambiguous), is_prototyp(is_prototyp) {};
+				expr(expr), is_comp(is_comp), is_highlighted(is_highlighted), is_ambiguous(is_ambiguous),
+				is_prototyp(is_prototyp) {};
 
 		Expr expr;
+		bool is_comp;
 		bool is_highlighted;
 		bool is_ambiguous;
 		bool is_prototyp;

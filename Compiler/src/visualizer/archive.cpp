@@ -69,7 +69,7 @@ uint32_t archive::get_pos_in_src() const {
 
 void archive::add_cons(long id, const Expr& cons) {
 	bool is_proto = cons(beg_) == cons(end_);
-	m_cons.try_emplace(id, cons, is_proto);
+	m_cons.try_emplace(id, cons, false, is_proto);
 	invalidate();
 }
 
@@ -81,7 +81,7 @@ void archive::add_comp(long id, const Expr& comp) {
 		element.is_ambiguous = true;
 		is_comp_ambiguous = true;
 	}
-	m_comp.try_emplace(id, comp, false, false, is_comp_ambiguous);
+	m_comp.try_emplace(id, comp, true, false, false, is_comp_ambiguous);
 	invalidate();
 }
 
@@ -234,9 +234,11 @@ CH::str archive::archive_element::as_string() const {
 	CH::str result;
 
 	if(is_prototyp)
-		result = id_prefix + " " + expr(to_str_);
+		result += expr(to_str_);
+	else if(!is_comp)
+		result += get_scanned_str_for_expr(expr) + expr(to_str_from_currpart_);
 	else
-		result = id_prefix + " " + get_scanned_str_for_expr(expr) + expr(to_str_from_currpart_);
+		result += get_scanned_str_for_expr(expr);
 
 	if(*result > REPLACE_WITH_ID_THRESHOLD && id_or_error.has_value())
 		result = "ID: " + id_str;
