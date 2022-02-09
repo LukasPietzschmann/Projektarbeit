@@ -12,7 +12,7 @@ public:
 	void show();
 	void hide();
 	bool toggle();
-	bool is_currently_shown();
+	bool is_currently_shown() const;
 
 	WINDOW* operator*();
 

@@ -30,7 +30,7 @@ bool popup::toggle() {
 	return m_is_currently_shown;
 }
 
-bool popup::is_currently_shown() {
+bool popup::is_currently_shown() const {
 	return m_is_currently_shown;
 }
 
