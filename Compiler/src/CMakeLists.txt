@@ -25,7 +25,7 @@ add_executable(main main)
 target_link_libraries(main flxc Visualizer cxxopts)
 
 if(CURSES_FOUND)
-	include_directories(${CURSES_INCLUDE_DIR})
+	include_directories(${CURSES_INCLUDE_DIR} ${CURSES_INCLUDE_DIR}/ncurses)
 	target_link_libraries(main ${CURSES_LIBRARIES} panel)
 	add_compile_definitions(HAS_CURSES_LIB)
 endif(CURSES_FOUND)
