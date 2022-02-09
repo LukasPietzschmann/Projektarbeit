@@ -34,10 +34,18 @@ bool expr_queue::pop_front() {
 
 CH::str expr_queue::expr_to_str(const Expr& expr) {
 	const auto& id_or_error = oper_store::the().get_id_from_oper(expr(oper_));
-	const CH::str& id_prefix = id_or_error.has_value() ? CH::str(std::to_string(*id_or_error) + ": ") : "?: ";
+	const CH::str& id_str = CH::str(std::to_string(*id_or_error));
+	const CH::str& id_prefix = id_or_error.has_value() ? (id_str + ": ") : "?: ";
+
+	CH::str result;
 
 	if(expr(beg_) == expr(end_))
-		return id_prefix + " " + expr(to_str_);
+		result = id_prefix + " " + expr(to_str_);
+	else
+		result = id_prefix + " " + get_scanned_str_for_expr(expr) + expr(to_str_from_currpart_);
 
-	return id_prefix + " " + get_scanned_str_for_expr(expr) + expr(to_str_from_currpart_);
+	if(*result > REPLACE_WITH_ID_THRESHOLD && id_or_error.has_value())
+		result = "ID: " + id_str;
+
+	return result;
 }
