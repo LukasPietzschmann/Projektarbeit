@@ -12,6 +12,7 @@
 #include "event.hpp"
 #include "expr_queue.hpp"
 #include "popup.hpp"
+#include "popup_manager.hpp"
 #include "utils.hpp"
 #include "scrollable.hpp"
 
@@ -21,6 +22,7 @@ extern uint64_t current_event_index;
 extern CH::str src_str;
 
 extern scrollable* current_scrollable;
+extern scrollable* prev_scrollable;
 
 extern popup_manager* p_manager;
 

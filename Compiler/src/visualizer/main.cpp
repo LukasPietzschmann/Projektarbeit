@@ -10,6 +10,7 @@ popup* help_popup;
 popup_manager* p_manager;
 
 scrollable* current_scrollable;
+scrollable* prev_scrollable;
 
 int main_viewport_center;
 int src_str_center;
@@ -84,16 +85,28 @@ void setup_windows() {
 	auto* help_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_center - POPUP_WIDTH / 2, 5);
 	wbkgd(**help_win, COLOR_PAIR(POPUP_COLOR_PAIR));
 	help_popup = new popup(help_win);
-	help_win->add_string("arrow-up: scroll up", 0, 0);
-	help_win->add_string("arrow-down: scroll down", 0, 1);
-	help_win->add_string("s: switch window to scroll in", 0, 2);
-	help_win->add_string("m [a-z]: set marker to the current event", 0, 3);
-	help_win->add_string("' [a-z]: jump to marker", 0, 4);
-	help_win->add_string("[0-9]+ <command>: execute command n times", 0, 5);
+	mvpaddstr(help_popup, 0, 0, "q: quit");
+	mvpaddstr(help_popup, 1, 0, "n: go one step forward");
+	mvpaddstr(help_popup, 2, 0, "p: go one step backward");
+	mvpaddstr(help_popup, 3, 0, "o: show all operators");
+	mvpaddstr(help_popup, 4, 0, "arrow-up: scroll up");
+	mvpaddstr(help_popup, 5, 0, "arrow-down: scroll down");
+	mvpaddstr(help_popup, 6, 0, "s: switch window to scroll in");
+	mvpaddstr(help_popup, 7, 0, "m [a-z]: set marker to the current event");
+	mvpaddstr(help_popup, 8, 0, "' [a-z]: jump to marker");
+	mvpaddstr(help_popup, 9, 0, "[0-9]+ <command>: execute command n times");
 
 	p_manager = new popup_manager(2);
-	p_manager->insert(opers_popup);
-	p_manager->insert(help_popup);
+	p_manager->insert(opers_popup, [&]() {
+		prev_scrollable = current_scrollable;
+		current_scrollable = **opers_popup;
+	}, [&]() {
+		current_scrollable = prev_scrollable;
+		main_viewport->prepare_refresh();
+	});
+	p_manager->insert(help_popup, {}, [&]() {
+		main_viewport->prepare_refresh();
+	});
 
 	wnoutrefresh(src_display);
 	wnoutrefresh(footer);
@@ -166,7 +179,6 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 	doupdate();
 
 	int multiplier = 0;
-	scrollable* prev_scrollable;
 	while(int c = wgetch(footer)) {
 		const auto& use_multiplier = [&multiplier]() {
 			int multiplier_backup = multiplier;
@@ -220,18 +232,11 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 		}else if(current_state == s_any_input) {
 			if(c == 'q')
 				break;
-			if(c == 'h') {
-				if(!p_manager->toggle(help_popup))
-					main_viewport->prepare_refresh();
-			}else if(c == 'o') {
-				if(p_manager->toggle(opers_popup)) {
-					prev_scrollable = current_scrollable;
-					current_scrollable = **opers_popup;
-				}else { // wenn das popup geschlossen wird, sollten die archive neu gerendert werden
-					main_viewport->prepare_refresh();
-					current_scrollable = prev_scrollable;
-				}
-			}else if(c == 'n')
+			if(c == 'h')
+				p_manager->toggle(help_popup);
+			else if(c == 'o')
+				p_manager->toggle(opers_popup);
+			else if(c == 'n')
 				worked = step_n_events_forward(use_multiplier());
 			else if(c == 'p')
 				worked = step_n_events_backward(use_multiplier());

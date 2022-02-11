@@ -4,7 +4,7 @@
 
 #include "scrollable.hpp"
 
-#define mvpaddstr(popup, y, x, str) mvsaddstr((**popup), y, x, str)
+#define mvpaddstr(popup, y, x, str) mvsaddstr((**popup), y, x + 1, str)
 
 class popup {
 	friend class popup_manager;
