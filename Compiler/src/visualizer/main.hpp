@@ -20,6 +20,8 @@ extern event_iterator next_event_it;
 extern uint64_t current_event_index;
 extern CH::str src_str;
 
+extern scrollable* current_scrollable;
+
 /**
  * Wird das Programm unerwartet durch ein Signal beendet,
  * MUSS der curses-Modus korrekt verlassen werden.

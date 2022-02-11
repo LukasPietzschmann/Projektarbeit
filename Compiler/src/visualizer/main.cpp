@@ -6,6 +6,8 @@ scrollable* queue_display;
 scrollable* main_viewport;
 popup* opers_popup;
 
+scrollable* current_scrollable;
+
 int main_viewport_center;
 int src_str_center;
 int src_str_len;
@@ -128,6 +130,7 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 	getmaxyx(stdscr, height, width);
 
 	setup_windows();
+	current_scrollable = main_viewport;
 
 	next_event_it = events.begin();
 	current_event_index = 0;
@@ -206,20 +209,10 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 			case 'p':worked = step_n_events_backward(multiplier);
 				break;
 			case 66: // arrow down
-				if(opers_popup->is_currently_shown())
-					(**opers_popup)->scroll_y(multiplier * 1);
-				else
-					main_viewport->scroll_y(multiplier * 1);
+				current_scrollable->scroll_y(multiplier * 1);
 				break;
 			case 65: // arrow up
-				if(opers_popup->is_currently_shown())
-					(**opers_popup)->scroll_y(multiplier * -1);
-				else
-					main_viewport->scroll_y(multiplier * -1);
-				break;
-			case 's': queue_display->scroll_y(multiplier * 1);
-				break;
-			case 'w': queue_display->scroll_y(multiplier * -1);
+				current_scrollable->scroll_y(multiplier * -1);
 				break;
 		}
 
