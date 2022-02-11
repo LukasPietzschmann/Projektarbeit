@@ -7,6 +7,8 @@ scrollable* main_viewport;
 popup* opers_popup;
 popup* help_popup;
 
+popup_manager* p_manager;
+
 scrollable* current_scrollable;
 
 int main_viewport_center;
@@ -82,11 +84,15 @@ void setup_windows() {
 	wbkgd(**help_win, COLOR_PAIR(POPUP_COLOR_PAIR));
 	help_popup = new popup(help_win);
 	help_win->add_string("arrow-up: scroll up", 0, 0);
-	help_win->add_string("arrow-up: scroll down", 0, 1);
+	help_win->add_string("arrow-down: scroll down", 0, 1);
 	help_win->add_string("s: switch window to scroll in", 0, 2);
 	help_win->add_string("m [a-z]: set marker to the current event", 0, 3);
 	help_win->add_string("' [a-z]: jump to marker", 0, 4);
 	help_win->add_string("[0-9]+ <command>: execute command n times", 0, 5);
+
+	p_manager = new popup_manager(2);
+	p_manager->insert(opers_popup);
+	p_manager->insert(help_popup);
 
 	wnoutrefresh(src_display);
 	wnoutrefresh(footer);
@@ -214,10 +220,10 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 			if(c == 'q')
 				break;
 			if(c == 'h') {
-				if(!help_popup->toggle())
+				if(!p_manager->toggle(help_popup))
 					main_viewport->prepare_refresh();
 			}else if(c == 'o') {
-				if(opers_popup->toggle()) {
+				if(p_manager->toggle(opers_popup)) {
 					prev_scrollable = current_scrollable;
 					current_scrollable = **opers_popup;
 				}else { // wenn das popup geschlossen wird, sollten die archive neu gerendert werden
@@ -234,9 +240,9 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 				current_state = s_wait_for_marker | s_read_marker;
 			else if(c == 's')
 				current_state = s_wait_for_scrollable_selection;
-			else if(c == KEY_ARROW_UP)
-				current_scrollable->scroll_y(use_multiplier());
 			else if(c == KEY_ARROW_DOWN)
+				current_scrollable->scroll_y(use_multiplier());
+			else if(c == KEY_ARROW_UP)
 				current_scrollable->scroll_y(-use_multiplier());
 			else if(c >= '0' && c <= '9') {
 				multiplier = multiplier * 10 + (c - 48);
@@ -264,8 +270,8 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 
 		// das muss als letztes vor `doupdate` ausgeführt werden, damit das popup,
 		// falls es denn angezeigt wird, nicht vom rest überlagert wird
-		if(opers_popup->is_currently_shown())
-			opers_popup->prepare_refresh();
+		if(p_manager->is_one_popup_shown())
+			p_manager->prepare_refresh_for_shown_popups();
 
 		//`doupdate` hier nötig, da alle aufgerufenen Funktionen in der Regel nu `wnoutrefresh` verwenden
 		doupdate();

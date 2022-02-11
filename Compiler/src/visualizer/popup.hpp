@@ -7,17 +7,12 @@
 #define mvpaddstr(popup, y, x, str) mvsaddstr((**popup), y, x, str)
 
 class popup {
+	friend class popup_manager;
+
 public:
 	explicit popup(scrollable* window);
 	~popup();
 
-	void show();
-	void hide();
-	/**
-	 * @return `true`, falls das popup geöffnet wurde,
-	 * sonst `false`
-	 */
-	bool toggle();
 	bool is_currently_shown() const;
 
 	void prepare_refresh() const;
@@ -25,6 +20,14 @@ public:
 	scrollable* operator*();
 
 private:
+	void show();
+	void hide();
+	/**
+	 * @return `true`, falls das popup geöffnet wurde,
+	 * sonst `false`
+	 */
+	bool toggle();
+
 	PANEL* m_panel;
 	scrollable* m_origin_win;
 	bool m_is_currently_shown {false};

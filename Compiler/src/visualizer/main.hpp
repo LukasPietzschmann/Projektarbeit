@@ -22,6 +22,8 @@ extern CH::str src_str;
 
 extern scrollable* current_scrollable;
 
+extern popup_manager* p_manager;
+
 enum input_state {
 	s_wait_for_marker = 1 << 0,
 	s_create_marker = 1 << 1,
