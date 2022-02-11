@@ -67,6 +67,7 @@ void setup_windows() {
 	footer = newwin(FOOTER_HEIGHT, width - QUEUE_WIDTH, height - FOOTER_HEIGHT, 0);
 	wbkgd(footer, COLOR_PAIR(FOOTER_COLOR_PAIR));
 	center_text_hor(footer, "q: quit    n: next    p: previous    o: toggle opers    h: help", 0);
+	keypad(footer, TRUE);
 
 	src_display = newwin(HEADER_HEIGHT, width - QUEUE_WIDTH, 0, 0);
 	wbkgd(src_display, COLOR_PAIR(HEADER_COLOR_PAIR));
@@ -166,7 +167,7 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 
 	int multiplier = 0;
 	scrollable* prev_scrollable;
-	while(char c = getch()) {
+	while(int c = wgetch(footer)) {
 		const auto& use_multiplier = [&multiplier]() {
 			int multiplier_backup = multiplier;
 			multiplier = 0;
