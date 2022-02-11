@@ -22,6 +22,8 @@ uint64_t current_event_index;
 
 std::map<char, int> markers;
 
+int current_state;
+
 void handleSignal(int sig) {
 	arch_windows.clear();
 	events.clear();
@@ -112,6 +114,8 @@ bool step_n_events_backward(int n) {
 int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 	assert(event_to_scip_to >= 0);
 
+	current_state = s_any_input;
+
 	src_str = source_string;
 	src_str_len = *source_string;
 	src_str_center = src_str_len / 2;
@@ -138,92 +142,108 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 	step_n_events_forward(event_to_scip_to);
 
 	wmove(src_display, 0, 0);
-	wprintw(src_display, "Event: %3d", current_event_index);
+	wprintw(src_display, "Event: %d", current_event_index);
 	wnoutrefresh(src_display);
 
 	doupdate();
 
 	int multiplier = 0;
-	bool expects_marker_name_to_register = false;
-	bool expects_marker_name_to_jump_to = false;
-
+	scrollable* prev_scrollable;
 	while(char c = getch()) {
+		const auto& use_multiplier = [&multiplier]() {
+			int multiplier_backup = multiplier;
+			multiplier = 0;
+			return std::max(1, multiplier_backup);
+		};
 		bool worked = true;
 
-		if((expects_marker_name_to_jump_to || expects_marker_name_to_register) && c == 27 /* escape */) {
-			expects_marker_name_to_jump_to = false;
-			expects_marker_name_to_register = false;
-			goto skip_with_refresh;
-		}
-		if(expects_marker_name_to_register) {
-			if(!(c >= 'a' && c <= 'z')) {
+		if(current_state == s_wait_for_scrollable_selection) {
+			if(c == KEY_ESCAPE) {
+				current_state = s_any_input;
+				goto skip_with_refresh;
+			}
+			if(c == 'a')
+				current_scrollable = main_viewport;
+			else if(c == 'b')
+				current_scrollable = queue_display;
+			else if(c == 'o' && opers_popup->is_currently_shown())
+				current_scrollable = **opers_popup;
+			else {
 				worked = false;
 				goto skip_without_refresh;
 			}
-			markers.try_emplace(c, current_event_index);
-			expects_marker_name_to_register = false;
+			current_state = s_any_input;
 			goto skip_with_refresh;
-		}
-		if(expects_marker_name_to_jump_to) {
-			if(!(c >= 'a' && c <= 'z') || markers.find(c) == markers.end()) {
-				worked = false;
-				goto skip_without_refresh;
+		}else if(current_state & s_wait_for_marker) {
+			if(c == KEY_ESCAPE) {
+				current_state = s_any_input;
+				goto skip_with_refresh;
 			}
-			const int marker_adr = markers.at(c);
-
-			if(marker_adr > current_event_index)
-				step_n_events_forward(marker_adr - current_event_index);
-			else if(marker_adr < current_event_index)
-				step_n_events_backward(current_event_index - marker_adr);
-
-			expects_marker_name_to_jump_to = false;
+			const auto& is_invalid_marker_name = [&c]() { return !(c >= 'a' && c <= 'z'); };
+			if(current_state & s_read_marker) {
+				if(is_invalid_marker_name() || markers.find(c) == markers.end()) {
+					worked = false;
+					goto skip_without_refresh;
+				}
+				int marked_event_index = markers.at(c);
+				if(marked_event_index > current_event_index)
+					step_n_events_forward(marked_event_index - current_event_index);
+				else if(marked_event_index < current_event_index)
+					step_n_events_backward(current_event_index - marked_event_index);
+			}else if(current_state & s_create_marker) {
+				if(is_invalid_marker_name() || markers.find(c) != markers.end()) {
+					worked = false;
+					goto skip_without_refresh;
+				}
+				markers.try_emplace(c, current_event_index);
+			}
+			current_state = s_any_input;
 			goto skip_with_refresh;
-		}
-
-		if(c == 'q')
-			break;
-
-		if(c >= '0' && c <= '9') {
-			multiplier *= 10;
-			multiplier += c - 48;
-			goto skip_without_refresh;
-		}
-		multiplier = std::max(1, multiplier);
-
-		if(c == 'm') {
-			expects_marker_name_to_register = true;
-			goto skip_with_refresh;
-		}
-		if(c == '\'') {
-			expects_marker_name_to_jump_to = true;
-			goto skip_with_refresh;
-		}
-
-		switch(c) {
-			case 'o':
-				if(!opers_popup->toggle()) // wenn das popup geschlossen wird, sollten die archive neu gerendert werden
+		}else if(current_state == s_any_input) {
+			if(c == 'q')
+				break;
+			if(c == 'o') {
+				if(opers_popup->toggle()) {
+					prev_scrollable = current_scrollable;
+					current_scrollable = **opers_popup;
+				}else { // wenn das popup geschlossen wird, sollten die archive neu gerendert werden
 					main_viewport->prepare_refresh();
-				break;
-			case 'n': worked = step_n_events_forward(multiplier);
-				break;
-			case 'p':worked = step_n_events_backward(multiplier);
-				break;
-			case 66: // arrow down
-				current_scrollable->scroll_y(multiplier * 1);
-				break;
-			case 65: // arrow up
-				current_scrollable->scroll_y(multiplier * -1);
-				break;
+					current_scrollable = prev_scrollable;
+				}
+			}else if(c == 'n')
+				worked = step_n_events_forward(use_multiplier());
+			else if(c == 'p')
+				worked = step_n_events_backward(use_multiplier());
+			else if(c == 'm')
+				current_state = s_wait_for_marker | s_create_marker;
+			else if(c == '\'')
+				current_state = s_wait_for_marker | s_read_marker;
+			else if(c == 's')
+				current_state = s_wait_for_scrollable_selection;
+			else if(c == KEY_ARROW_UP)
+				current_scrollable->scroll_y(use_multiplier());
+			else if(c == KEY_ARROW_DOWN)
+				current_scrollable->scroll_y(-use_multiplier());
+			else if(c >= '0' && c <= '9') {
+				multiplier = multiplier * 10 + (c - 48);
+				goto skip_without_refresh;
+			}else {
+				worked = false;
+				goto skip_without_refresh;
+			}
+			goto skip_with_refresh;
 		}
 
 		skip_with_refresh:
 		wmove(src_display, 0, 0);
-		wprintw(src_display, "Event: %3d", current_event_index);
+		wprintw(src_display, "Event: %d", current_event_index);
 		wnoutrefresh(src_display);
 
 		werase(footer);
-		if(expects_marker_name_to_jump_to || expects_marker_name_to_register)
+		if(current_state & s_wait_for_marker)
 			center_text_hor(footer, "Input marker or press <esc>", 0);
+		else if(current_state == s_wait_for_scrollable_selection)
+			center_text_hor(footer, "Input Scrollable-Selector (a: archives b: queue o: opers) or press <esc>", 0);
 		else
 			center_text_hor(footer, "q: quit    n: next    p: previous    o: toggle opers", 0);
 		wnoutrefresh(footer);
@@ -241,8 +261,6 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 			beep();
 			flash();
 		}
-
-		multiplier = 0;
 	}
 
 	handleSignal(0);

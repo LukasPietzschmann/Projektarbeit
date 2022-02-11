@@ -13,6 +13,10 @@ public:
 
 	void show();
 	void hide();
+	/**
+	 * @return `true`, falls das popup geöffnet wurde,
+	 * sonst `false`
+	 */
 	bool toggle();
 	bool is_currently_shown() const;
 

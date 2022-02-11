@@ -22,6 +22,16 @@ extern CH::str src_str;
 
 extern scrollable* current_scrollable;
 
+enum input_state {
+	s_wait_for_marker = 1 << 0,
+	s_create_marker = 1 << 1,
+	s_read_marker = 2 << 1,
+	s_wait_for_scrollable_selection = 3 << 1,
+	s_any_input = 4 << 1
+};
+
+extern int current_state;
+
 /**
  * Wird das Programm unerwartet durch ein Signal beendet,
  * MUSS der curses-Modus korrekt verlassen werden.
