@@ -5,6 +5,7 @@ WINDOW* src_display;
 scrollable* queue_display;
 scrollable* main_viewport;
 popup* opers_popup;
+popup* help_popup;
 
 scrollable* current_scrollable;
 
@@ -63,7 +64,7 @@ void setup_windows() {
 
 	footer = newwin(FOOTER_HEIGHT, width - QUEUE_WIDTH, height - FOOTER_HEIGHT, 0);
 	wbkgd(footer, COLOR_PAIR(FOOTER_COLOR_PAIR));
-	center_text_hor(footer, "q: quit    n: next    p: previous    o: toggle opers", 0);
+	center_text_hor(footer, "q: quit    n: next    p: previous    o: toggle opers    h: help", 0);
 
 	src_display = newwin(HEADER_HEIGHT, width - QUEUE_WIDTH, 0, 0);
 	wbkgd(src_display, COLOR_PAIR(HEADER_COLOR_PAIR));
@@ -73,12 +74,22 @@ void setup_windows() {
 	wbkgd(**queue_display, COLOR_PAIR(QUEUE_COLOR_PAIR));
 	queue_display->prepare_refresh();
 
-	wnoutrefresh(src_display);
-	wnoutrefresh(footer);
-
 	auto* popup_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_center - POPUP_WIDTH / 2, 5);
 	wbkgd(**popup_win, COLOR_PAIR(POPUP_COLOR_PAIR));
 	opers_popup = new popup(popup_win);
+
+	auto* help_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_center - POPUP_WIDTH / 2, 5);
+	wbkgd(**help_win, COLOR_PAIR(POPUP_COLOR_PAIR));
+	help_popup = new popup(help_win);
+	help_win->add_string("arrow-up: scroll up", 0, 0);
+	help_win->add_string("arrow-up: scroll down", 0, 1);
+	help_win->add_string("s: switch window to scroll in", 0, 2);
+	help_win->add_string("m [a-z]: set marker to the current event", 0, 3);
+	help_win->add_string("' [a-z]: jump to marker", 0, 4);
+	help_win->add_string("[0-9]+ <command>: execute command n times", 0, 5);
+
+	wnoutrefresh(src_display);
+	wnoutrefresh(footer);
 }
 
 bool step_n_events_forward(int n) {
@@ -202,7 +213,10 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 		}else if(current_state == s_any_input) {
 			if(c == 'q')
 				break;
-			if(c == 'o') {
+			if(c == 'h') {
+				if(!help_popup->toggle())
+					main_viewport->prepare_refresh();
+			}else if(c == 'o') {
 				if(opers_popup->toggle()) {
 					prev_scrollable = current_scrollable;
 					current_scrollable = **opers_popup;
@@ -245,7 +259,7 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 		else if(current_state == s_wait_for_scrollable_selection)
 			center_text_hor(footer, "Input Scrollable-Selector (a: archives b: queue o: opers) or press <esc>", 0);
 		else
-			center_text_hor(footer, "q: quit    n: next    p: previous    o: toggle opers", 0);
+			center_text_hor(footer, "q: quit    n: next    p: previous    o: toggle opers    h: help", 0);
 		wnoutrefresh(footer);
 
 		// das muss als letztes vor `doupdate` ausgeführt werden, damit das popup,
