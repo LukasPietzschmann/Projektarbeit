@@ -11,11 +11,14 @@ int src_str_center;
 int src_str_len;
 int width;
 int height;
+CH::str src_str;
 
 std::vector<archive> arch_windows;
 std::vector<event*> events;
 event_iterator next_event_it;
 uint64_t current_event_index;
+
+std::map<char, int> markers;
 
 void handleSignal(int sig) {
 	arch_windows.clear();
@@ -42,48 +45,7 @@ void setup_colors() {
 	init_pair(AMBIGUOUS_COLOR_PAIR, COLOR_BLACK, COLOR_RED);
 }
 
-bool step_one_event_forward() {
-	if(next_event_it == events.end())
-		return false;
-
-	++current_event_index;
-	// Hatte das aktuelle event keine Auswirkung, wird direkt das Nächste ausgeführt
-	if((*(next_event_it++))->exec() == event::did_nothing)
-		step_one_event_forward();
-
-	return true;
-}
-
-bool step_one_event_backward() {
-	if(next_event_it == events.begin())
-		return false;
-
-	--current_event_index;
-	// Hatte das aktuelle event keine Auswirkung, wird direkt das Nächste ausgeführt
-	if((*(--next_event_it))->undo() == event::did_nothing)
-		step_one_event_backward();
-
-	return true;
-}
-
-int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
-	assert(event_to_scip_to >= 0);
-
-	src_str_len = *source_string;
-	src_str_center = src_str_len / 2;
-
-	initscr();
-
-	signal(SIGINT, handleSignal);
-	signal(SIGABRT, handleSignal);
-	signal(SIGKILL, handleSignal);
-
-	cbreak();
-	timeout(-1);
-	noecho();
-	setup_colors();
-	curs_set(0);
-	getmaxyx(stdscr, height, width);
+void setup_windows() {
 	//Wird der stdsrc nicht minimal klein gemacht, verdeckt er den Rest
 	wresize(stdscr, 0, 0);
 	wnoutrefresh(stdscr);
@@ -101,7 +63,7 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 
 	src_display = newwin(HEADER_HEIGHT, width - QUEUE_WIDTH, 0, 0);
 	wbkgd(src_display, COLOR_PAIR(HEADER_COLOR_PAIR));
-	mvwaddstr(src_display, 0, getmaxx(src_display) / 2 - *source_string / 2, &source_string.elems[0]);
+	mvwaddstr(src_display, 0, getmaxx(src_display) / 2 - *src_str / 2, &src_str.elems[0]);
 
 	queue_display = new scrollable(QUEUE_WIDTH - 1, height - 1, width - QUEUE_WIDTH, 0);
 	wbkgd(**queue_display, COLOR_PAIR(QUEUE_COLOR_PAIR));
@@ -113,40 +75,135 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 	auto* popup_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_center - POPUP_WIDTH / 2, 5);
 	wbkgd(**popup_win, COLOR_PAIR(POPUP_COLOR_PAIR));
 	opers_popup = new popup(popup_win);
+}
+
+bool step_n_events_forward(int n) {
+	assert(n >= 0);
+
+	for(int i = 0; i < n; ++i) {
+		if(next_event_it == events.end())
+			return false;
+		++current_event_index;
+		// Hatte das aktuelle event keine Auswirkung, wird direkt das Nächste ausgeführt
+		if((*(next_event_it++))->exec() == event::did_nothing)
+			--i;
+	}
+
+	return true;
+}
+
+bool step_n_events_backward(int n) {
+	assert(n >= 0);
+
+	for(int i = 0; i < n; ++i) {
+		if(next_event_it == events.begin())
+			return false;
+		--current_event_index;
+		// Hatte das aktuelle event keine Auswirkung, wird direkt das Nächste ausgeführt
+		if((*(--next_event_it))->undo() == event::did_nothing)
+			--i;
+	}
+
+	return true;
+}
+
+int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
+	assert(event_to_scip_to >= 0);
+
+	src_str = source_string;
+	src_str_len = *source_string;
+	src_str_center = src_str_len / 2;
+
+	initscr();
+
+	signal(SIGINT, handleSignal);
+	signal(SIGABRT, handleSignal);
+	signal(SIGKILL, handleSignal);
+
+	cbreak();
+	timeout(-1);
+	noecho();
+	setup_colors();
+	curs_set(0);
+	getmaxyx(stdscr, height, width);
+
+	setup_windows();
 
 	next_event_it = events.begin();
 	current_event_index = 0;
 
-	for(int i = 0; i < event_to_scip_to; ++i)
-		step_one_event_forward();
+	step_n_events_forward(event_to_scip_to);
+
+	wmove(src_display, 0, 0);
+	wprintw(src_display, "Event: %3d", current_event_index);
+	wnoutrefresh(src_display);
 
 	doupdate();
 
 	int multiplier = 0;
+	bool expects_marker_name_to_register = false;
+	bool expects_marker_name_to_jump_to = false;
+
 	while(char c = getch()) {
+		bool worked = true;
+
+		if((expects_marker_name_to_jump_to || expects_marker_name_to_register) && c == 27 /* escape */) {
+			expects_marker_name_to_jump_to = false;
+			expects_marker_name_to_register = false;
+			goto skip_with_refresh;
+		}
+		if(expects_marker_name_to_register) {
+			if(!(c >= 'a' && c <= 'z')) {
+				worked = false;
+				goto skip_without_refresh;
+			}
+			markers.try_emplace(c, current_event_index);
+			expects_marker_name_to_register = false;
+			goto skip_with_refresh;
+		}
+		if(expects_marker_name_to_jump_to) {
+			if(!(c >= 'a' && c <= 'z') || markers.find(c) == markers.end()) {
+				worked = false;
+				goto skip_without_refresh;
+			}
+			const int marker_adr = markers.at(c);
+
+			if(marker_adr > current_event_index)
+				step_n_events_forward(marker_adr - current_event_index);
+			else if(marker_adr < current_event_index)
+				step_n_events_backward(current_event_index - marker_adr);
+
+			expects_marker_name_to_jump_to = false;
+			goto skip_with_refresh;
+		}
+
 		if(c == 'q')
 			break;
-
-		bool worked = true;
 
 		if(c >= '0' && c <= '9') {
 			multiplier *= 10;
 			multiplier += c - 48;
-			continue;
+			goto skip_without_refresh;
 		}
-
 		multiplier = std::max(1, multiplier);
 
-		if(c == 'o' && !opers_popup->toggle())
-			main_viewport->prepare_refresh();
+		if(c == 'm') {
+			expects_marker_name_to_register = true;
+			goto skip_with_refresh;
+		}
+		if(c == '\'') {
+			expects_marker_name_to_jump_to = true;
+			goto skip_with_refresh;
+		}
+
 		switch(c) {
-			case 'n':
-				for(int i = 0; i < multiplier; ++i)
-					worked = step_one_event_forward();
+			case 'o':
+				if(!opers_popup->toggle()) // wenn das popup geschlossen wird, sollten die archive neu gerendert werden
+					main_viewport->prepare_refresh();
 				break;
-			case 'p':
-				for(int i = 0; i < multiplier; ++i)
-					worked = step_one_event_backward();
+			case 'n': worked = step_n_events_forward(multiplier);
+				break;
+			case 'p':worked = step_n_events_backward(multiplier);
 				break;
 			case 66: // arrow down
 				if(opers_popup->is_currently_shown())
@@ -166,9 +223,17 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 				break;
 		}
 
+		skip_with_refresh:
 		wmove(src_display, 0, 0);
 		wprintw(src_display, "Event: %3d", current_event_index);
 		wnoutrefresh(src_display);
+
+		werase(footer);
+		if(expects_marker_name_to_jump_to || expects_marker_name_to_register)
+			center_text_hor(footer, "Input marker or press <esc>", 0);
+		else
+			center_text_hor(footer, "q: quit    n: next    p: previous    o: toggle opers", 0);
+		wnoutrefresh(footer);
 
 		// das muss als letztes vor `doupdate` ausgeführt werden, damit das popup,
 		// falls es denn angezeigt wird, nicht vom rest überlagert wird
@@ -178,6 +243,7 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 		//`doupdate` hier nötig, da alle aufgerufenen Funktionen in der Regel nu `wnoutrefresh` verwenden
 		doupdate();
 
+		skip_without_refresh:
 		if(!worked) {
 			beep();
 			flash();
