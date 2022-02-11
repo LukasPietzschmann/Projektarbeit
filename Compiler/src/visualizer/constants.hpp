@@ -26,3 +26,12 @@
 #define KEY_ESCAPE 27
 #define KEY_ARROW_UP KEY_UP
 #define KEY_ARROW_DOWN KEY_DOWN
+
+#define EVENT_COUNTER_TEXT "Event: %d"
+#define FOOTER_QUICK_ACTIONS_TEXT "q: quit    n: next    p: previous    o: toggle opers    h: help"
+#define FOOTER_WAIT_FOR_MARKER_TEXT "Input marker or press <esc>"
+#define FOOTER_WAIT_FOR_SCROLLABLE_SELECTOR_TEXT "Input Scrollable-Selector a: archives b: queue o: opers) or press <esc>"
+
+#define MAIN_VIEWPORT_SELECTOR 'a'
+#define QUEUE_SELECTOR 'b'
+#define OPER_POPUP_SELECTOR 'o'

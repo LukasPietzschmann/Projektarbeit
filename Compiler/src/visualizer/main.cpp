@@ -67,7 +67,7 @@ void setup_windows() {
 
 	footer = newwin(FOOTER_HEIGHT, width - QUEUE_WIDTH, height - FOOTER_HEIGHT, 0);
 	wbkgd(footer, COLOR_PAIR(FOOTER_COLOR_PAIR));
-	center_text_hor(footer, "q: quit    n: next    p: previous    o: toggle opers    h: help", 0);
+	center_text_hor(footer, FOOTER_QUICK_ACTIONS_TEXT, 0);
 	keypad(footer, TRUE);
 
 	src_display = newwin(HEADER_HEIGHT, width - QUEUE_WIDTH, 0, 0);
@@ -173,7 +173,7 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 	step_n_events_forward(event_to_scip_to);
 
 	wmove(src_display, 0, 0);
-	wprintw(src_display, "Event: %d", current_event_index);
+	wprintw(src_display, EVENT_COUNTER_TEXT, current_event_index);
 	wnoutrefresh(src_display);
 
 	doupdate();
@@ -192,11 +192,11 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 				current_state = s_any_input;
 				goto skip_with_refresh;
 			}
-			if(c == 'a')
+			if(c == MAIN_VIEWPORT_SELECTOR)
 				current_scrollable = main_viewport;
-			else if(c == 'b')
+			else if(c == QUEUE_SELECTOR)
 				current_scrollable = queue_display;
-			else if(c == 'o' && opers_popup->is_currently_shown())
+			else if(c == OPER_POPUP_SELECTOR && opers_popup->is_currently_shown())
 				current_scrollable = **opers_popup;
 			else {
 				worked = false;
@@ -262,16 +262,16 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 
 		skip_with_refresh:
 		wmove(src_display, 0, 0);
-		wprintw(src_display, "Event: %d", current_event_index);
+		wprintw(src_display, EVENT_COUNTER_TEXT, current_event_index);
 		wnoutrefresh(src_display);
 
 		werase(footer);
 		if(current_state & s_wait_for_marker)
-			center_text_hor(footer, "Input marker or press <esc>", 0);
+			center_text_hor(footer, FOOTER_WAIT_FOR_MARKER_TEXT, 0);
 		else if(current_state == s_wait_for_scrollable_selection)
-			center_text_hor(footer, "Input Scrollable-Selector (a: archives b: queue o: opers) or press <esc>", 0);
+			center_text_hor(footer, FOOTER_WAIT_FOR_SCROLLABLE_SELECTOR_TEXT, 0);
 		else
-			center_text_hor(footer, "q: quit    n: next    p: previous    o: toggle opers    h: help", 0);
+			center_text_hor(footer, FOOTER_QUICK_ACTIONS_TEXT, 0);
 		wnoutrefresh(footer);
 
 		// das muss als letztes vor `doupdate` ausgeführt werden, damit das popup,
