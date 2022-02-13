@@ -8,7 +8,6 @@
 #include "constants.hpp"
 
 #define mvsaddstr(scrollable, y, x, str) (scrollable)->add_string((str), (x), (y))
-#define mvsaddch(scrollable, y, x, chr) (scrollable)->add_char((chr), (x), (y))
 
 class scrollable {
 public:
@@ -18,7 +17,6 @@ public:
 	void scroll_y(int delta);
 
 	void add_string(const CH::str& string, int x, int y);
-	void add_char(char c, int x, int y);
 	void del_line(int x, int y);
 
 	void clear();

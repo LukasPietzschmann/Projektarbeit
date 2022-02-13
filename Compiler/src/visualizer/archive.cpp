@@ -14,19 +14,19 @@ bool archive::intersects_with(const archive::rect& other) const {
 
 void archive::render() {
 	for(int i = 0; i < m_height; ++i) {
-		mvsaddch(main_viewport, i + m_y_start, m_x_start, '|');
-		mvsaddch(main_viewport, i + m_y_start, m_width + m_x_start, '|');
+		mvsaddstr(main_viewport, i + m_y_start, m_x_start, "|");
+		mvsaddstr(main_viewport, i + m_y_start, m_width + m_x_start, "|");
 	}
 
 	for(int i = 0; i <= m_width; ++i) {
-		mvsaddch(main_viewport, m_y_start, i + m_x_start, '-');
-		mvsaddch(main_viewport, m_height + m_y_start - 1, i + m_x_start, '-');
+		mvsaddstr(main_viewport, m_y_start, i + m_x_start, "-");
+		mvsaddstr(main_viewport, m_height + m_y_start - 1, i + m_x_start, "-");
 	}
 
 	auto comp_it = m_comp.begin();
 	auto cons_it = m_cons.begin();
 	for(int i = 1; i < m_height - 1; ++i) {
-		mvsaddch(main_viewport, i + m_y_start, m_divider_x_pos + m_x_start, '|');
+		mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + m_x_start, "|");
 
 		if(comp_it != m_comp.end()) {
 			const auto& elem = comp_it->second;

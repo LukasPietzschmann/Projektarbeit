@@ -38,11 +38,6 @@ void scrollable::add_string(const CH::str& string, int x, int y) {
 		m_content_height = y - m_content_start_y;
 }
 
-void scrollable::add_char(char c, int x, int y) {
-	mvwaddch(m_pad, y, x, c);
-	m_content_height = std::max((uint32_t) y, m_content_height) - m_content_start_y;
-}
-
 void scrollable::del_line(int x, int y) {
 	wmove(m_pad, y, x);
 	wclrtoeol(m_pad);
