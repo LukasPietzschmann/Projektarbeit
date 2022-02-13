@@ -1,5 +1,6 @@
-add_library(Visualizer main.hpp main.cpp archive.cpp utils.hpp utils.cpp windows.hpp layouting.cpp layouting.hpp archive_change_listener.hpp event.cpp event.hpp event.cpp main.hpp events.hpp constants.hpp expr_queue.cpp expr_queue.hpp scrollable.hpp scrollable.cpp popup.hpp popup.cpp oper_store.hpp oper_store.cpp popup_manager.hpp popup_manager.cpp)
-link_libraries(Visualizer flxc)
+add_library(Visualizer main.cpp archive.cpp utils.cpp layouting.cpp event.cpp event.cpp expr_queue.cpp scrollable.cpp
+		popup.cpp oper_store.cpp popup_manager.cpp expr_repr.cpp)
+target_link_libraries(Visualizer flxc)
 
 include_directories(
 		../libCH
