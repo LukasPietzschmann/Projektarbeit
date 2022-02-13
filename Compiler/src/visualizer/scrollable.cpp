@@ -12,14 +12,26 @@ scrollable::~scrollable() {
 }
 
 void scrollable::scroll_y(int delta) {
-	if(m_scroll_amount == 0 && delta < 0)
-		return;
-	if(!(m_scroll_amount + m_screen_height > m_content_height && delta < 0)) {
+	const auto& is_allowed_to_scroll = [&]() {
+		if(delta == 0)
+			return false;
+		if(m_scroll_amount == 0 && delta < 0)
+			return false;
+		if(m_scroll_amount + m_screen_height > m_content_height) {
+			if(delta < 0)
+				return true;
+			return false;
+		}
 		if(m_content_height < m_screen_height)
-			return;
-		if(m_scroll_amount + delta > m_content_height - m_screen_height)
-			return;
-	}
+			return false;
+		if(m_scroll_amount + m_screen_height + delta > m_content_height)
+			return false;
+		return true;
+	};
+
+	if(!is_allowed_to_scroll())
+		return;
+
 	m_scroll_amount += delta;
 	prepare_refresh();
 }
@@ -63,7 +75,8 @@ void scrollable::prepare_refresh() {
 
 	if(m_content_height > m_screen_height) {
 		number_of_segments = std::max((uint32_t) 1, m_screen_height * m_screen_height / m_content_height);
-		const uint32_t internal_scroll_amount = std::clamp(m_scroll_amount, (uint32_t) 0, m_content_height - m_screen_height);
+		const uint32_t internal_scroll_amount = std::clamp(m_scroll_amount, (uint32_t) 0,
+				m_content_height - m_screen_height);
 		segments_start =
 				(m_screen_height - number_of_segments) * internal_scroll_amount /
 						(m_content_height - m_screen_height);
