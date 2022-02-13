@@ -5,6 +5,8 @@
 #include <cassert>
 #include <seq.ch>
 
+#include "constants.hpp"
+
 #define mvsaddstr(scrollable, y, x, str) (scrollable)->add_string((str), (x), (y))
 #define mvsaddch(scrollable, y, x, chr) (scrollable)->add_char((chr), (x), (y))
 

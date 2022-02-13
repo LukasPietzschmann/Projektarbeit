@@ -2,7 +2,7 @@
 
 scrollable::scrollable(uint32_t width, uint32_t height, uint32_t x_start, uint32_t y_start) :
 		m_width(width), m_screen_height(height), m_x_start(x_start), m_y_start(y_start) {
-	m_pad = newpad(height * 100, width * 4);
+	m_pad = newpad(height * PAD_HEIGHT_MULTIPLIER, width);
 	prepare_refresh();
 }
 
@@ -74,13 +74,12 @@ void scrollable::prepare_refresh() {
 						(m_content_height - m_screen_height);
 		clear_scrollbar = true;
 	}else {
-		segments_start = 0;
 		number_of_segments = 0;
 		if(!clear_scrollbar)
 			clear_scrollbar = true;
 	}
 
-	for(int i = 0; clear_scrollbar && i < m_screen_height * 4; ++i)
+	for(int i = 0; clear_scrollbar && i < m_screen_height * PAD_HEIGHT_MULTIPLIER; ++i)
 		mvwaddch(m_pad, i, m_width - 1, ' ');
 
 	clear_scrollbar = false;
