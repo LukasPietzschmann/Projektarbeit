@@ -14,7 +14,7 @@ void popup_manager::insert(popup* popup, const std::optional<popup_manager::call
 
 bool popup_manager::toggle(popup* popup) const {
 	assert(popup != nullptr);
-	if(popup->is_currently_shown()) {
+	if(popup->m_is_currently_shown) {
 		hide(popup);
 		return false;
 	}
@@ -22,10 +22,15 @@ bool popup_manager::toggle(popup* popup) const {
 	return true;
 }
 
+/**
+ * Sollte nur aufgerufen werden, wenn popup->m_is_currently_shown == true
+ * Ansonsten wird der show_callback zu Unrecht aufgerufen
+ */
 void popup_manager::show(popup* popup) const {
 	assert(popup != nullptr);
+	assert(!popup->m_is_currently_shown);
 	for(auto* p: m_popups) {
-		if(p == popup)
+		if(p == popup || !p->m_is_currently_shown)
 			continue;
 		hide(p);
 	}
@@ -33,8 +38,13 @@ void popup_manager::show(popup* popup) const {
 	popup->show();
 }
 
+/**
+ * Sollte nur aufgerufen werden, wenn popup->m_is_currently_shown == false
+ * Ansonsten wird der hide_callback zu Unrecht aufgerufen
+ */
 void popup_manager::hide(popup* popup) const {
 	assert(popup != nullptr);
+	assert(popup->m_is_currently_shown);
 	m_hide_callbacks.at(popup)();
 	popup->hide();
 }
