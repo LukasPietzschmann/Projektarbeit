@@ -21,6 +21,7 @@ public:
 	};
 
 	explicit event(unsigned int position);
+	virtual ~event() = default;
 
 	virtual event_exec_result exec() = 0;
 	virtual event_exec_result undo() = 0;

@@ -30,6 +30,8 @@ int current_state;
 
 void handleSignal(int sig) {
 	arch_windows.clear();
+	for(const auto e : events)
+		delete e;
 	events.clear();
 	delwin(footer);
 	delwin(src_display);
