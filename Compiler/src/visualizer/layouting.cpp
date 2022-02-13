@@ -16,13 +16,12 @@ void layouter::unregister_cat(archive& c) {
 void layouter::notify_dimensions_changed(archive&) const {
 	const auto& layout = [](archive& archive_to_layout) {
 		const auto has_intersections = [&archive_to_layout](const archive::rect& rect_to_test) {
-			for(archive& current_archive: arch_windows) {
-				if(!current_archive.is_layouted || current_archive == archive_to_layout)
-					continue;
-				if(current_archive.intersects_with(rect_to_test))
-					return true;
-			}
-			return false;
+			return std::any_of(arch_windows.begin(), arch_windows.end(),
+					[&archive_to_layout, &rect_to_test](const archive& a) {
+						if(!a.is_layouted || a == archive_to_layout)
+							return false;
+						return a.intersects_with(rect_to_test);
+					});
 		};
 
 		int desired_x_coord = std::max(0,

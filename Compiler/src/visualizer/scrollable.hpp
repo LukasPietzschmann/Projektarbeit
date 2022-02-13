@@ -5,8 +5,8 @@
 #include <cassert>
 #include <seq.ch>
 
-#define mvsaddstr(scrollable, y, x, str) scrollable->add_string(str, x, y)
-#define mvsaddch(scrollable, y, x, chr) scrollable->add_char(chr, x, y)
+#define mvsaddstr(scrollable, y, x, str) (scrollable)->add_string((str), (x), (y))
+#define mvsaddch(scrollable, y, x, chr) (scrollable)->add_char((chr), (x), (y))
 
 class scrollable {
 public:
@@ -23,7 +23,6 @@ public:
 	void prepare_refresh();
 
 	uint32_t get_width() const;
-	uint32_t get_height() const;
 
 	WINDOW* operator*() const;
 

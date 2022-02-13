@@ -16,15 +16,10 @@
 #include "utils.hpp"
 #include "scrollable.hpp"
 
+
+
+
 using event_iterator = std::vector<event*>::iterator;
-extern event_iterator next_event_it;
-extern uint64_t current_event_index;
-extern CH::str src_str;
-
-extern scrollable* current_scrollable;
-extern scrollable* prev_scrollable;
-
-extern popup_manager* p_manager;
 
 enum input_state {
 	s_wait_for_marker = 1 << 0,
@@ -33,8 +28,6 @@ enum input_state {
 	s_wait_for_scrollable_selection = 3 << 1,
 	s_any_input = 4 << 1
 };
-
-extern int current_state;
 
 /**
  * Wird das Programm unerwartet durch ein Signal beendet,

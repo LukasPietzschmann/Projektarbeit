@@ -216,7 +216,7 @@ void archive::invalidate() {
 	if(new_width % 2 == 0)
 		++new_width;
 
-	m_height = std::max(m_comp.size(), m_cons.size()) + 2;;
+	m_height = std::max(m_comp.size(), m_cons.size()) + 2;
 	m_width = new_width;
 	for(const archive_change_listener* listener: m_listeners)
 		listener->notify_dimensions_changed(*this);

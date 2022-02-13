@@ -4,10 +4,6 @@ long event::m_next_id = 0;
 
 event::event(unsigned int position) : m_position(position), m_id(m_next_id++) {}
 
-unsigned int event::getPosition() const {
-	return m_position;
-}
-
 template <typename Callback>
 void event::exec_on_archive_at_pos(unsigned int pos, Callback callback) const {
 	const auto& it = std::find_if(arch_windows.begin(), arch_windows.end(), [&pos](const archive& c) {
@@ -16,10 +12,6 @@ void event::exec_on_archive_at_pos(unsigned int pos, Callback callback) const {
 	if(it == arch_windows.end())
 		return;
 	callback(*it);
-}
-
-Expr event_with_data::getData() const {
-	return m_data;
 }
 
 event_with_data::event_with_data(unsigned int position, const Expr& data) :

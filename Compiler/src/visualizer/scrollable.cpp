@@ -47,7 +47,7 @@ void scrollable::del_line(int x, int y) {
 	wmove(m_pad, y, x);
 	wclrtoeol(m_pad);
 	if(y == m_content_height + m_content_start_y)
-		m_content_height = std::max(0, (int)m_content_height - 1);
+		m_content_height = std::max(0, (int) m_content_height - 1);
 	else if(y == m_content_start_y) {
 		++m_content_start_y;
 		m_content_height = std::max(0, (int) m_content_height - 1);
@@ -94,8 +94,4 @@ void scrollable::prepare_refresh() {
 
 uint32_t scrollable::get_width() const {
 	return m_width;
-}
-
-uint32_t scrollable::get_height() const {
-	return m_screen_height;
 }

@@ -4,7 +4,7 @@
 
 #include "scrollable.hpp"
 
-#define mvpaddstr(popup, y, x, str) mvsaddstr((**popup), y, x + 1, str)
+#define mvpaddstr(popup, y, x, str) mvsaddstr(**(popup), (y), (x) + 1, (str))
 
 class popup {
 	friend class popup_manager;
@@ -26,8 +26,6 @@ private:
 	 * @return `true`, falls das popup geöffnet wurde,
 	 * sonst `false`
 	 */
-	bool toggle();
-
 	PANEL* m_panel;
 	scrollable* m_origin_win;
 	bool m_is_currently_shown {false};

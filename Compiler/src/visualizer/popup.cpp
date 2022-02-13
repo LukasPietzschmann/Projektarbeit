@@ -23,14 +23,6 @@ void popup::hide() {
 	m_is_currently_shown = false;
 }
 
-bool popup::toggle() {
-	if(m_is_currently_shown)
-		hide();
-	else
-		show();
-	return m_is_currently_shown;
-}
-
 bool popup::is_currently_shown() const {
 	return m_is_currently_shown;
 }

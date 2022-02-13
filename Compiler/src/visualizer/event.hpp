@@ -25,8 +25,6 @@ public:
 	virtual event_exec_result exec() = 0;
 	virtual event_exec_result undo() = 0;
 
-	unsigned int getPosition() const;
-
 protected:
 	long m_id;
 	unsigned int m_position;
@@ -41,7 +39,6 @@ private:
 class event_with_data : public event {
 public:
 	event_with_data(unsigned int position, const Expr& data);
-	Expr getData() const;
 
 protected:
 	Expr m_data;
@@ -101,7 +98,7 @@ public:
 class event_group : public event {
 public:
 	using event::event;
-	explicit event_group(std::initializer_list<event*>);
+	event_group(std::initializer_list<event*>);
 	event_exec_result exec() override;
 	event_exec_result undo() override;
 private:
