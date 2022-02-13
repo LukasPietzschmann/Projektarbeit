@@ -12,15 +12,15 @@ scrollable::~scrollable() {
 }
 
 void scrollable::scroll_y(int delta) {
-	if(m_scroll_y == 0 && delta < 0)
+	if(m_scroll_amount == 0 && delta < 0)
 		return;
-	if(!(m_scroll_y + m_screen_height > m_content_height && delta < 0)) {
+	if(!(m_scroll_amount + m_screen_height > m_content_height && delta < 0)) {
 		if(m_content_height < m_screen_height)
 			return;
-		if(m_scroll_y + delta > m_content_height - m_screen_height)
+		if(m_scroll_amount + delta > m_content_height - m_screen_height)
 			return;
 	}
-	m_scroll_y += delta;
+	m_scroll_amount += delta;
 	prepare_refresh();
 }
 
@@ -63,20 +63,19 @@ void scrollable::clear() {
 void scrollable::prepare_refresh() {
 	static bool clear_scrollbar = false;
 
-	uint32_t segments_y_start;
-	uint32_t number_of_segments_to_draw;
-
-	uint32_t view_y = m_scroll_y; //oder m_scroll_y + m_content_start_y
+	uint32_t segments_start;
+	uint32_t number_of_segments;
 
 	if(m_content_height > m_screen_height) {
-		number_of_segments_to_draw = std::max((uint32_t) 1, m_screen_height * m_screen_height / m_content_height);
-		view_y = std::clamp(view_y, (uint32_t) 0, m_content_height - m_screen_height);
-		segments_y_start =
-				(m_screen_height - number_of_segments_to_draw) * view_y / (m_content_height - m_screen_height);
+		number_of_segments = std::max((uint32_t) 1, m_screen_height * m_screen_height / m_content_height);
+		const uint32_t internal_scroll_amount = std::clamp(m_scroll_amount, (uint32_t) 0, m_content_height - m_screen_height);
+		segments_start =
+				(m_screen_height - number_of_segments) * internal_scroll_amount /
+						(m_content_height - m_screen_height);
 		clear_scrollbar = true;
 	}else {
-		segments_y_start = 0;
-		number_of_segments_to_draw = 0;
+		segments_start = 0;
+		number_of_segments = 0;
 		if(!clear_scrollbar)
 			clear_scrollbar = true;
 	}
@@ -86,10 +85,10 @@ void scrollable::prepare_refresh() {
 
 	clear_scrollbar = false;
 
-	for(int i = 0; i < number_of_segments_to_draw; ++i)
-		mvwaddch(m_pad, segments_y_start + i + m_scroll_y + m_content_start_y, m_width - 1, '|');
+	for(int i = 0; i < number_of_segments; ++i)
+		mvwaddch(m_pad, segments_start + i + m_scroll_amount + m_content_start_y, m_width - 1, '|');
 
-	pnoutrefresh(m_pad, m_scroll_y + m_content_start_y, 0, m_y_start, m_x_start, m_y_start + m_screen_height,
+	pnoutrefresh(m_pad, m_scroll_amount + m_content_start_y, 0, m_y_start, m_x_start, m_y_start + m_screen_height,
 			m_x_start + m_width);
 }
 
