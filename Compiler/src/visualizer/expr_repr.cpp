@@ -14,7 +14,7 @@ CH::str expr_repr::as_string() const {
 
 	if(is_prototyp)
 		result += expr(to_str_);
-	else if(!is_comp)
+	else if(flags & f_is_comp)
 		result += get_scanned_str_for_expr(expr) + expr(to_str_from_currpart_);
 	else
 		result += get_scanned_str_for_expr(expr);

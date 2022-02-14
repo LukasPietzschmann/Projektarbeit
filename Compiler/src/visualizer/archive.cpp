@@ -31,14 +31,14 @@ void archive::render() {
 		if(comp_it != m_comp.end()) {
 			const auto& elem = comp_it->second;
 			const auto& string = elem.as_string();
-			if(elem.is_highlighted)
+			if(elem.flags & expr_repr::f_is_highlighted)
 				wattron(**main_viewport, HIGHLIGHT_EXPR_ATTR);
-			if(elem.is_ambiguous)
+			if(elem.flags & expr_repr::f_is_ambiguous)
 				wattron(**main_viewport, COLOR_PAIR(AMBIGUOUS_COLOR_PAIR));
 			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start, string);
-			if(elem.is_highlighted)
+			if(elem.flags & expr_repr::f_is_highlighted)
 				wattroff(**main_viewport, HIGHLIGHT_EXPR_ATTR);
-			if(elem.is_ambiguous)
+			if(elem.flags & expr_repr::f_is_ambiguous)
 				wattroff(**main_viewport, COLOR_PAIR(AMBIGUOUS_COLOR_PAIR));
 			++comp_it;
 		}
@@ -46,10 +46,10 @@ void archive::render() {
 		if(cons_it != m_cons.end()) {
 			const auto& elem = cons_it->second;
 			const auto& string = elem.as_string();
-			if(elem.is_highlighted)
+			if(elem.flags & expr_repr::f_is_highlighted)
 				wattron(**main_viewport, HIGHLIGHT_EXPR_ATTR);
 			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - *string + m_x_start, string);
-			if(elem.is_highlighted)
+			if(elem.flags & expr_repr::f_is_highlighted)
 				wattroff(**main_viewport, HIGHLIGHT_EXPR_ATTR);
 			++cons_it;
 		}
@@ -68,20 +68,20 @@ uint32_t archive::get_pos_in_src() const {
 }
 
 void archive::add_cons(long id, const Expr& cons) {
-	bool is_proto = cons(beg_) == cons(end_);
-	m_cons.try_emplace(id, cons, false, is_proto);
+	m_cons.try_emplace(id, cons, false);
 	invalidate();
 }
 
 void archive::add_comp(long id, const Expr& comp) {
-	bool is_comp_ambiguous = false;
+	bool is_new_expr_ambiguous = false;
 	for(auto&[id, element]: m_comp) {
 		if(element.expr(end_) != comp(end_))
 			continue;
-		element.is_ambiguous = true;
-		is_comp_ambiguous = true;
+		element.flags |= expr_repr::f_is_ambiguous;
+		is_new_expr_ambiguous = true;
 	}
-	m_comp.try_emplace(id, comp, true, false, false, is_comp_ambiguous);
+	int flags = expr_repr::f_is_comp | (is_new_expr_ambiguous ? expr_repr::f_is_ambiguous : 0);
+	m_comp.try_emplace(id, comp, flags);
 	invalidate();
 }
 
@@ -98,13 +98,13 @@ bool archive::remove_comp_with_id(long id) {
 	if(it == m_comp.end())
 		return false;
 
-	if(it->second.is_ambiguous) {
+	if(it->second.flags & expr_repr::f_is_ambiguous) {
 		for(auto &[e_id, elem]: m_comp) {
 			if(e_id == id)
 				continue;
 			if(elem.expr(end_) != it->second.expr(end_))
 				continue;
-			elem.is_ambiguous = false;
+			elem.flags &= ~expr_repr::f_is_ambiguous;
 		}
 	}
 
@@ -118,7 +118,7 @@ bool archive::set_expr_active(const Expr& expr) {
 		for(auto&[id, element]: elements) {
 			if(element.expr != expr)
 				continue;
-			element.is_highlighted = true;
+			element.flags |= expr_repr::f_is_highlighted;
 			invalidate();
 			return true;
 		}
@@ -133,7 +133,7 @@ bool archive::set_expr_inactive(const Expr& expr) {
 		for(auto&[id, element]: elements) {
 			if(element.expr != expr)
 				continue;
-			element.is_highlighted = false;
+			element.flags &= ~expr_repr::f_is_highlighted;
 			invalidate();
 			return true;
 		}

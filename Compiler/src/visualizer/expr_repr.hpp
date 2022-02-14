@@ -5,13 +5,16 @@
 #include "oper_store.hpp"
 
 struct expr_repr {
-	expr_repr(const Expr& expr, bool is_comp, bool is_prototyp = false, bool is_highlighted = false,
-			bool is_ambiguous = false);
+	enum flags {
+		f_is_comp = 1 << 0,
+		f_is_highlighted = 1 << 1,
+		f_is_ambiguous = 1 << 2
+	};
+
+	expr_repr(const Expr& expr, int flags = 0);
 
 	Expr expr;
-	bool is_comp;
-	bool is_highlighted;
-	bool is_ambiguous;
+	int flags;
 	bool is_prototyp;
 
 	CH::str as_string() const;
