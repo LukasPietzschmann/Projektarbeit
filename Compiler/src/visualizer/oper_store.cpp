@@ -1,6 +1,6 @@
 #include "oper_store.hpp"
 
-bool oper_store::insert_prototyp(const Expr& expr) {
+bool oper_store::insert_if_prototyp(const Expr& expr) {
 	static int next_id_and_line = 0;
 
 	if(expr(beg_) != expr(end_))

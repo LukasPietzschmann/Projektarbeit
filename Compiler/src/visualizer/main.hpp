@@ -16,8 +16,15 @@
 #include "utils.hpp"
 #include "scrollable.hpp"
 
+/*
+Teil des Ausdrucks ab currpart_ anders farbig machen
 
+Davids Code übernehmen
 
+Vielleicht seitwärts scrollen
+
+Noch ein Paar Kommentare
+*/
 
 using event_iterator = std::vector<event*>::iterator;
 

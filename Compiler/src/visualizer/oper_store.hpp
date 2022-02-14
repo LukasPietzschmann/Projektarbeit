@@ -22,7 +22,7 @@ public:
 	oper_store& operator=(const oper_store&) = delete;
 	oper_store& operator=(oper_store&&) noexcept = default;
 
-	bool insert_prototyp(const Expr& expr);
+	bool insert_if_prototyp(const Expr& expr);
 	std::optional<int> get_id_from_oper(const Oper& oper);
 
 private:

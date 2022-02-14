@@ -93,11 +93,12 @@ event::event_exec_result expr_no_longer_gets_used_event::undo() {
 	return res ? did_something : did_nothing;
 }
 
-add_expr_to_queue::add_expr_to_queue(const Expr& expr) : event_with_data(0, expr) {}
+add_expr_to_queue::add_expr_to_queue(const Expr& expr, bool is_comp) : event_with_data(0, expr), m_is_comp(is_comp) {}
 
 event::event_exec_result add_expr_to_queue::exec() {
-	oper_store::the().insert_prototyp(m_data);
-	expr_queue::the().push_back(m_data);
+	if(!m_is_comp)
+		oper_store::the().insert_if_prototyp(m_data);
+	expr_queue::the().push_back(m_data, false);
 	return event::did_something;
 }
 
@@ -105,14 +106,15 @@ event::event_exec_result add_expr_to_queue::undo() {
 	return expr_queue::the().pop_back() ? event::did_something : event::did_nothing;
 }
 
-remove_expr_from_queue::remove_expr_from_queue(const Expr& expr) : event_with_data(0, expr) {}
+remove_expr_from_queue::remove_expr_from_queue(const Expr& expr, bool is_comp) :
+		event_with_data(0, expr), m_is_comp(is_comp) {}
 
 event::event_exec_result remove_expr_from_queue::exec() {
 	return expr_queue::the().pop_front() ? event::did_something : event::did_nothing;
 }
 
 event::event_exec_result remove_expr_from_queue::undo() {
-	expr_queue::the().push_front(m_data);
+	expr_queue::the().push_front(m_data, m_is_comp);
 	return event::did_something;
 }
 
