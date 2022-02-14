@@ -14,7 +14,8 @@
 #include "constants.hpp"
 #include "coordinates.hpp"
 #include "oper_store.hpp"
-#include "windows.hpp"
+
+extern std::vector<archive> arch_windows;
 
 class archive {
 public:

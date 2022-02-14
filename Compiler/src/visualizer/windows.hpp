@@ -3,12 +3,8 @@
 #include <ncurses.h>
 #include <vector>
 
-#include "archive.hpp"
-
 class scrollable;
 class popup;
-
-extern std::vector<archive> arch_windows;
 
 extern WINDOW* src_display;
 extern WINDOW* footer;
