@@ -13,6 +13,7 @@
 #include "archive_change_listener.hpp"
 #include "constants.hpp"
 #include "coordinates.hpp"
+#include "expr_repr.hpp"
 #include "oper_store.hpp"
 
 extern std::vector<archive> arch_windows;
@@ -65,22 +66,6 @@ public:
 	bool is_layouted {false};
 
 private:
-	struct archive_element {
-		explicit archive_element(const Expr& expr, bool is_comp, bool is_prototyp = false,
-				bool is_highlighted = false,
-				bool is_ambiguous = false) :
-				expr(expr), is_comp(is_comp), is_highlighted(is_highlighted), is_ambiguous(is_ambiguous),
-				is_prototyp(is_prototyp) {};
-
-		Expr expr;
-		bool is_comp;
-		bool is_highlighted;
-		bool is_ambiguous;
-		bool is_prototyp;
-
-		CH::str as_string() const;
-	};
-
 	uint32_t m_width {0};
 	uint32_t m_height {0};
 	uint32_t m_y_start {0};
@@ -88,7 +73,7 @@ private:
 	uint32_t m_divider_x_pos {0};
 	uint32_t m_pos_in_src;
 
-	std::map<long, archive_element> m_cons {}, m_comp {};
+	std::map<long, expr_repr> m_cons {}, m_comp {};
 
 	t_id m_id {-1};
 

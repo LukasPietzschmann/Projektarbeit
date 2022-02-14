@@ -114,7 +114,7 @@ bool archive::remove_comp_with_id(long id) {
 }
 
 bool archive::set_expr_active(const Expr& expr) {
-	const auto& do_in = [&](map<long, archive::archive_element>& elements) {
+	const auto& do_in = [&](map<long, expr_repr>& elements) {
 		for(auto&[id, element]: elements) {
 			if(element.expr != expr)
 				continue;
@@ -129,7 +129,7 @@ bool archive::set_expr_active(const Expr& expr) {
 }
 
 bool archive::set_expr_inactive(const Expr& expr) {
-	const auto& do_in = [&](map<long, archive::archive_element>& elements) {
+	const auto& do_in = [&](map<long, expr_repr>& elements) {
 		for(auto&[id, element]: elements) {
 			if(element.expr != expr)
 				continue;
@@ -197,7 +197,7 @@ void archive::unregister_as_listener(archive_change_listener* listener) {
 }
 
 void archive::invalidate() {
-	static const auto longest_str_len = [](const std::map<long, archive_element>& elements) {
+	static const auto longest_str_len = [](const std::map<long, expr_repr>& elements) {
 		unsigned long max = 0;
 		for(const auto&[id, elem]: elements) {
 			const auto& string = elem.as_string();
@@ -224,24 +224,4 @@ void archive::invalidate() {
 
 bool archive::operator==(const archive& other) const {
 	return this == &other;
-}
-
-CH::str archive::archive_element::as_string() const {
-	const auto& id_or_error = oper_store::the().get_id_from_oper(expr(oper_));
-	const CH::str& id_str = CH::str(std::to_string(*id_or_error));
-	const CH::str& id_prefix = id_or_error.has_value() ? (id_str + ": ") : "?: ";
-
-	CH::str result;
-
-	if(is_prototyp)
-		result += expr(to_str_);
-	else if(!is_comp)
-		result += get_scanned_str_for_expr(expr) + expr(to_str_from_currpart_);
-	else
-		result += get_scanned_str_for_expr(expr);
-
-	if(*result > REPLACE_WITH_ID_THRESHOLD && id_or_error.has_value())
-		result = "ID: " + id_str;
-
-	return result;
 }
