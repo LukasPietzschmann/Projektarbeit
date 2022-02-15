@@ -16,6 +16,7 @@ struct expr_repr {
 
 	Expr expr;
 	int flags;
+	uint32_t currpart_pos;
 
-	CH::str as_string() const;
+	CH::str as_string();
 };

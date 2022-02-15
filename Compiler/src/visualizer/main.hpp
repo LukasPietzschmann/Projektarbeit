@@ -17,8 +17,6 @@
 #include "scrollable.hpp"
 
 /*
-Teil des Ausdrucks ab currpart_ anders farbig machen
-
 Davids Code übernehmen
 
 Vielleicht seitwärts scrollen

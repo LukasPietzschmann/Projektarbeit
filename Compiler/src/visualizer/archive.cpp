@@ -29,13 +29,16 @@ void archive::render() {
 		mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + m_x_start, "|");
 
 		if(comp_it != m_comp.end()) {
-			const auto& elem = comp_it->second;
+			auto elem = comp_it->second;
 			const auto& string = elem.as_string();
 			if(elem.flags & expr_repr::f_is_highlighted)
 				wattron(**main_viewport, HIGHLIGHT_EXPR_ATTR);
 			if(elem.flags & expr_repr::f_is_ambiguous)
 				wattron(**main_viewport, COLOR_PAIR(AMBIGUOUS_COLOR_PAIR));
-			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start, string);
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start, string(A | Z - elem.currpart_pos));
+			wattron(**main_viewport, A_UNDERLINE | A_DIM);
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start + elem.currpart_pos, string(A + elem.currpart_pos | Z));
+			wattroff(**main_viewport, A_UNDERLINE | A_DIM);
 			if(elem.flags & expr_repr::f_is_highlighted)
 				wattroff(**main_viewport, HIGHLIGHT_EXPR_ATTR);
 			if(elem.flags & expr_repr::f_is_ambiguous)
@@ -44,11 +47,14 @@ void archive::render() {
 		}
 
 		if(cons_it != m_cons.end()) {
-			const auto& elem = cons_it->second;
+			auto elem = cons_it->second;
 			const auto& string = elem.as_string();
 			if(elem.flags & expr_repr::f_is_highlighted)
 				wattron(**main_viewport, HIGHLIGHT_EXPR_ATTR);
-			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - *string + m_x_start, string);
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - *string + m_x_start, string(A | Z - elem.currpart_pos));
+			wattron(**main_viewport, A_UNDERLINE | A_DIM);
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - (*string - elem.currpart_pos) + m_x_start, string(A + elem.currpart_pos | Z));
+			wattroff(**main_viewport, A_UNDERLINE | A_DIM);
 			if(elem.flags & expr_repr::f_is_highlighted)
 				wattroff(**main_viewport, HIGHLIGHT_EXPR_ATTR);
 			++cons_it;
@@ -199,7 +205,7 @@ void archive::unregister_as_listener(archive_change_listener* listener) {
 void archive::invalidate() {
 	static const auto longest_str_len = [](const std::map<long, expr_repr>& elements) {
 		unsigned long max = 0;
-		for(const auto&[id, elem]: elements) {
+		for(auto[id, elem]: elements) {
 			const auto& string = elem.as_string();
 			if(*string > max)
 				max = *string;

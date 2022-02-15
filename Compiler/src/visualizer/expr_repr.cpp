@@ -8,23 +8,31 @@ expr_repr::expr_repr(const Expr& expr, int flags) :
 		this->flags &= ~f_is_prototype;
 }
 
-CH::str expr_repr::as_string() const {
+//FIXME: nicht gerade ideal hier currpart_pos zu setzten
+//		1: as_string kann dann nicht mehr const sein
+//		2: es fühlt sich einfach nicht richtig an :|
+CH::str expr_repr::as_string() {
 	const auto& id_or_error = oper_store::the().get_id_from_oper(expr(oper_));
 	const CH::str& id_str = CH::str(std::to_string(*id_or_error));
 	const CH::str& id_prefix = id_or_error.has_value() ? (id_str + ": ") : "?: ";
 
-	CH::str result;
+	CH::str result = id_prefix;
 
-	if(flags & f_is_prototype)
+	if(flags & f_is_prototype) {
+		currpart_pos = *result;
 		result += expr(to_str_);
-	else if(!(flags & f_is_comp))
-		result += get_scanned_str_for_expr(expr) + expr(to_str_from_currpart_);
-	else
+	}else if(flags & f_is_comp) {
 		result += get_scanned_str_for_expr(expr);
-	result = id_prefix + result;
-
-	if(*result > REPLACE_WITH_ID_THRESHOLD && id_or_error.has_value())
+		currpart_pos = *result;
+	}else {
+		result += get_scanned_str_for_expr(expr);
+		currpart_pos = *result;
+		result += expr(to_str_from_currpart_);
+	}
+	if(*result > REPLACE_WITH_ID_THRESHOLD && id_or_error.has_value()) {
 		result = "ID: " + id_str;
+		currpart_pos = *result;
+	}
 
 	return result;
 }

@@ -1,11 +1,15 @@
 #include "expr_queue.hpp"
 
 void expr_queue::push_back(const Expr& expr, bool is_comp) {
-	const auto& er = expr_repr(expr, is_comp ? expr_repr::f_is_comp : 0);
+	auto er = expr_repr(expr, is_comp ? expr_repr::f_is_comp : 0);
 	CH::str expr_str = er.as_string();
 	if(*expr_str >= QUEUE_WIDTH)
 		expr_str = expr_str(A | A + (QUEUE_WIDTH - 2));
-	mvsaddstr(queue_display, m_y_end++, 0, expr_str);
+	++m_y_end;
+	mvsaddstr(queue_display, m_y_end, 0, expr_str(A | Z - er.currpart_pos));
+	wattron(**queue_display, A_UNDERLINE | A_DIM);
+	mvsaddstr(queue_display, m_y_end, er.currpart_pos, expr_str(A + er.currpart_pos | Z));
+	wattroff(**queue_display, A_UNDERLINE | A_DIM);
 	queue_display->prepare_refresh();
 }
 
@@ -18,11 +22,15 @@ bool expr_queue::pop_back() {
 }
 
 void expr_queue::push_front(const Expr& expr, bool is_comp) {
-	const auto& er = expr_repr(expr, is_comp ? expr_repr::f_is_comp : 0);
+	auto er = expr_repr(expr, is_comp ? expr_repr::f_is_comp : 0);
 	CH::str expr_str = er.as_string();
 	if(*expr_str >= QUEUE_WIDTH)
 		expr_str = expr_str(A | A + (QUEUE_WIDTH - 2));
-	mvsaddstr(queue_display, --m_y_begin, 0, expr_str);
+	--m_y_begin;
+	mvsaddstr(queue_display, m_y_begin, 0, expr_str(A | Z - er.currpart_pos));
+	wattron(**queue_display, A_UNDERLINE | A_DIM);
+	mvsaddstr(queue_display, m_y_begin, er.currpart_pos, expr_str(A + er.currpart_pos | Z));
+	wattroff(**queue_display, A_UNDERLINE | A_DIM);
 	queue_display->prepare_refresh();
 }
 
