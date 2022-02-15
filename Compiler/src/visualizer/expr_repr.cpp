@@ -3,9 +3,9 @@
 expr_repr::expr_repr(const Expr& expr, int flags) :
 		expr(expr), flags(flags) {
 	if(expr(beg_) == expr(end_))
-		flags |= f_is_prototype;
+		this->flags |= f_is_prototype;
 	else
-		flags &= ~f_is_prototype;
+		this->flags &= ~f_is_prototype;
 }
 
 CH::str expr_repr::as_string() const {
