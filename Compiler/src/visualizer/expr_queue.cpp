@@ -5,11 +5,11 @@ void expr_queue::push_back(const Expr& expr, bool is_comp) {
 	CH::str expr_str = er.as_string();
 	if(*expr_str >= QUEUE_WIDTH)
 		expr_str = expr_str(A | A + (QUEUE_WIDTH - 2));
-	++m_y_end;
 	mvsaddstr(queue_display, m_y_end, 0, expr_str(A | Z - er.currpart_pos));
 	wattron(**queue_display, A_UNDERLINE | A_DIM);
 	mvsaddstr(queue_display, m_y_end, er.currpart_pos, expr_str(A + er.currpart_pos | Z));
 	wattroff(**queue_display, A_UNDERLINE | A_DIM);
+	++m_y_end;
 	queue_display->prepare_refresh();
 }
 
