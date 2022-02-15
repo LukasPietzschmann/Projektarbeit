@@ -29,7 +29,7 @@ CH::str expr_repr::as_string() {
 		currpart_pos = *result;
 		result += expr(to_str_from_currpart_);
 	}
-	if(*result > REPLACE_WITH_ID_THRESHOLD && id_or_error.has_value()) {
+	if(*result > REPLACE_WITH_ID_THRESHOLD && id_or_error.has_value() && flags & f_is_prototype) {
 		result = "ID: " + id_str;
 		currpart_pos = *result;
 	}
