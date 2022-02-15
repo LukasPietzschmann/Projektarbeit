@@ -1,7 +1,12 @@
 #include "expr_repr.hpp"
 
 expr_repr::expr_repr(const Expr& expr, int flags) :
-		expr(expr), flags(flags), is_prototyp(expr(beg_) == expr(end_)) {}
+		expr(expr), flags(flags) {
+	if(expr(beg_) == expr(end_))
+		flags |= f_is_prototype;
+	else
+		flags &= ~f_is_prototype;
+}
 
 CH::str expr_repr::as_string() const {
 	const auto& id_or_error = oper_store::the().get_id_from_oper(expr(oper_));
@@ -10,7 +15,7 @@ CH::str expr_repr::as_string() const {
 
 	CH::str result;
 
-	if(is_prototyp)
+	if(flags & f_is_prototype)
 		result += expr(to_str_);
 	else if(!(flags & f_is_comp))
 		result += get_scanned_str_for_expr(expr) + expr(to_str_from_currpart_);
