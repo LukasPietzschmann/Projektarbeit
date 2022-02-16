@@ -32,17 +32,17 @@ void archive::render() {
 			auto elem = comp_it->second;
 			const auto& string = elem.as_string();
 			if(elem.flags & expr_repr::f_is_highlighted)
-				wattron(**main_viewport, HIGHLIGHT_EXPR_ATTR);
+				wattron(**main_viewport, A_HIGHLIGHT);
 			if(elem.flags & expr_repr::f_is_ambiguous)
-				wattron(**main_viewport, COLOR_PAIR(AMBIGUOUS_COLOR_PAIR));
+				wattron(**main_viewport, A_AMBIGUOUS);
 			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start, string(A | Z - elem.currpart_pos));
-			wattron(**main_viewport, A_UNDERLINE | A_DIM);
+			wattron(**main_viewport, A_MUTED);
 			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start + elem.currpart_pos, string(A + elem.currpart_pos | Z));
-			wattroff(**main_viewport, A_UNDERLINE | A_DIM);
+			wattroff(**main_viewport, A_MUTED);
 			if(elem.flags & expr_repr::f_is_highlighted)
-				wattroff(**main_viewport, HIGHLIGHT_EXPR_ATTR);
+				wattroff(**main_viewport, A_HIGHLIGHT);
 			if(elem.flags & expr_repr::f_is_ambiguous)
-				wattroff(**main_viewport, COLOR_PAIR(AMBIGUOUS_COLOR_PAIR));
+				wattroff(**main_viewport, A_AMBIGUOUS);
 			++comp_it;
 		}
 
@@ -50,13 +50,13 @@ void archive::render() {
 			auto elem = cons_it->second;
 			const auto& string = elem.as_string();
 			if(elem.flags & expr_repr::f_is_highlighted)
-				wattron(**main_viewport, HIGHLIGHT_EXPR_ATTR);
+				wattron(**main_viewport, A_HIGHLIGHT);
 			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - *string + m_x_start, string(A | Z - elem.currpart_pos));
-			wattron(**main_viewport, A_UNDERLINE | A_DIM);
+			wattron(**main_viewport, A_MUTED);
 			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - (*string - elem.currpart_pos) + m_x_start, string(A + elem.currpart_pos | Z));
-			wattroff(**main_viewport, A_UNDERLINE | A_DIM);
+			wattroff(**main_viewport, A_MUTED);
 			if(elem.flags & expr_repr::f_is_highlighted)
-				wattroff(**main_viewport, HIGHLIGHT_EXPR_ATTR);
+				wattroff(**main_viewport, A_HIGHLIGHT);
 			++cons_it;
 		}
 	}
