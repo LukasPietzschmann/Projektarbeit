@@ -13,7 +13,7 @@
 class scrollable : public window_like<WINDOW> {
 public:
 	scrollable(uint32_t width, uint32_t height, uint32_t x_start, uint32_t y_start);
-	~scrollable();
+	~scrollable() override;
 
 	void scroll_y(int delta);
 	uint32_t get_width() const;

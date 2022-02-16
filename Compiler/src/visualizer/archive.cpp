@@ -37,7 +37,8 @@ void archive::render() {
 				wattron(**main_viewport, A_AMBIGUOUS);
 			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start, string(A | Z - elem.currpart_pos));
 			wattron(**main_viewport, A_MUTED);
-			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start + elem.currpart_pos, string(A + elem.currpart_pos | Z));
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start + elem.currpart_pos,
+					string(A + elem.currpart_pos | Z));
 			wattroff(**main_viewport, A_MUTED);
 			if(elem.flags & expr_repr::f_is_highlighted)
 				wattroff(**main_viewport, A_HIGHLIGHT);
@@ -51,9 +52,11 @@ void archive::render() {
 			const auto& string = elem.as_string();
 			if(elem.flags & expr_repr::f_is_highlighted)
 				wattron(**main_viewport, A_HIGHLIGHT);
-			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - *string + m_x_start, string(A | Z - elem.currpart_pos));
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - *string + m_x_start,
+					string(A | Z - elem.currpart_pos));
 			wattron(**main_viewport, A_MUTED);
-			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - (*string - elem.currpart_pos) + m_x_start, string(A + elem.currpart_pos | Z));
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - (*string - elem.currpart_pos) + m_x_start,
+					string(A + elem.currpart_pos | Z));
 			wattroff(**main_viewport, A_MUTED);
 			if(elem.flags & expr_repr::f_is_highlighted)
 				wattroff(**main_viewport, A_HIGHLIGHT);
@@ -80,7 +83,7 @@ void archive::add_cons(long id, const Expr& cons) {
 
 void archive::add_comp(long id, const Expr& comp) {
 	bool is_new_expr_ambiguous = false;
-	for(auto&[id, element]: m_comp) {
+	for(auto&[_, element]: m_comp) {
 		if(element.expr(end_) != comp(end_))
 			continue;
 		element.flags |= expr_repr::f_is_ambiguous;

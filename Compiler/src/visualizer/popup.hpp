@@ -12,7 +12,7 @@ class popup : public window_like<scrollable> {
 
 public:
 	explicit popup(scrollable* window);
-	~popup();
+	~popup() override;
 
 	bool is_currently_shown() const;
 

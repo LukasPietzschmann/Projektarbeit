@@ -13,11 +13,11 @@ struct expr_repr {
 		f_is_prototype = 1 << 3,
 	};
 
-	expr_repr(const Expr& expr, int flags = 0);
+	explicit expr_repr(const Expr& expr, int flags = 0);
 
 	Expr expr;
 	int flags;
-	uint32_t currpart_pos;
+	uint32_t currpart_pos {0};
 
 	CH::str as_string();
 };

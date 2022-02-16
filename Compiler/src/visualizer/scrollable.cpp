@@ -3,7 +3,11 @@
 scrollable::scrollable(uint32_t width, uint32_t height, uint32_t x_start, uint32_t y_start) : window_like<WINDOW>(
 		newpad(height * PAD_HEIGHT_MULTIPLIER, width)), m_width(width), m_screen_height(height), m_x_start(x_start),
 		m_y_start(y_start) {
-	prepare_refresh();
+	// In einem Konstruktor ist der virtuelle Aufrufmechanismus deaktiviert,
+	// da das Überschreiben von abgeleiteten Klassen noch nicht stattgefunden hat.
+	// Also sollten hier in der Regel keine virtuellen Methoden aufgerufen werden!
+	// Durch die explizite Angabe des Scopes ist der Aufruf hier aber okay!
+	scrollable::prepare_refresh();
 }
 
 scrollable::~scrollable() {
