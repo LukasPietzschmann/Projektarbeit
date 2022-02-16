@@ -1,8 +1,8 @@
 #pragma once
 
 #include <algorithm>
-#include <ncurses.h>
 #include <cassert>
+#include <ncurses.h>
 #include <seq.ch>
 
 #include "constants.hpp"

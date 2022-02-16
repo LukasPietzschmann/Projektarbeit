@@ -2,6 +2,7 @@
 
 #include "../flxc/data.h"
 #include "../flxc/scanner.h"
+
 #include "oper_store.hpp"
 
 struct expr_repr {

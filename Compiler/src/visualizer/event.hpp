@@ -1,15 +1,16 @@
 #pragma once
 
 #include <algorithm>
-#include <initializer_list>
 #include <functional>
-#include <sstream>
+#include <initializer_list>
 #include <memory>
+#include <sstream>
 #include <vector>
 
 #include "../flxc/data.h"
-#include "layouting.hpp"
+
 #include "expr_queue.hpp"
+#include "layouting.hpp"
 #include "oper_store.hpp"
 
 class event {

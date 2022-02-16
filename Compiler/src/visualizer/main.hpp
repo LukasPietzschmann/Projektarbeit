@@ -1,11 +1,11 @@
 #pragma once
 
 #include <cassert>
-#include <ncurses.h>
-#include <map>
-#include <vector>
 #include <csignal>
+#include <map>
+#include <ncurses.h>
 #include <panel.h>
+#include <vector>
 
 #include "archive.hpp"
 #include "constants.hpp"
@@ -13,8 +13,8 @@
 #include "expr_queue.hpp"
 #include "popup.hpp"
 #include "popup_manager.hpp"
-#include "utils.hpp"
 #include "scrollable.hpp"
+#include "utils.hpp"
 
 /*
 Davids Code übernehmen

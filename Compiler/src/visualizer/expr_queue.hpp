@@ -5,11 +5,12 @@
 #include "../flxc/data.h"
 #include "../flxc/scanner.h"
 #include "../libCH/seq.ch"
+
 #include "constants.hpp"
 #include "coordinates.hpp"
 #include "expr_repr.hpp"
-#include "scrollable.hpp"
 #include "oper_store.hpp"
+#include "scrollable.hpp"
 #include "windows.hpp"
 
 class expr_queue {

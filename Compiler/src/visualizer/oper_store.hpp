@@ -1,11 +1,12 @@
 #pragma once
 
 #include <map>
-#include <sstream>
 #include <optional>
+#include <sstream>
 
 #include "../flxc/data.h"
 #include "../libCH/seq.ch"
+
 #include "constants.hpp"
 #include "popup.hpp"
 #include "windows.hpp"
