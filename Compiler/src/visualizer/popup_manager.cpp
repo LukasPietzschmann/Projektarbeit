@@ -1,7 +1,8 @@
 #include "popup_manager.hpp"
 
-popup_manager::popup_manager(int expected_size) {
-	m_popups.reserve(expected_size);
+popup_manager& popup_manager::the() {
+	static popup_manager instance;
+	return instance;
 }
 
 void popup_manager::insert(popup* popup, const std::optional<popup_manager::callback>& show_callback,

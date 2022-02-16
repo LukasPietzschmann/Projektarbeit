@@ -7,8 +7,6 @@ scrollable* main_viewport;
 popup* opers_popup;
 popup* help_popup;
 
-popup_manager* p_manager;
-
 scrollable* current_scrollable;
 scrollable* prev_scrollable;
 
@@ -31,7 +29,7 @@ int current_state;
 
 void handleSignal(int sig) {
 	arch_windows.clear();
-	for(const auto e : events)
+	for(const auto e: events)
 		delete e;
 	events.clear();
 	delwin(footer);
@@ -82,11 +80,13 @@ void setup_windows() {
 	wbkgd(**queue_display, COLOR_PAIR(QUEUE_COLOR_PAIR));
 	queue_display->prepare_refresh();
 
-	auto* popup_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_horizontal_center - POPUP_WIDTH / 2, main_viewport_vertical_center - POPUP_HEIGHT / 2);
+	auto* popup_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_horizontal_center - POPUP_WIDTH / 2,
+			main_viewport_vertical_center - POPUP_HEIGHT / 2);
 	wbkgd(**popup_win, COLOR_PAIR(POPUP_COLOR_PAIR));
 	opers_popup = new popup(popup_win);
 
-	auto* help_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_horizontal_center - POPUP_WIDTH / 2, main_viewport_vertical_center - POPUP_HEIGHT / 2);
+	auto* help_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_horizontal_center - POPUP_WIDTH / 2,
+			main_viewport_vertical_center - POPUP_HEIGHT / 2);
 	wbkgd(**help_win, COLOR_PAIR(POPUP_COLOR_PAIR));
 	help_popup = new popup(help_win);
 	mvpaddstr(help_popup, 0, 0, "q: quit");
@@ -100,15 +100,14 @@ void setup_windows() {
 	mvpaddstr(help_popup, 8, 0, "' [a-z]: jump to marker");
 	mvpaddstr(help_popup, 9, 0, "[0-9]+ <command>: execute command n times");
 
-	p_manager = new popup_manager(2);
-	p_manager->insert(opers_popup, [&]() {
+	popup_manager::the().insert(opers_popup, [&]() {
 		prev_scrollable = current_scrollable;
 		current_scrollable = **opers_popup;
 	}, [&]() {
 		current_scrollable = prev_scrollable;
 		main_viewport->prepare_refresh();
 	});
-	p_manager->insert(help_popup, {}, [&]() {
+	popup_manager::the().insert(help_popup, {}, [&]() {
 		main_viewport->prepare_refresh();
 	});
 
@@ -237,9 +236,9 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 			if(c == 'q')
 				break;
 			if(c == 'h')
-				p_manager->toggle(help_popup);
+				popup_manager::the().toggle(help_popup);
 			else if(c == 'o')
-				p_manager->toggle(opers_popup);
+				popup_manager::the().toggle(opers_popup);
 			else if(c == 'n')
 				worked = step_n_events_forward(use_multiplier());
 			else if(c == 'p')
@@ -280,8 +279,8 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 
 		// das muss als letztes vor `doupdate` ausgeführt werden, damit das popup,
 		// falls es denn angezeigt wird, nicht vom rest überlagert wird
-		if(p_manager->is_one_popup_shown())
-			p_manager->prepare_refresh_for_shown_popups();
+		if(popup_manager::the().is_one_popup_shown())
+			popup_manager::the().prepare_refresh_for_shown_popups();
 
 		//`doupdate` hier nötig, da alle aufgerufenen Funktionen in der Regel nu `wnoutrefresh` verwenden
 		doupdate();
