@@ -3,10 +3,11 @@
 #include <panel.h>
 
 #include "scrollable.hpp"
+#include "window_like.hpp"
 
-#define mvpaddstr(popup, y, x, str) mvsaddstr(**(popup), (y), (x) + 1, (str))
+#define mvpaddstr(popup, y, x, str) (popup)->add_n_str((str), (x), (y))
 
-class popup {
+class popup : public window_like<scrollable> {
 	friend class popup_manager;
 
 public:
@@ -15,18 +16,14 @@ public:
 
 	bool is_currently_shown() const;
 
-	void prepare_refresh() const;
-
-	scrollable* operator*();
+	void add_n_str(const CH::str& str, int x, int y) override;
+	void del_line(int x, int y) override;
+	void clear() override;
+	void prepare_refresh() const override;
 
 private:
 	void show();
 	void hide();
-	/**
-	 * @return `true`, falls das popup geöffnet wurde,
-	 * sonst `false`
-	 */
 	PANEL* m_panel;
-	scrollable* m_origin_win;
 	bool m_is_currently_shown {false};
 };
