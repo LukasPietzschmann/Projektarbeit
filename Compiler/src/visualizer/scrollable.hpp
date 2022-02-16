@@ -16,7 +16,6 @@ public:
 	~scrollable() override;
 
 	void scroll_y(int delta);
-	uint32_t get_width() const;
 
 	void add_n_str(const CH::str& str, int x, int y) override;
 	void del_line(int x, int y) override;
@@ -24,8 +23,6 @@ public:
 	void prepare_refresh() const override;
 
 private:
-	uint32_t m_width;
-	uint32_t m_screen_height;
 	uint32_t m_x_start;
 	uint32_t m_y_start;
 	uint32_t m_scroll_amount {0};

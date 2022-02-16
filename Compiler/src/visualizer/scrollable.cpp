@@ -1,7 +1,7 @@
 #include "scrollable.hpp"
 
 scrollable::scrollable(uint32_t width, uint32_t height, uint32_t x_start, uint32_t y_start) : window_like<WINDOW>(
-		newpad(height * PAD_HEIGHT_MULTIPLIER, width)), m_width(width), m_screen_height(height), m_x_start(x_start),
+		newpad(height * PAD_HEIGHT_MULTIPLIER, width), width, height), m_x_start(x_start),
 		m_y_start(y_start) {
 	// In einem Konstruktor ist der virtuelle Aufrufmechanismus deaktiviert,
 	// da das Überschreiben von abgeleiteten Klassen noch nicht stattgefunden hat.
@@ -88,18 +88,15 @@ void scrollable::prepare_refresh() const {
 	}
 
 	for(int i = 0; clear_scrollbar && i < m_screen_height * PAD_HEIGHT_MULTIPLIER; ++i)
-		mvwaddch(m_underlying_window, i, m_width - 1, ' ');
+		mvwaddch(m_underlying_window, i, m_screen_width - 1, ' ');
 
 	clear_scrollbar = false;
 
 	for(int i = 0; i < number_of_segments; ++i)
-		mvwaddch(m_underlying_window, segments_start + i + m_scroll_amount + m_content_start_y, m_width - 1, '|');
+		mvwaddch(m_underlying_window, segments_start + i + m_scroll_amount + m_content_start_y, m_screen_width - 1,
+				'|');
 
 	pnoutrefresh(m_underlying_window, m_scroll_amount + m_content_start_y, 0, m_y_start, m_x_start,
 			m_y_start + m_screen_height,
-			m_x_start + m_width);
-}
-
-uint32_t scrollable::get_width() const {
-	return m_width;
+			m_x_start + m_screen_width);
 }

@@ -1,6 +1,7 @@
 #include "popup.hpp"
 
-popup::popup(scrollable* window) : window_like<scrollable>(window), m_panel(new_panel(**window)) {
+popup::popup(scrollable* window) :
+		window_like<scrollable>(window, window->get_width(), window->get_height()), m_panel(new_panel(**window)) {
 	top_panel(m_panel);
 	update_panels();
 	hide();
