@@ -12,7 +12,8 @@ popup_manager* p_manager;
 scrollable* current_scrollable;
 scrollable* prev_scrollable;
 
-int main_viewport_center;
+int main_viewport_horizontal_center;
+int main_viewport_vertical_center;
 int src_str_center;
 int src_str_len;
 int width;
@@ -65,7 +66,8 @@ void setup_windows() {
 	wbkgd(**main_viewport, COLOR_PAIR(STD_COLOR_PAIR));
 	main_viewport->prepare_refresh();
 
-	main_viewport_center = main_viewport->get_width() / 2;
+	main_viewport_horizontal_center = main_viewport->get_width() / 2;
+	main_viewport_vertical_center = main_viewport->get_height() / 2;
 
 	footer = newwin(FOOTER_HEIGHT, width - QUEUE_WIDTH, height - FOOTER_HEIGHT, 0);
 	wbkgd(footer, COLOR_PAIR(FOOTER_COLOR_PAIR));
@@ -80,11 +82,11 @@ void setup_windows() {
 	wbkgd(**queue_display, COLOR_PAIR(QUEUE_COLOR_PAIR));
 	queue_display->prepare_refresh();
 
-	auto* popup_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_center - POPUP_WIDTH / 2, 5);
+	auto* popup_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_horizontal_center - POPUP_WIDTH / 2, main_viewport_vertical_center - POPUP_HEIGHT / 2);
 	wbkgd(**popup_win, COLOR_PAIR(POPUP_COLOR_PAIR));
 	opers_popup = new popup(popup_win);
 
-	auto* help_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_center - POPUP_WIDTH / 2, 5);
+	auto* help_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_horizontal_center - POPUP_WIDTH / 2, main_viewport_vertical_center - POPUP_HEIGHT / 2);
 	wbkgd(**help_win, COLOR_PAIR(POPUP_COLOR_PAIR));
 	help_popup = new popup(help_win);
 	mvpaddstr(help_popup, 0, 0, "q: quit");

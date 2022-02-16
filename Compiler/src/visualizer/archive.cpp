@@ -64,7 +64,7 @@ void archive::render() {
 		}
 	}
 	const CH::str pos_in_src_str(std::to_string(m_pos_in_src));
-	int pos = main_viewport_center + (-src_str_center + m_pos_in_src) - m_x_start;
+	int pos = main_viewport_horizontal_center + (-src_str_center + m_pos_in_src) - m_x_start;
 
 	if(pos >= m_width)
 		pos -= (pos - m_width) + *pos_in_src_str;

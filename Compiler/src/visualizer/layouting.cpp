@@ -25,7 +25,7 @@ void layouter::notify_dimensions_changed(archive&) const {
 		};
 
 		int desired_x_coord = std::max(0,
-				(int) (main_viewport_center - src_str_center + archive_to_layout.get_pos_in_src()) -
+				(int) (main_viewport_horizontal_center - src_str_center + archive_to_layout.get_pos_in_src()) -
 						(int) archive_to_layout.get_divider_x_pos());
 
 		uint32_t y_coordinate = 0;
