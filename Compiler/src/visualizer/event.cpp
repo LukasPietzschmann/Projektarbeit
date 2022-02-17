@@ -98,7 +98,7 @@ add_expr_to_queue::add_expr_to_queue(const Expr& expr, bool is_comp) : event_wit
 event::event_exec_result add_expr_to_queue::exec() {
 	if(!m_is_comp)
 		oper_store::the().insert_if_prototyp(m_data);
-	expr_queue::the().push_back(m_data, false);
+	expr_queue::the().push_back(m_data, m_is_comp);
 	return event::did_something;
 }
 

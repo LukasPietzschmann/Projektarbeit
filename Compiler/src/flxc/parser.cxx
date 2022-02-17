@@ -795,15 +795,25 @@ namespace iterative {
 queue<pair<Expr, int>> q;
 
 void proceed (Expr cons, int flags) {
-	//std::cout << "proceed:\tAusdruck '" << get_scanned_str_for_expr(cons) << "' in die Queue abgelegt" << std::endl;
-    events.push_back(new add_expr_to_queue(cons, flags & Finish));
+	// FIXME: funktioniert noch nicht!
+	const auto& is_comp = [flags](const Expr& expr){
+		while(exec(expr, after_), !right(expr)) {
+			if(!up(expr)) {
+				if(!(flags & Extend))
+					return true;
+				return false;
+			}
+		}
+		return false;
+	};
+
+    events.push_back(new add_expr_to_queue(cons, is_comp(+cons)));
     q.push(make_pair(cons, flags));
 }
 
 void process () {
     while (!q.empty()) {
 	auto pair = q.front();
-	//std::cout << "process:\tAusdruck '" << get_scanned_str_for_expr(pair.first) << "' aus der Queue herausgenommen" << std::endl;
 	events.push_back(new remove_expr_from_queue(pair.first, pair.second & Finish));
 	q.pop();
 	recursive::proceed(pair.first, pair.second);
