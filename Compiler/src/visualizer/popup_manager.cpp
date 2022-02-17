@@ -31,7 +31,7 @@ void popup_manager::show(popup* popup) const {
 	assert(popup != nullptr);
 	assert(!popup->m_is_currently_shown);
 	for(auto* p: m_popups) {
-		if(p == popup || !p->m_is_currently_shown)
+		if(!p->m_is_currently_shown)
 			continue;
 		hide(p);
 	}
