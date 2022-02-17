@@ -30,8 +30,7 @@ enum input_state {
 	s_wait_for_marker = 1 << 0,
 	s_create_marker = 1 << 1,
 	s_read_marker = 1 << 2,
-	s_wait_for_scrollable_selection = 1 << 3,
-	s_any_input = 1 << 4
+	s_any_input = 1 << 3
 };
 
 /**

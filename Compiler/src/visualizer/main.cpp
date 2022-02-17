@@ -93,12 +93,13 @@ void setup_windows() {
 	mvpaddstr(help_popup, 1, 0, "n: go one step forward");
 	mvpaddstr(help_popup, 2, 0, "p: go one step backward");
 	mvpaddstr(help_popup, 3, 0, "o: show all operators");
-	mvpaddstr(help_popup, 4, 0, "arrow-up: scroll up");
-	mvpaddstr(help_popup, 5, 0, "arrow-down: scroll down");
-	mvpaddstr(help_popup, 6, 0, "s: switch window to scroll in");
-	mvpaddstr(help_popup, 7, 0, "m [a-z]: set marker to the current event");
-	mvpaddstr(help_popup, 8, 0, "' [a-z]: jump to marker");
-	mvpaddstr(help_popup, 9, 0, "[0-9]+ <command>: execute command n times");
+	mvpaddstr(help_popup, 4, 0, "arrow-up: scroll archives/popup up");
+	mvpaddstr(help_popup, 5, 0, "arrow-down: scroll archives/popup down");
+	mvpaddstr(help_popup, 6, 0, "w: scroll queue up");
+	mvpaddstr(help_popup, 7, 0, "s: scroll queue down");
+	mvpaddstr(help_popup, 8, 0, "m [a-z]: set marker to the current event");
+	mvpaddstr(help_popup, 9, 0, "' [a-z]: jump to marker");
+	mvpaddstr(help_popup, 10, 0, "[0-9]+ <command>: execute command n times");
 
 	popup_manager::the().insert(opers_popup, [&]() {
 		prev_scrollable = current_scrollable;
@@ -190,24 +191,7 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 		};
 		bool worked = true;
 
-		if(current_state == s_wait_for_scrollable_selection) {
-			if(c == KEY_ESCAPE) {
-				current_state = s_any_input;
-				goto skip_with_refresh;
-			}
-			if(c == MAIN_VIEWPORT_SELECTOR)
-				current_scrollable = main_viewport;
-			else if(c == QUEUE_SELECTOR)
-				current_scrollable = queue_display;
-			else if(c == OPER_POPUP_SELECTOR && opers_popup->is_currently_shown())
-				current_scrollable = **opers_popup;
-			else {
-				worked = false;
-				goto skip_without_refresh;
-			}
-			current_state = s_any_input;
-			goto skip_with_refresh;
-		}else if(current_state & s_wait_for_marker) {
+		if(current_state & s_wait_for_marker) {
 			if(c == KEY_ESCAPE) {
 				current_state = s_any_input;
 				goto skip_with_refresh;
@@ -247,12 +231,13 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 				current_state = s_wait_for_marker | s_create_marker;
 			else if(c == '\'')
 				current_state = s_wait_for_marker | s_read_marker;
-			else if(c == 's')
-				current_state = s_wait_for_scrollable_selection;
 			else if(c == KEY_ARROW_DOWN)
 				current_scrollable->scroll_y(use_multiplier());
 			else if(c == KEY_ARROW_UP)
-				current_scrollable->scroll_y(-use_multiplier());
+			else if(c == 'w')
+				worked = queue_display->scroll_y(-use_multiplier());
+			else if(c == 's')
+				worked = queue_display->scroll_y(use_multiplier());
 			else if(c >= '0' && c <= '9') {
 				multiplier = multiplier * 10 + (c - 48);
 				goto skip_without_refresh;
@@ -271,8 +256,6 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 		werase(footer);
 		if(current_state & s_wait_for_marker)
 			center_text_hor(footer, FOOTER_WAIT_FOR_MARKER_TEXT, 0);
-		else if(current_state == s_wait_for_scrollable_selection)
-			center_text_hor(footer, FOOTER_WAIT_FOR_SCROLLABLE_SELECTOR_TEXT, 0);
 		else
 			center_text_hor(footer, FOOTER_QUICK_ACTIONS_TEXT, 0);
 		wnoutrefresh(footer);
