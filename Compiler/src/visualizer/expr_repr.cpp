@@ -30,12 +30,14 @@ CH::str expr_repr::as_string() {
 		result += expr(to_str_from_currpart_);
 	}
 	const auto& pos = result(CH::searchA([](const char c) { return c == '\n'; }));
-	if(pos != 0 * A)
+	if(pos != 0 * A) {
 		result = result(pos | pos + 1, "\\n");
+		++currpart_pos;
+	}
 
 	if(*result > REPLACE_WITH_ID_THRESHOLD && id_or_error.has_value() && flags & f_is_prototype) {
-		result = "ID: " + id_str;
-		currpart_pos = *result;
+		result = result(A | A + (REPLACE_WITH_ID_THRESHOLD - 4));
+		result += "...";
 	}
 
 	return result;

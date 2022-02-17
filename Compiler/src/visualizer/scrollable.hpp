@@ -15,7 +15,7 @@ public:
 	scrollable(uint32_t width, uint32_t height, uint32_t x_start, uint32_t y_start);
 	~scrollable() override;
 
-	void scroll_y(int delta);
+	bool scroll_y(int delta);
 
 	void add_n_str(const CH::str& str, int x, int y) override;
 	void del_line(int x, int y) override;

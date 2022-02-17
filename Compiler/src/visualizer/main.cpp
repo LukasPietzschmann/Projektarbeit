@@ -232,8 +232,9 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 			else if(c == '\'')
 				current_state = s_wait_for_marker | s_read_marker;
 			else if(c == KEY_ARROW_DOWN)
-				current_scrollable->scroll_y(use_multiplier());
+				worked = current_scrollable->scroll_y(use_multiplier());
 			else if(c == KEY_ARROW_UP)
+				worked = current_scrollable->scroll_y(-use_multiplier());
 			else if(c == 'w')
 				worked = queue_display->scroll_y(-use_multiplier());
 			else if(c == 's')

@@ -15,7 +15,7 @@ scrollable::~scrollable() {
 	delwin(m_underlying_window);
 }
 
-void scrollable::scroll_y(int delta) {
+bool scrollable::scroll_y(int delta) {
 	const auto& is_allowed_to_scroll = [&]() {
 		if(delta == 0)
 			return false;
@@ -34,10 +34,11 @@ void scrollable::scroll_y(int delta) {
 	};
 
 	if(!is_allowed_to_scroll())
-		return;
+		return false;
 
 	m_scroll_amount += delta;
 	prepare_refresh();
+	return true;
 }
 
 void scrollable::add_n_str(const CH::str& string, int x, int y) {
