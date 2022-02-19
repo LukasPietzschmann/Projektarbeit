@@ -78,6 +78,7 @@ uint32_t archive::get_pos_in_src() const {
 
 void archive::add_cons(long id, const Expr& cons) {
 	m_cons.try_emplace(id, cons, false);
+	m_dirty_dimensions = true;
 	invalidate();
 }
 
@@ -91,6 +92,7 @@ void archive::add_comp(long id, const Expr& comp) {
 	}
 	int flags = expr_repr::f_is_comp | (is_new_expr_ambiguous ? expr_repr::f_is_ambiguous : 0);
 	m_comp.try_emplace(id, comp, flags);
+	m_dirty_dimensions = true;
 	invalidate();
 }
 
@@ -98,6 +100,7 @@ bool archive::remove_cons_with_id(long id) {
 	if(m_cons.erase(id) == 0)
 		return false;
 
+	m_dirty_dimensions = true;
 	invalidate();
 	return true;
 }
@@ -114,10 +117,12 @@ bool archive::remove_comp_with_id(long id) {
 			if(elem.expr(end_) != it->second.expr(end_))
 				continue;
 			elem.flags &= ~expr_repr::f_is_ambiguous;
+			m_dirty_visuals = true;
 		}
 	}
 
 	m_comp.erase(it);
+	m_dirty_dimensions = true;
 	invalidate();
 	return true;
 }
@@ -128,6 +133,7 @@ bool archive::set_expr_active(const Expr& expr) {
 			if(element.expr != expr)
 				continue;
 			element.flags |= expr_repr::f_is_highlighted;
+			m_dirty_visuals = true;
 			invalidate();
 			return true;
 		}
@@ -143,6 +149,7 @@ bool archive::set_expr_inactive(const Expr& expr) {
 			if(element.expr != expr)
 				continue;
 			element.flags &= ~expr_repr::f_is_highlighted;
+			m_dirty_visuals = true;
 			invalidate();
 			return true;
 		}
@@ -155,12 +162,14 @@ bool archive::set_expr_inactive(const Expr& expr) {
 void archive::set_y_start(uint32_t y_start) {
 	if(m_y_start == y_start)
 		return;
+	m_dirty_dimensions = true;
 	m_y_start = y_start;
 }
 
 void archive::set_x_start(uint32_t x_start) {
 	if(m_x_start == x_start)
 		return;
+	m_dirty_dimensions = true;
 	m_x_start = x_start;
 }
 
@@ -182,15 +191,6 @@ uint32_t archive::get_x_start() const {
 
 uint32_t archive::get_divider_x_pos() const {
 	return m_divider_x_pos;
-}
-
-archive::t_id archive::id() {
-	static t_id next_id = 0;
-
-	if(m_id == -1)
-		m_id = next_id++;
-
-	return m_id;
 }
 
 void archive::register_as_listener(archive_change_listener* listener) {
@@ -216,19 +216,29 @@ void archive::invalidate() {
 		return max;
 	};
 
-	const auto cons_len = std::max((unsigned long) 1, longest_str_len(m_cons));
-	const auto comp_len = std::max((unsigned long) 1, longest_str_len(m_comp));
+	if(m_dirty_dimensions) {
+		const auto cons_len = std::max((unsigned long) 1, longest_str_len(m_cons));
+		const auto comp_len = std::max((unsigned long) 1, longest_str_len(m_comp));
 
-	uint32_t new_width = comp_len + 5 + cons_len + 5;
-	m_divider_x_pos = cons_len + 5;
+		uint32_t new_width = comp_len + 5 + cons_len + 5;
+		m_divider_x_pos = cons_len + 5;
 
-	if(new_width % 2 == 0)
-		++new_width;
+		if(new_width % 2 == 0)
+			++new_width;
 
-	m_height = std::max(m_comp.size(), m_cons.size()) + 2;
-	m_width = new_width;
-	for(const archive_change_listener* listener: m_listeners)
-		listener->notify_dimensions_changed(*this);
+		m_height = std::max(m_comp.size(), m_cons.size()) + 2;
+		m_width = new_width;
+		for(const archive_change_listener* listener: m_listeners)
+			listener->notify_dimensions_changed(*this);
+		m_dirty_dimensions = false;
+		m_dirty_visuals = false;
+		return;
+	}
+	if(m_dirty_visuals) {
+		for(const archive_change_listener* listener: m_listeners)
+			listener->notify_visuals_changed(*this);
+		m_dirty_visuals = false;
+	}
 }
 
 bool archive::operator==(const archive& other) const {

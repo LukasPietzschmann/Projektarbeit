@@ -19,6 +19,7 @@ public:
 	void unregister_cat(archive& c);
 
 	void notify_dimensions_changed(archive& archive_to_layout) const override;
+	void notify_visuals_changed(archive& archive_to_rerender) const override;
 
 private:
 	layouter() = default;

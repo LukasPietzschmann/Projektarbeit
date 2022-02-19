@@ -20,6 +20,8 @@
 extern std::vector<archive> arch_windows;
 
 class archive {
+	friend class layouter;
+
 public:
 	struct rect {
 		rect(uint32_t x, uint32_t y, uint32_t width, uint32_t height) : x(x), y(y), width(width), height(height) {}
@@ -47,7 +49,7 @@ public:
 	bool remove_comp_with_id(long id);
 
 	bool set_expr_active(const Expr& expr);
-	bool set_expr_inactive(const Expr& elements);
+	bool set_expr_inactive(const Expr& expr);
 
 	void set_y_start(uint32_t y_start);
 	void set_x_start(uint32_t x_start);
@@ -58,13 +60,8 @@ public:
 	uint32_t get_x_start() const;
 	uint32_t get_divider_x_pos() const;
 
-	using t_id = long;
-	t_id id();
-
 	void register_as_listener(archive_change_listener* listener);
 	void unregister_as_listener(archive_change_listener* listener);
-
-	bool is_layouted {false};
 
 private:
 	uint32_t m_width {0};
@@ -74,9 +71,11 @@ private:
 	uint32_t m_divider_x_pos {0};
 	uint32_t m_pos_in_src;
 
-	std::map<long, expr_repr> m_cons {}, m_comp {};
+	bool m_is_layouted {false};
+	bool m_dirty_dimensions {true};
+	bool m_dirty_visuals {true};
 
-	t_id m_id {-1};
+	std::map<long, expr_repr> m_cons {}, m_comp {};
 
 	std::vector<archive_change_listener*> m_listeners {};
 
