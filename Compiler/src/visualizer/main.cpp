@@ -48,7 +48,6 @@ void setup_colors() {
 	init_pair(STD_COLOR_PAIR, COLOR_WHITE, COLOR_BLACK);
 	init_pair(FOOTER_COLOR_PAIR, COLOR_BLACK, COLOR_RED);
 	init_pair(HEADER_COLOR_PAIR, COLOR_WHITE, COLOR_GREY);
-	init_pair(QUEUE_COLOR_PAIR, COLOR_WHITE, COLOR_DARK_GREY);
 	init_pair(HIGHLIGHT_EXPR_COLOR_PAR, COLOR_GREEN, COLOR_BLACK);
 	init_pair(MUTED_COLOR_PAIR, COLOR_LIGHT_GREY, COLOR_BLACK);
 	init_pair(AMBIGUOUS_COLOR_PAIR, COLOR_BLACK, COLOR_RED);
@@ -77,7 +76,7 @@ void setup_windows() {
 	mvwaddstr(src_display, 0, getmaxx(src_display) / 2 - *src_str / 2, &src_str.elems[0]);
 
 	queue_display = new scrollable(QUEUE_WIDTH - 1, height - 1, width - QUEUE_WIDTH, 0);
-	wbkgd(**queue_display, COLOR_PAIR(QUEUE_COLOR_PAIR));
+	wbkgd(**queue_display, COLOR_PAIR(STD_COLOR_PAIR));
 	queue_display->prepare_refresh();
 
 	auto* popup_win = new scrollable(POPUP_WIDTH, POPUP_HEIGHT, main_viewport_horizontal_center - POPUP_WIDTH / 2,
