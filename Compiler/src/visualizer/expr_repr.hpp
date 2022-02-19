@@ -4,6 +4,7 @@
 #include "../flxc/scanner.h"
 
 #include "oper_store.hpp"
+#include "utils.hpp"
 
 struct expr_repr {
 	enum flags {

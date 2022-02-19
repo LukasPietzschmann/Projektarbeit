@@ -11,12 +11,8 @@ bool oper_store::insert_if_prototyp(const Expr& expr) {
 
 	m_opers.try_emplace(expr(oper_), next_id_and_line);
 
-	std::stringstream ss;
-	ss << std::to_string(next_id_and_line) << ": " << expr(to_str_);
-	CH::str entry(ss.str());
-
-	if(*entry >= POPUP_WIDTH)
-		entry = entry(A | A + (POPUP_WIDTH - 5)) + "...";
+	CH::str entry = truncate_string_to_length(CH::str(std::to_string(next_id_and_line)) + ": " + expr(to_str_),
+			POPUP_WIDTH);
 
 	mvpaddstr(opers_popup, next_id_and_line, 0, entry);
 	++next_id_and_line;

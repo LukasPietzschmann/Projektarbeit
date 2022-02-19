@@ -35,10 +35,8 @@ CH::str expr_repr::as_string() {
 		++currpart_pos;
 	}
 
-	if(*result > REPLACE_WITH_ID_THRESHOLD && id_or_error.has_value() && flags & f_is_prototype) {
-		result = result(A | A + (REPLACE_WITH_ID_THRESHOLD - 4));
-		result += "...";
-	}
+	if(*result > REPLACE_WITH_ID_THRESHOLD && id_or_error.has_value() && flags & f_is_prototype)
+		result = truncate_string_to_length(result, REPLACE_WITH_ID_THRESHOLD);
 
 	return result;
 }

@@ -2,13 +2,13 @@
 
 #include <map>
 #include <optional>
-#include <sstream>
 
 #include "../flxc/data.h"
 #include "../libCH/seq.ch"
 
 #include "constants.hpp"
 #include "popup.hpp"
+#include "utils.hpp"
 #include "windows.hpp"
 
 class oper_store {

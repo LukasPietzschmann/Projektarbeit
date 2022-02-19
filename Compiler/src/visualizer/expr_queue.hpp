@@ -11,6 +11,7 @@
 #include "expr_repr.hpp"
 #include "oper_store.hpp"
 #include "scrollable.hpp"
+#include "utils.hpp"
 #include "windows.hpp"
 
 class expr_queue {
