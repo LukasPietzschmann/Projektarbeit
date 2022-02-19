@@ -4,7 +4,7 @@
 #include <csignal>
 #include <map>
 #include <ncurses.h>
-#include <panel.h>
+#include PANEL_HEADER
 #include <vector>
 
 #include "archive.hpp"

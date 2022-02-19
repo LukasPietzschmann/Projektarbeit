@@ -5,6 +5,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
+option(USE_ALTERNATIVE_PANEL_HEADER OFF)
+if (${USE_ALTERNATIVE_PANEL_HEADER})
+	add_compile_definitions(PANEL_HEADER=<panel.h>)
+else ()
+	add_compile_definitions(PANEL_HEADER=<ncurses/panel.h>)
+endif ()
+
 add_subdirectory(src)
 
 # **********************************************

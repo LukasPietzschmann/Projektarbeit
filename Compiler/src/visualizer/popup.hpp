@@ -1,6 +1,6 @@
 #pragma once
 
-#include <panel.h>
+#include PANEL_HEADER
 
 #include "scrollable.hpp"
 #include "window_like.hpp"
