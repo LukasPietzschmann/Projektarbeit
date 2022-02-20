@@ -5,14 +5,6 @@ layouter& layouter::the() {
 	return instance;
 }
 
-void layouter::register_new_archive(archive& a) {
-	a.register_as_listener(this);
-}
-
-void layouter::unregister_archive(archive& a) {
-	a.unregister_as_listener(this);
-}
-
 void layouter::notify_dimensions_changed(archive&) const {
 	const auto& layout = [](archive& archive_to_layout) {
 		const auto has_intersections = [&archive_to_layout](const archive::rect& rect_to_test) {
