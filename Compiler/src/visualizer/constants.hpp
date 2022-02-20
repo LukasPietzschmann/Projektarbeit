@@ -1,5 +1,8 @@
 #pragma once
 
+#define ARCHIVE_X_PADDING 5
+#define ARCHIVE_Y_PADDING 2
+
 #define REPLACE_WITH_ID_THRESHOLD 15
 
 #define FOOTER_HEIGHT 1

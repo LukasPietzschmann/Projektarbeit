@@ -46,6 +46,12 @@ void layouter::notify_dimensions_changed(archive&) const {
 		a.m_is_layouted = true;
 	}
 
+	// Da hier der komplette Bildschirm gecleared wird, und nicht nur das einzelne Archiv, das geändert wird,
+	// müssen ALLE Archive neu gerendert werden, da sie sonst nicht angezeigt werden.
+	// Aus diesem Grund darf auch die Überprüfung am Anfang von archive::render() nicht verwendet werden,
+	// da sonst nicht veränderte Archive eben nicht neu gezeichnet werden würden.
+	// Nur einzelne Archive zu clearen ist wohl zu umständlich. Diese Variante fügt bei print 1+2 'nur' 28
+	// zusätzliche Aufrufe zu render hinzu.
 	main_viewport->clear();
 	for(auto& window: arch_windows)
 		window.render();

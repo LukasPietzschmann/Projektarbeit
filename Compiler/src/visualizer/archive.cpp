@@ -13,6 +13,10 @@ bool archive::intersects_with(const archive::rect& other) const {
 }
 
 void archive::render() {
+	// s. layouter::notify_dimensions_changed()
+	// if(!m_dirty_visuals && !m_dirty_dimensions)
+	// 	return;
+
 	for(int i = 0; i < m_height; ++i) {
 		mvsaddstr(main_viewport, i + m_y_start, m_x_start, "|");
 		mvsaddstr(main_viewport, i + m_y_start, m_width + m_x_start, "|");
@@ -70,6 +74,9 @@ void archive::render() {
 		pos -= (pos - m_width) + *pos_in_src_str;
 
 	mvsaddstr(main_viewport, m_y_start, pos + m_x_start, pos_in_src_str);
+
+	m_dirty_visuals = false;
+	m_dirty_dimensions = false;
 }
 
 uint32_t archive::get_pos_in_src() const {
@@ -83,14 +90,15 @@ void archive::add_cons(long id, const Expr& cons) {
 }
 
 void archive::add_comp(long id, const Expr& comp) {
-	bool is_new_expr_ambiguous = false;
+	int flags = 0;
 	for(auto&[_, element]: m_comp) {
 		if(element.expr(end_) != comp(end_))
 			continue;
 		element.flags |= expr_repr::f_is_ambiguous;
-		is_new_expr_ambiguous = true;
+		m_dirty_visuals = true;
+		flags = expr_repr::f_is_ambiguous;
 	}
-	int flags = expr_repr::f_is_comp | (is_new_expr_ambiguous ? expr_repr::f_is_ambiguous : 0);
+	flags |= expr_repr::f_is_comp;
 	m_comp.try_emplace(id, comp, flags);
 	m_dirty_dimensions = true;
 	invalidate();
@@ -217,27 +225,20 @@ void archive::invalidate() {
 	};
 
 	if(m_dirty_dimensions) {
-		const auto cons_len = std::max((unsigned long) 1, longest_str_len(m_cons));
-		const auto comp_len = std::max((unsigned long) 1, longest_str_len(m_comp));
+		const auto cons_len = longest_str_len(m_cons);
+		const auto comp_len = longest_str_len(m_comp);
 
-		uint32_t new_width = comp_len + 5 + cons_len + 5;
-		m_divider_x_pos = cons_len + 5;
+		m_divider_x_pos = cons_len + ARCHIVE_X_PADDING;
 
-		if(new_width % 2 == 0)
-			++new_width;
+		m_width = comp_len + ARCHIVE_X_PADDING + cons_len + ARCHIVE_X_PADDING;
+		m_height = std::max(m_comp.size(), m_cons.size()) + ARCHIVE_Y_PADDING;
 
-		m_height = std::max(m_comp.size(), m_cons.size()) + 2;
-		m_width = new_width;
 		for(const archive_change_listener* listener: m_listeners)
 			listener->notify_dimensions_changed(*this);
-		m_dirty_dimensions = false;
-		m_dirty_visuals = false;
-		return;
 	}
 	if(m_dirty_visuals) {
 		for(const archive_change_listener* listener: m_listeners)
 			listener->notify_visuals_changed(*this);
-		m_dirty_visuals = false;
 	}
 }
 
