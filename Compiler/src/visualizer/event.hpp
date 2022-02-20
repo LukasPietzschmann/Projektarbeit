@@ -10,7 +10,7 @@
 #include "../flxc/data.h"
 
 #include "expr_queue.hpp"
-#include "layouting.hpp"
+#include "layouter.hpp"
 #include "oper_store.hpp"
 
 class event {
