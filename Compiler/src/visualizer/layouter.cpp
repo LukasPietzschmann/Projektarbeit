@@ -5,12 +5,12 @@ layouter& layouter::the() {
 	return instance;
 }
 
-void layouter::register_new_cat(archive& c) {
-	c.register_as_listener(this);
+void layouter::register_new_archive(archive& a) {
+	a.register_as_listener(this);
 }
 
-void layouter::unregister_cat(archive& c) {
-	c.unregister_as_listener(this);
+void layouter::unregister_archive(archive& a) {
+	a.unregister_as_listener(this);
 }
 
 void layouter::notify_dimensions_changed(archive&) const {

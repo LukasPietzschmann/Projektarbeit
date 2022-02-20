@@ -15,8 +15,8 @@ public:
 	layouter& operator=(const layouter&) = delete;
 	layouter& operator=(layouter&&) = default;
 
-	void register_new_cat(archive& c);
-	void unregister_cat(archive& c);
+	void register_new_archive(archive& a);
+	void unregister_archive(archive& a);
 
 	void notify_dimensions_changed(archive& archive_to_layout) const override;
 	void notify_visuals_changed(archive& archive_to_rerender) const override;

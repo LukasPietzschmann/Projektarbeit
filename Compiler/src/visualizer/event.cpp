@@ -46,7 +46,7 @@ event::event_exec_result add_comp_event::undo() {
 }
 
 event::event_exec_result create_archive_event::exec() {
-	layouter::the().register_new_cat(arch_windows.emplace_back(m_position));
+	layouter::the().register_new_archive(arch_windows.emplace_back(m_position));
 	return did_something;
 }
 
@@ -56,7 +56,7 @@ event::event_exec_result create_archive_event::undo() {
 	});
 
 	assert(it != arch_windows.end());
-	layouter::the().unregister_cat(*it);
+	layouter::the().unregister_archive(*it);
 	arch_windows.erase(it);
 	return did_something;
 }
