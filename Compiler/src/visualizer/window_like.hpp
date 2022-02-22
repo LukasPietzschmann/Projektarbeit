@@ -5,8 +5,8 @@
 template <typename underlying_window_type>
 class window_like {
 public:
-	explicit window_like(underlying_window_type* base, uint32_t width, uint32_t height) :
-			m_underlying_window(base), m_screen_width(width), m_screen_height(height) {}
+	explicit window_like(underlying_window_type* base, uint32_t screen_width, uint32_t screen_height) :
+			m_underlying_window(base), m_screen_width(screen_width), m_screen_height(screen_height) {}
 	virtual ~window_like() = default;
 
 	virtual void add_n_str(const CH::str&, int x, int y) = 0;

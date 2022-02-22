@@ -24,10 +24,6 @@ void popup::hide() {
 	m_is_currently_shown = false;
 }
 
-bool popup::is_currently_shown() const {
-	return m_is_currently_shown;
-}
-
 void popup::add_n_str(const CH::str& str, int x, int y) {
 	mvsaddstr(m_underlying_window, y, x, str);
 }

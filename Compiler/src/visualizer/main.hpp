@@ -21,7 +21,7 @@ Davids Code übernehmen
 
 Vielleicht seitwärts scrollen
 
-Noch ein Paar Kommentare
+Noch ein paar Kommentare
 */
 
 using event_iterator = std::vector<event*>::iterator;

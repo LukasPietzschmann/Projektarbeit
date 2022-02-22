@@ -14,8 +14,6 @@ public:
 	explicit popup(scrollable* window);
 	~popup() override;
 
-	bool is_currently_shown() const;
-
 	void add_n_str(const CH::str& str, int x, int y) override;
 	void del_line(int x, int y) override;
 	void clear() override;

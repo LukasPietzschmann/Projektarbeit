@@ -260,7 +260,7 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 			center_text_hor(footer, FOOTER_QUICK_ACTIONS_TEXT, 0);
 		wnoutrefresh(footer);
 
-		// das muss als letztes vor `doupdate` ausgeführt werden, damit das popup,
+		// das muss als Letztes vor `doupdate` ausgeführt werden, damit das popup,
 		// falls es denn angezeigt wird, nicht vom rest überlagert wird
 		if(popup_manager::the().is_one_popup_shown())
 			popup_manager::the().prepare_refresh_for_shown_popups();
