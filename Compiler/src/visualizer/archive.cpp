@@ -118,13 +118,23 @@ bool archive::remove_comp_with_id(long id) {
 	if(it == m_comp.end())
 		return false;
 
+	int number_of_exprs_with_same_end = 0;
+	expr_repr* repr_if_one_expr_with_same_end;
 	if(it->second.flags & expr_repr::f_is_ambiguous) {
 		for(auto &[e_id, elem]: m_comp) {
 			if(e_id == id)
 				continue;
 			if(elem.expr(end_) != it->second.expr(end_))
 				continue;
-			elem.flags &= ~expr_repr::f_is_ambiguous;
+			assert(elem.flags & expr_repr::f_is_ambiguous);
+			++number_of_exprs_with_same_end;
+			repr_if_one_expr_with_same_end = &elem;
+		}
+		// Wenn weiterhin mehr als ein Ausdruck mit der selben Länge im Archiv existiert,
+		// soll natürlich auch weiterhin das f_is_ambiguous Flags gesetzt bleiben!
+		if(number_of_exprs_with_same_end == 1) {
+			assert(repr_if_one_expr_with_same_end != nullptr);
+			repr_if_one_expr_with_same_end->flags &= ~expr_repr::f_is_ambiguous;
 			m_dirty_visuals = true;
 		}
 	}
