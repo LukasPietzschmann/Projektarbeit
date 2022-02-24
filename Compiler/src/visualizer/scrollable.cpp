@@ -74,13 +74,15 @@ void scrollable::prepare_refresh() const {
 	uint32_t segments_start;
 	uint32_t number_of_segments;
 
-	if(m_content_height > m_screen_height) {
-		number_of_segments = std::max((uint32_t) 1, m_screen_height * m_screen_height / m_content_height);
+	if(m_content_height > m_screen_height || m_scroll_amount + m_screen_height > m_screen_height) {
+		const uint32_t internal_content_height = std::max(m_content_height, m_screen_height + m_scroll_amount);
 		const uint32_t internal_scroll_amount = std::clamp(m_scroll_amount, (uint32_t) 0,
-				m_content_height - m_screen_height);
+				internal_content_height - m_screen_height);
+
+		number_of_segments = std::max((uint32_t) 1, m_screen_height * m_screen_height / internal_content_height);
 		segments_start =
 				(m_screen_height - number_of_segments) * internal_scroll_amount /
-						(m_content_height - m_screen_height);
+						(internal_content_height - m_screen_height);
 		clear_scrollbar = true;
 	}else {
 		number_of_segments = 0;
