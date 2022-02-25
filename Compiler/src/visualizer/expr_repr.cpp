@@ -30,7 +30,7 @@ CH::str expr_repr::as_string() {
 		result += expr(to_str_from_currpart_);
 	}
 	const auto& pos = result(CH::searchA([](const char c) { return c == '\n'; }));
-	if(pos != 0 * A) {
+	if(pos != 0 * CH::A ) {
 		result = result(pos | pos + 1, "\\n");
 		++currpart_pos;
 	}

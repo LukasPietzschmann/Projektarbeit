@@ -39,10 +39,10 @@ void archive::render() {
 				wattron(**main_viewport, A_HIGHLIGHT);
 			if(elem.flags & expr_repr::f_is_ambiguous)
 				wattron(**main_viewport, A_AMBIGUOUS);
-			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start, string(A | Z - elem.currpart_pos));
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start, string(CH::A  | CH::Z  - elem.currpart_pos));
 			wattron(**main_viewport, A_MUTED);
 			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start + elem.currpart_pos,
-					string(A + elem.currpart_pos | Z));
+					string(CH::A  + elem.currpart_pos | CH::Z ));
 			wattroff(**main_viewport, A_MUTED);
 			if(elem.flags & expr_repr::f_is_highlighted)
 				wattroff(**main_viewport, A_HIGHLIGHT);
@@ -57,10 +57,10 @@ void archive::render() {
 			if(elem.flags & expr_repr::f_is_highlighted)
 				wattron(**main_viewport, A_HIGHLIGHT);
 			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - *string + m_x_start,
-					string(A | Z - elem.currpart_pos));
+					string(CH::A  | CH::Z  - elem.currpart_pos));
 			wattron(**main_viewport, A_MUTED);
 			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - (*string - elem.currpart_pos) + m_x_start,
-					string(A + elem.currpart_pos | Z));
+					string(CH::A  + elem.currpart_pos | CH::Z ));
 			wattroff(**main_viewport, A_MUTED);
 			if(elem.flags & expr_repr::f_is_highlighted)
 				wattroff(**main_viewport, A_HIGHLIGHT);
