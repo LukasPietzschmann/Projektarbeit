@@ -4,7 +4,6 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
-#include <sstream>
 #include <vector>
 
 #include "../flxc/data.h"
@@ -27,14 +26,10 @@ public:
 	virtual event_exec_result undo() = 0;
 
 protected:
-	long m_id;
 	unsigned int m_position;
 
 	template <typename Callback>
 	void exec_on_archive_at_pos(unsigned int pos, Callback callback) const;
-
-private:
-	static long m_next_id;
 };
 
 class event_with_data : public event {

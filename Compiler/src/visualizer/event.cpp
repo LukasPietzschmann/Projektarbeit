@@ -1,8 +1,6 @@
 #include "event.hpp"
 
-long event::m_next_id = 0;
-
-event::event(unsigned int position) : m_position(position), m_id(m_next_id++) {}
+event::event(unsigned int position) : m_position(position) {}
 
 template <typename Callback>
 void event::exec_on_archive_at_pos(unsigned int pos, Callback callback) const {
@@ -19,28 +17,28 @@ event_with_data::event_with_data(unsigned int position, const Expr& data) :
 
 event::event_exec_result add_cons_event::exec() {
 	exec_on_archive_at_pos(m_position, [this](archive& c) {
-		c.add_cons(m_id, m_data);
+		c.add_cons(m_data);
 	});
 	return did_something;
 }
 
 event::event_exec_result add_cons_event::undo() {
 	exec_on_archive_at_pos(m_position, [this](archive& c) {
-		c.remove_cons_with_id(m_id);
+		c.remove_cons(m_data);
 	});
 	return did_something;
 }
 
 event::event_exec_result add_comp_event::exec() {
 	exec_on_archive_at_pos(m_position, [this](archive& c) {
-		c.add_comp(m_id, m_data);
+		c.add_comp(m_data);
 	});
 	return did_something;
 }
 
 event::event_exec_result add_comp_event::undo() {
 	exec_on_archive_at_pos(m_position, [this](archive& c) {
-		c.remove_comp_with_id(m_id);
+		c.remove_comp(m_data);
 	});
 	return did_something;
 }

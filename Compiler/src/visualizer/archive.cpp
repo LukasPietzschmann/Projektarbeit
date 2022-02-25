@@ -83,29 +83,29 @@ uint32_t archive::get_pos_in_src() const {
 	return m_pos_in_src;
 }
 
-void archive::add_cons(long id, const Expr& cons) {
-	m_cons.try_emplace(id, cons, false);
+void archive::add_cons(const Expr& cons) {
+	m_cons.try_emplace(cons, cons, false);
 	m_dirty_dimensions = true;
 	invalidate();
 }
 
-void archive::add_comp(long id, const Expr& comp) {
+void archive::add_comp(const Expr& comp) {
 	int flags = 0;
-	for(auto&[_, element]: m_comp) {
-		if(element.expr(end_) != comp(end_))
+	for(auto&[expr, repr]: m_comp) {
+		if(expr(end_) != comp(end_))
 			continue;
-		element.flags |= expr_repr::f_is_ambiguous;
+		repr.flags |= expr_repr::f_is_ambiguous;
 		m_dirty_visuals = true;
 		flags = expr_repr::f_is_ambiguous;
 	}
 	flags |= expr_repr::f_is_comp;
-	m_comp.try_emplace(id, comp, flags);
+	m_comp.try_emplace(comp, comp, flags);
 	m_dirty_dimensions = true;
 	invalidate();
 }
 
-bool archive::remove_cons_with_id(long id) {
-	if(m_cons.erase(id) == 0)
+bool archive::remove_cons(const Expr& cons) {
+	if(m_cons.erase(cons) == 0)
 		return false;
 
 	m_dirty_dimensions = true;
@@ -113,22 +113,22 @@ bool archive::remove_cons_with_id(long id) {
 	return true;
 }
 
-bool archive::remove_comp_with_id(long id) {
-	const auto& it = m_comp.find(id);
+bool archive::remove_comp(const Expr& comp) {
+	const auto& it = m_comp.find(comp);
 	if(it == m_comp.end())
 		return false;
 
 	int number_of_exprs_with_same_end = 0;
 	expr_repr* repr_if_one_expr_with_same_end;
 	if(it->second.flags & expr_repr::f_is_ambiguous) {
-		for(auto &[e_id, elem]: m_comp) {
-			if(e_id == id)
+		for(auto &[expr, repr]: m_comp) {
+			if(expr == comp)
 				continue;
-			if(elem.expr(end_) != it->second.expr(end_))
+			if(expr(end_) != it->second.expr(end_))
 				continue;
-			assert(elem.flags & expr_repr::f_is_ambiguous);
+			assert(repr.flags & expr_repr::f_is_ambiguous);
 			++number_of_exprs_with_same_end;
-			repr_if_one_expr_with_same_end = &elem;
+			repr_if_one_expr_with_same_end = &repr;
 		}
 		// Wenn weiterhin mehr als ein Ausdruck mit der selben Länge im Archiv existiert,
 		// soll natürlich auch weiterhin das f_is_ambiguous Flags gesetzt bleiben!
@@ -146,7 +146,7 @@ bool archive::remove_comp_with_id(long id) {
 }
 
 bool archive::set_expr_active(const Expr& expr) {
-	const auto& do_in = [&](map<long, expr_repr>& elements) {
+	const auto& do_in = [&](unordered_map<Expr, expr_repr>& elements) {
 		for(auto&[id, element]: elements) {
 			if(element.expr != expr)
 				continue;
@@ -162,7 +162,7 @@ bool archive::set_expr_active(const Expr& expr) {
 }
 
 bool archive::set_expr_inactive(const Expr& expr) {
-	const auto& do_in = [&](map<long, expr_repr>& elements) {
+	const auto& do_in = [&](unordered_map<Expr, expr_repr>& elements) {
 		for(auto&[id, element]: elements) {
 			if(element.expr != expr)
 				continue;
@@ -224,7 +224,7 @@ void archive::unregister_as_listener(archive_change_listener* listener) {
 }
 
 void archive::invalidate() {
-	static const auto longest_str_len = [](const std::map<long, expr_repr>& elements) {
+	static const auto longest_str_len = [](const std::unordered_map<Expr, expr_repr>& elements) {
 		unsigned long max = 0;
 		for(auto[id, elem]: elements) {
 			const auto& string = elem.as_string();
