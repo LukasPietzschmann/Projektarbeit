@@ -26,7 +26,7 @@ using namespace std;
 #include "predef.h"
 #include "parser.h"
 #include "eval.h"
-#include "visualizer/main.hpp"
+#include "visualizer/visualizer.hpp"
 
 int repl();
 void eval_exprs(const seq<Expr>&);

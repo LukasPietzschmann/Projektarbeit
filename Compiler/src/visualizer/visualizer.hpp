@@ -17,7 +17,15 @@
 #include "utils.hpp"
 
 /*
+Bindestrich Fehler in der Arbeit
+ -> Leerzeichen in Komposita Wikipedia
+Zeichesetzung (Kommata, ...)
+
 Davids Code übernehmen
+
+Überprüfung ob ein Ausdruck vollständig ist anpassen
+
+Leerzeichen nach Operator einfügen (Alternative)
 
 Vielleicht seitwärts scrollen
 

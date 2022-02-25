@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "visualizer.hpp"
 
 WINDOW* footer;
 WINDOW* src_display;
