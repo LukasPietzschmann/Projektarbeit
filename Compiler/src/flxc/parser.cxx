@@ -795,8 +795,7 @@ namespace iterative {
 queue<pair<Expr, int>> q;
 
 void proceed (Expr cons, int flags) {
-	// FIXME: funktioniert noch nicht!
-	const auto& is_comp = [flags](const Expr& expr){
+	const auto& is_comp = [flags](const Expr& expr) {
 		while(!right(expr)) {
 			if(!up(expr)) {
 				if(!(flags & Extend))
@@ -807,16 +806,31 @@ void proceed (Expr cons, int flags) {
 		return false;
 	};
 
-    events.push_back(new add_expr_to_queue(cons, is_comp(+cons)));
+	// Heinlein 25.02.2022:
+	// Kopie an visualizer übergeben, weil cons vom Parser noch verändert werden kann.
+	events.push_back(new add_expr_to_queue(+cons, is_comp(+cons)));
     q.push(make_pair(cons, flags));
 }
 
 void process () {
+	const auto& is_comp = [](const Expr& expr, int flags) {
+		while(!right(expr)) {
+			if(!up(expr)) {
+				if(!(flags & Extend))
+					return true;
+				return false;
+			}
+		}
+		return false;
+	};
+
     while (!q.empty()) {
-	auto pair = q.front();
-	events.push_back(new remove_expr_from_queue(pair.first, pair.second & Finish));
-	q.pop();
-	recursive::proceed(pair.first, pair.second);
+		auto pair = q.front();
+		// Heinlein 25.02.2022:
+		// Kopie an visualizer übergeben, weil pair.first vom Parser noch verändert werden kann.
+        events.push_back(new remove_expr_from_queue(+pair.first, is_comp(+pair.first, pair.second)));
+		q.pop();
+		recursive::proceed(pair.first, pair.second);
     }
 }
 
