@@ -27,10 +27,13 @@ CH::str expr_repr::as_string() {
 	}else {
 		result += get_scanned_str_for_expr(expr);
 		currpart_pos = *result;
+		// Zusätzlichen Leerschritt einfügen, um das Resultat etwas leserlicher zu machen
+		if(result[CH::Z] != ' ')
+			result += ' ';
 		result += expr(to_str_from_currpart_);
 	}
 	const auto& pos = result(CH::searchA([](const char c) { return c == '\n'; }));
-	if(pos != 0 * CH::A ) {
+	if(pos != 0 * CH::A) {
 		result = result(pos | pos + 1, "\\n");
 		++currpart_pos;
 	}
