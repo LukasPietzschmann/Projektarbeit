@@ -41,30 +41,4 @@ enum input_state {
 	s_any_input = 1 << 3
 };
 
-/**
- * Wird das Programm unerwartet durch ein Signal beendet,
- * MUSS der curses-Modus korrekt verlassen werden.
- * Dazu wird diese Funktion als Signal-Handler verwendet.
- */
-void handleSignal(int sig);
-
-/**
- * Hilfsfunktion um alle verwendeten Farben und Farb-Paare
- * zu initialisieren
- */
-void setup_colors();
-void setup_windows();
-
-/**
- * @return `true`, falls noch ein nächstes Event existiert hat,
- * sonst `false`
- */
-bool step_n_events_forward(int n);
-
-/**
- * @return `true`, falls noch ein vorheriges Event existiert hat,
- * sonst `false`
- */
-bool step_n_events_backward(int n);
-
-int start_visualizer(const CH::str& source_string, int event_to_skip_to);
+int start_visualizer(const CH::str& source_string, int event_to_skip_to = 0);

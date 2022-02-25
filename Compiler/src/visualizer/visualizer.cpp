@@ -27,6 +27,11 @@ std::map<char, int> markers;
 
 int current_state;
 
+/**
+ * Wird das Programm unerwartet durch ein Signal beendet,
+ * MUSS der curses-Modus korrekt verlassen werden.
+ * Dazu wird diese Funktion als Signal-Handler verwendet.
+ */
 void handleSignal(int sig) {
 	arch_windows.clear();
 	for(const auto e: events)
@@ -115,6 +120,10 @@ void setup_windows() {
 	wnoutrefresh(footer);
 }
 
+/**
+ * @return `true`, falls noch ein nächstes Event existiert hat,
+ * sonst `false`
+ */
 bool step_n_events_forward(int n) {
 	assert(n >= 0);
 
@@ -130,6 +139,10 @@ bool step_n_events_forward(int n) {
 	return true;
 }
 
+/**
+ * @return `true`, falls noch ein vorheriges Event existiert hat,
+ * sonst `false`
+ */
 bool step_n_events_backward(int n) {
 	assert(n >= 0);
 
