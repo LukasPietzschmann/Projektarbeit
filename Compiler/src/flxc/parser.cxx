@@ -797,7 +797,7 @@ queue<pair<Expr, int>> q;
 void proceed (Expr cons, int flags) {
 	// FIXME: funktioniert noch nicht!
 	const auto& is_comp = [flags](const Expr& expr){
-		while(exec(expr, after_), !right(expr)) {
+		while(!right(expr)) {
 			if(!up(expr)) {
 				if(!(flags & Extend))
 					return true;
