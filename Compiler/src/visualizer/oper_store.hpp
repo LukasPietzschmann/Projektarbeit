@@ -7,6 +7,7 @@
 #include "../libCH/seq.ch"
 
 #include "constants.hpp"
+#include "expr_repr.hpp"
 #include "popup.hpp"
 #include "utils.hpp"
 #include "windows.hpp"

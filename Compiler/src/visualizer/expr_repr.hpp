@@ -3,6 +3,7 @@
 #include "../flxc/data.h"
 #include "../flxc/scanner.h"
 
+#include "constants.hpp"
 #include "oper_store.hpp"
 #include "utils.hpp"
 
@@ -20,5 +21,5 @@ struct expr_repr {
 	int flags;
 	uint32_t currpart_pos {0};
 
-	CH::str as_string();
+	CH::str as_string(int string_length_threshold = REPLACE_WITH_ID_THRESHOLD);
 };
