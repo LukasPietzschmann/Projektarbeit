@@ -233,19 +233,23 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 		}else if(current_state == s_any_input) {
 			if(c == 'q')
 				break;
-			if(c == 'h')
+			if(c == 'h') {
 				popup_manager::the().toggle(help_popup);
-			else if(c == 'o')
+				multiplier = 0; // multiplier zurücksetzen
+			}else if(c == 'o') {
 				popup_manager::the().toggle(opers_popup);
-			else if(c == 'n')
+				multiplier = 0; // multiplier zurücksetzen
+			}else if(c == 'n')
 				worked = step_n_events_forward(use_multiplier());
 			else if(c == 'p')
 				worked = step_n_events_backward(use_multiplier());
-			else if(c == 'm')
+			else if(c == 'm') {
 				current_state = s_wait_for_marker | s_create_marker;
-			else if(c == '\'')
+				multiplier = 0; // multiplier zurücksetzen
+			}else if(c == '\'') {
 				current_state = s_wait_for_marker | s_read_marker;
-			else if(c == KEY_ARROW_DOWN)
+				multiplier = 0; // multiplier zurücksetzen
+			}else if(c == KEY_ARROW_DOWN)
 				worked = current_scrollable->scroll_y(use_multiplier());
 			else if(c == KEY_ARROW_UP)
 				worked = current_scrollable->scroll_y(-use_multiplier());
