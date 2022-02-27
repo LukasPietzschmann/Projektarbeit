@@ -192,6 +192,9 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 	wprintw(src_display, EVENT_COUNTER_TEXT, current_event_index);
 	wnoutrefresh(src_display);
 
+	wmove(footer, 0, 0);
+	wprintw(footer, MULTIPLIER_TEXT, 1);
+
 	doupdate();
 
 	int multiplier = 0;
@@ -253,7 +256,7 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 				worked = queue_display->scroll_y(use_multiplier());
 			else if(c >= '0' && c <= '9') {
 				multiplier = multiplier * 10 + (c - 48);
-				goto skip_without_refresh;
+				goto skip_with_refresh;
 			}else {
 				worked = false;
 				goto skip_without_refresh;
@@ -271,6 +274,8 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 			center_text_hor(footer, FOOTER_WAIT_FOR_MARKER_TEXT, 0);
 		else
 			center_text_hor(footer, FOOTER_QUICK_ACTIONS_TEXT, 0);
+		wmove(footer, 0, 0);
+		wprintw(footer, MULTIPLIER_TEXT, std::max(1, multiplier));
 		wnoutrefresh(footer);
 
 		// das muss als Letztes vor `doupdate` ausgeführt werden, damit das popup,

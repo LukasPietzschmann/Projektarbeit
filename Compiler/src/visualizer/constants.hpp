@@ -34,5 +34,6 @@
 #define KEY_ARROW_DOWN KEY_DOWN
 
 #define EVENT_COUNTER_TEXT "Event: %3d"
+#define MULTIPLIER_TEXT "%dx"
 #define FOOTER_QUICK_ACTIONS_TEXT "q: quit    n: next    p: previous    o: toggle opers    h: help"
 #define FOOTER_WAIT_FOR_MARKER_TEXT "Input marker or press <esc>"
