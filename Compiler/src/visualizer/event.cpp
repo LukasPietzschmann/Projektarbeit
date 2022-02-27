@@ -4,8 +4,8 @@ event::event(unsigned int position) : m_position(position) {}
 
 template <typename Callback>
 void event::exec_on_archive_at_pos(unsigned int pos, Callback callback) const {
-	const auto& it = std::find_if(arch_windows.begin(), arch_windows.end(), [&pos](const archive& c) {
-		return c.get_pos_in_src() == pos;
+	const auto& it = std::find_if(arch_windows.begin(), arch_windows.end(), [&pos](const archive& a) {
+		return a.get_pos_in_src() == pos;
 	});
 	if(it == arch_windows.end())
 		return;
@@ -16,29 +16,29 @@ event_with_data::event_with_data(unsigned int position, const Expr& data) :
 		event(position), m_data(data) {}
 
 event::event_exec_result add_cons_event::exec() {
-	exec_on_archive_at_pos(m_position, [this](archive& c) {
-		c.add_cons(m_data);
+	exec_on_archive_at_pos(m_position, [this](archive& a) {
+		a.add_cons(m_data);
 	});
 	return did_something;
 }
 
 event::event_exec_result add_cons_event::undo() {
-	exec_on_archive_at_pos(m_position, [this](archive& c) {
-		c.remove_cons(m_data);
+	exec_on_archive_at_pos(m_position, [this](archive& a) {
+		a.remove_cons(m_data);
 	});
 	return did_something;
 }
 
 event::event_exec_result add_comp_event::exec() {
-	exec_on_archive_at_pos(m_position, [this](archive& c) {
-		c.add_comp(m_data);
+	exec_on_archive_at_pos(m_position, [this](archive& a) {
+		a.add_comp(m_data);
 	});
 	return did_something;
 }
 
 event::event_exec_result add_comp_event::undo() {
-	exec_on_archive_at_pos(m_position, [this](archive& c) {
-		c.remove_comp(m_data);
+	exec_on_archive_at_pos(m_position, [this](archive& a) {
+		a.remove_comp(m_data);
 	});
 	return did_something;
 }
@@ -49,8 +49,8 @@ event::event_exec_result create_archive_event::exec() {
 }
 
 event::event_exec_result create_archive_event::undo() {
-	const auto& it = std::find_if(arch_windows.begin(), arch_windows.end(), [this](const archive& c) {
-		return c.get_pos_in_src() == m_position;
+	const auto& it = std::find_if(arch_windows.begin(), arch_windows.end(), [this](const archive& a) {
+		return a.get_pos_in_src() == m_position;
 	});
 
 	assert(it != arch_windows.end());
