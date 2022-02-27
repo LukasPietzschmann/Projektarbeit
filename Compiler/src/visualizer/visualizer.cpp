@@ -98,13 +98,14 @@ void setup_windows() {
 	mvpaddstr(help_popup, 1, 0, "n: go one step forward");
 	mvpaddstr(help_popup, 2, 0, "p: go one step backward");
 	mvpaddstr(help_popup, 3, 0, "o: show all operators");
-	mvpaddstr(help_popup, 4, 0, "arrow-up: scroll archives/popup up");
-	mvpaddstr(help_popup, 5, 0, "arrow-down: scroll archives/popup down");
-	mvpaddstr(help_popup, 6, 0, "w: scroll queue up");
-	mvpaddstr(help_popup, 7, 0, "s: scroll queue down");
-	mvpaddstr(help_popup, 8, 0, "m [a-z]: set marker to the current event");
-	mvpaddstr(help_popup, 9, 0, "' [a-z]: jump to marker");
-	mvpaddstr(help_popup, 10, 0, "[0-9]+ <command>: execute command n times");
+	mvpaddstr(help_popup, 4, 0, "h: show this help");
+	mvpaddstr(help_popup, 5, 0, "arrow-up: scroll archives/popup up");
+	mvpaddstr(help_popup, 6, 0, "arrow-down: scroll archives/popup down");
+	mvpaddstr(help_popup, 7, 0, "w: scroll queue up");
+	mvpaddstr(help_popup, 8, 0, "s: scroll queue down");
+	mvpaddstr(help_popup, 9, 0, "m [a-z]: set marker to the current event");
+	mvpaddstr(help_popup, 10, 0, "' [a-z]: jump to marker");
+	mvpaddstr(help_popup, 11, 0, "[0-9]+ <command>: execute command n times");
 
 	popup_manager::the().insert(opers_popup, [&]() {
 		prev_scrollable = current_scrollable;
