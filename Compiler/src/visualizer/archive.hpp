@@ -2,7 +2,8 @@
 
 #include <algorithm>
 #include <cassert>
-#include <unordered_map>
+#include <map>
+#include <utility>
 #include <ncurses.h>
 #include <utility>
 #include <vector>
@@ -18,8 +19,6 @@
 #include "oper_store.hpp"
 
 extern std::vector<archive> arch_windows;
-
-HASH(Expr)
 
 class archive {
 	friend class layouter;
@@ -77,7 +76,7 @@ private:
 	bool m_dirty_dimensions {true};
 	bool m_dirty_visuals {true};
 
-	std::unordered_map<Expr, expr_repr> m_cons {}, m_comp {};
+	std::map<long, std::pair<Expr, expr_repr>> m_cons {}, m_comp {};
 
 	std::vector<archive_change_listener*> m_listeners {};
 

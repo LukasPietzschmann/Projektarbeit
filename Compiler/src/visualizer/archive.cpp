@@ -33,36 +33,37 @@ void archive::render() {
 		mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + m_x_start, "|");
 
 		if(comp_it != m_comp.end()) {
-			auto elem = comp_it->second;
-			const auto& string = elem.as_string();
-			if(elem.flags & expr_repr::f_is_highlighted)
+			auto&[_, repr] = comp_it->second;
+			const auto& string = repr.as_string();
+			if(repr.flags & expr_repr::f_is_highlighted)
 				wattron(**main_viewport, A_HIGHLIGHT);
-			if(elem.flags & expr_repr::f_is_ambiguous)
+			if(repr.flags & expr_repr::f_is_ambiguous)
 				wattron(**main_viewport, A_AMBIGUOUS);
-			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start, string(CH::A  | CH::Z  - elem.currpart_pos));
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start,
+					string(CH::A | CH::Z - repr.currpart_pos));
 			wattron(**main_viewport, A_MUTED);
-			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start + elem.currpart_pos,
-					string(CH::A  + elem.currpart_pos | CH::Z ));
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start + repr.currpart_pos,
+					string(CH::A + repr.currpart_pos | CH::Z));
 			wattroff(**main_viewport, A_MUTED);
-			if(elem.flags & expr_repr::f_is_highlighted)
+			if(repr.flags & expr_repr::f_is_highlighted)
 				wattroff(**main_viewport, A_HIGHLIGHT);
-			if(elem.flags & expr_repr::f_is_ambiguous)
+			if(repr.flags & expr_repr::f_is_ambiguous)
 				wattroff(**main_viewport, A_AMBIGUOUS);
 			++comp_it;
 		}
 
 		if(cons_it != m_cons.end()) {
-			auto elem = cons_it->second;
-			const auto& string = elem.as_string();
-			if(elem.flags & expr_repr::f_is_highlighted)
+			auto&[_, repr] = cons_it->second;
+			const auto& string = repr.as_string();
+			if(repr.flags & expr_repr::f_is_highlighted)
 				wattron(**main_viewport, A_HIGHLIGHT);
 			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - *string + m_x_start,
-					string(CH::A  | CH::Z  - elem.currpart_pos));
+					string(CH::A | CH::Z - repr.currpart_pos));
 			wattron(**main_viewport, A_MUTED);
-			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - (*string - elem.currpart_pos) + m_x_start,
-					string(CH::A  + elem.currpart_pos | CH::Z ));
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos - (*string - repr.currpart_pos) + m_x_start,
+					string(CH::A + repr.currpart_pos | CH::Z));
 			wattroff(**main_viewport, A_MUTED);
-			if(elem.flags & expr_repr::f_is_highlighted)
+			if(repr.flags & expr_repr::f_is_highlighted)
 				wattroff(**main_viewport, A_HIGHLIGHT);
 			++cons_it;
 		}
@@ -84,14 +85,15 @@ uint32_t archive::get_pos_in_src() const {
 }
 
 void archive::add_cons(const Expr& cons) {
-	m_cons.try_emplace(cons, cons, false);
+	m_cons.try_emplace(m_cons.size(), cons, (expr_repr) {cons, false});
 	m_dirty_dimensions = true;
 	invalidate();
 }
 
 void archive::add_comp(const Expr& comp) {
 	int flags = 0;
-	for(auto&[expr, repr]: m_comp) {
+	for(auto&[_, pair]: m_comp) {
+		auto&[expr, repr] = pair;
 		if(expr(end_) != comp(end_))
 			continue;
 		repr.flags |= expr_repr::f_is_ambiguous;
@@ -99,36 +101,43 @@ void archive::add_comp(const Expr& comp) {
 		flags = expr_repr::f_is_ambiguous;
 	}
 	flags |= expr_repr::f_is_comp;
-	m_comp.try_emplace(comp, comp, flags);
+	m_comp.try_emplace(m_comp.size(), comp, (expr_repr) {comp, flags});
 	m_dirty_dimensions = true;
 	invalidate();
 }
 
 bool archive::remove_cons(const Expr& cons) {
-	if(m_cons.erase(cons) == 0)
+	const auto& it = std::find_if(m_cons.begin(), m_cons.end(), [&cons](auto item) {
+		return item.second.first == cons;
+	});
+	if(it == m_cons.end())
 		return false;
 
+	m_cons.erase(it);
 	m_dirty_dimensions = true;
 	invalidate();
 	return true;
 }
 
 bool archive::remove_comp(const Expr& comp) {
-	const auto& it = m_comp.find(comp);
+	const auto& it = std::find_if(m_comp.begin(), m_comp.end(), [&comp](auto item) {
+		return item.second.first == comp;
+	});
 	if(it == m_comp.end())
 		return false;
 
 	int number_of_exprs_with_same_end = 0;
 	expr_repr* repr_if_one_expr_with_same_end;
-	if(it->second.flags & expr_repr::f_is_ambiguous) {
-		for(auto &[expr, repr]: m_comp) {
-			if(expr == comp)
+	const auto& comp_repr = it->second.second;
+	if(comp_repr.flags & expr_repr::f_is_ambiguous) {
+		for(auto &[_, expr_and_repr]: m_comp) {
+			if(expr_and_repr.first == comp)
 				continue;
-			if(expr(end_) != it->second.expr(end_))
+			if(expr_and_repr.first(end_) != it->second.first(end_))
 				continue;
-			assert(repr.flags & expr_repr::f_is_ambiguous);
+			assert(expr_and_repr.second.flags & expr_repr::f_is_ambiguous);
 			++number_of_exprs_with_same_end;
-			repr_if_one_expr_with_same_end = &repr;
+			repr_if_one_expr_with_same_end = &expr_and_repr.second;
 		}
 		// Wenn weiterhin mehr als ein Ausdruck mit der selben Länge im Archiv existiert,
 		// soll natürlich auch weiterhin das f_is_ambiguous Flags gesetzt bleiben!
@@ -146,11 +155,12 @@ bool archive::remove_comp(const Expr& comp) {
 }
 
 bool archive::set_expr_active(const Expr& expr) {
-	const auto& do_in = [&](unordered_map<Expr, expr_repr>& elements) {
-		for(auto&[id, element]: elements) {
-			if(element.expr != expr)
+	const auto& do_in = [&](std::map<long, std::pair<Expr, expr_repr>>& elements) {
+		for(auto&[_, pair]: elements) {
+			auto&[current_expr, repr] = pair;
+			if(current_expr != expr)
 				continue;
-			element.flags |= expr_repr::f_is_highlighted;
+			repr.flags |= expr_repr::f_is_highlighted;
 			m_dirty_visuals = true;
 			invalidate();
 			return true;
@@ -162,11 +172,12 @@ bool archive::set_expr_active(const Expr& expr) {
 }
 
 bool archive::set_expr_inactive(const Expr& expr) {
-	const auto& do_in = [&](unordered_map<Expr, expr_repr>& elements) {
-		for(auto&[id, element]: elements) {
-			if(element.expr != expr)
+	const auto& do_in = [&](std::map<long, std::pair<Expr, expr_repr>>& elements) {
+		for(auto&[_, pair]: elements) {
+			auto&[current_expr, repr] = pair;
+			if(current_expr != expr)
 				continue;
-			element.flags &= ~expr_repr::f_is_highlighted;
+			repr.flags &= ~expr_repr::f_is_highlighted;
 			m_dirty_visuals = true;
 			invalidate();
 			return true;
@@ -224,10 +235,10 @@ void archive::unregister_as_listener(archive_change_listener* listener) {
 }
 
 void archive::invalidate() {
-	static const auto longest_str_len = [](const std::unordered_map<Expr, expr_repr>& elements) {
+	static const auto longest_str_len = [](const std::map<long, std::pair<Expr, expr_repr>>& elements) {
 		unsigned long max = 0;
-		for(auto[id, elem]: elements) {
-			const auto& string = elem.as_string();
+		for(auto[_, pair]: elements) {
+			const auto& string = pair.second.as_string();
 			if(*string > max)
 				max = *string;
 		}
