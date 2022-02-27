@@ -13,7 +13,6 @@ scrollable* prev_scrollable;
 int main_viewport_horizontal_center;
 int main_viewport_vertical_center;
 int src_str_center;
-int src_str_len;
 int width;
 int height;
 CH::str src_str;
@@ -75,10 +74,12 @@ void setup_windows() {
 	wbkgd(footer, COLOR_PAIR(FOOTER_COLOR_PAIR));
 	center_text_hor(footer, FOOTER_QUICK_ACTIONS_TEXT, 0);
 	keypad(footer, TRUE);
+	wnoutrefresh(footer);
 
 	src_display = newwin(HEADER_HEIGHT, width - QUEUE_WIDTH, 0, 0);
 	wbkgd(src_display, COLOR_PAIR(HEADER_COLOR_PAIR));
-	mvwaddstr(src_display, 0, getmaxx(src_display) / 2 - *src_str / 2, &src_str.elems[0]);
+	mvwaddnstr(src_display, 0, getmaxx(src_display) / 2 - src_str_center, &src_str.elems[0], *src_str);
+	wnoutrefresh(src_display);
 
 	queue_display = new scrollable(QUEUE_WIDTH - 1, height - 1, width - QUEUE_WIDTH, 0);
 	wbkgd(**queue_display, COLOR_PAIR(STD_COLOR_PAIR));
@@ -116,8 +117,6 @@ void setup_windows() {
 		main_viewport->prepare_refresh();
 	});
 
-	wnoutrefresh(src_display);
-	wnoutrefresh(footer);
 }
 
 /**
@@ -164,8 +163,7 @@ int start_visualizer(const CH::str& source_string, int event_to_scip_to) {
 	current_state = s_any_input;
 
 	src_str = source_string;
-	src_str_len = *source_string;
-	src_str_center = src_str_len / 2;
+	src_str_center = *src_str / 2;
 
 	initscr();
 
