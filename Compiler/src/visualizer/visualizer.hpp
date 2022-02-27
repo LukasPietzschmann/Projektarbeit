@@ -23,10 +23,6 @@ Zeichesetzung (Kommata, ...)
 
 Davids Code übernehmen
 
-Überprüfung ob ein Ausdruck vollständig ist anpassen
-
-Leerzeichen nach Operator einfügen (Alternative)
-
 Vielleicht seitwärts scrollen
 
 Noch ein paar Kommentare

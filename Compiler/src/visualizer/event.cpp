@@ -53,6 +53,7 @@ event::event_exec_result create_archive_event::undo() {
 		return a.get_pos_in_src() == m_position;
 	});
 
+	// da vor undo immer exec aufgerufen wurde, sollte es definitiv ein Archiv an der Stelle geben
 	assert(it != arch_windows.end());
 	it->unregister_as_listener(&layouter::the());
 	arch_windows.erase(it);
@@ -91,27 +92,31 @@ event::event_exec_result expr_no_longer_gets_used_event::undo() {
 	return res ? did_something : did_nothing;
 }
 
-add_expr_to_queue::add_expr_to_queue(const Expr& expr, bool is_comp) : event_with_data(0, expr), m_is_comp(is_comp) {}
+add_expr_to_queue_event::add_expr_to_queue_event(const Expr& expr, bool is_comp) :
+		event_with_data(0, expr), m_is_comp(is_comp) {}
 
-event::event_exec_result add_expr_to_queue::exec() {
+event::event_exec_result add_expr_to_queue_event::exec() {
 	if(!m_is_comp)
 		oper_store::the().insert_if_prototyp(m_data);
 	expr_queue::the().push_back(m_data, m_is_comp);
 	return event::did_something;
 }
 
-event::event_exec_result add_expr_to_queue::undo() {
-	return expr_queue::the().pop_back() ? event::did_something : event::did_nothing;
+event::event_exec_result add_expr_to_queue_event::undo() {
+	bool res = expr_queue::the().pop_back();
+	// da vor undo immer exec aufgerufen wurde, sollte es definitiv ein Ausdruck zum Löschen vorhanden sein
+	assert(res);
+	return event::did_something;
 }
 
-remove_expr_from_queue::remove_expr_from_queue(const Expr& expr, bool is_comp) :
+remove_expr_from_queue_event::remove_expr_from_queue_event(const Expr& expr, bool is_comp) :
 		event_with_data(0, expr), m_is_comp(is_comp) {}
 
-event::event_exec_result remove_expr_from_queue::exec() {
+event::event_exec_result remove_expr_from_queue_event::exec() {
 	return expr_queue::the().pop_front() ? event::did_something : event::did_nothing;
 }
 
-event::event_exec_result remove_expr_from_queue::undo() {
+event::event_exec_result remove_expr_from_queue_event::undo() {
 	expr_queue::the().push_front(m_data, m_is_comp);
 	return event::did_something;
 }

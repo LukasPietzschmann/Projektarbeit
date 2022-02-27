@@ -75,10 +75,10 @@ public:
 	event_exec_result undo() override;
 };
 
-class add_expr_to_queue : public event_with_data {
+class add_expr_to_queue_event : public event_with_data {
 public:
 	using event_with_data::event_with_data;
-	explicit add_expr_to_queue(const Expr& expr, bool is_comp);
+	explicit add_expr_to_queue_event(const Expr& expr, bool is_comp);
 	event_exec_result exec() override;
 	event_exec_result undo() override;
 
@@ -86,10 +86,10 @@ private:
 	bool m_is_comp;
 };
 
-class remove_expr_from_queue : public event_with_data {
+class remove_expr_from_queue_event : public event_with_data {
 public:
 	using event_with_data::event_with_data;
-	explicit remove_expr_from_queue(const Expr& expr, bool is_comp);
+	explicit remove_expr_from_queue_event(const Expr& expr, bool is_comp);
 	event_exec_result exec() override;
 	event_exec_result undo() override;
 

@@ -808,7 +808,7 @@ void proceed (Expr cons, int flags) {
 
 	// Heinlein 25.02.2022:
 	// Kopie an visualizer übergeben, weil cons vom Parser noch verändert werden kann.
-	events.push_back(new add_expr_to_queue(+cons, is_comp(+cons)));
+	events.push_back(new add_expr_to_queue_event(+cons, is_comp(+cons)));
     q.push(make_pair(cons, flags));
 }
 
@@ -828,7 +828,7 @@ void process () {
 		auto pair = q.front();
 		// Heinlein 25.02.2022:
 		// Kopie an visualizer übergeben, weil pair.first vom Parser noch verändert werden kann.
-        events.push_back(new remove_expr_from_queue(+pair.first, is_comp(+pair.first, pair.second)));
+        events.push_back(new remove_expr_from_queue_event(+pair.first, is_comp(+pair.first, pair.second)));
 		q.pop();
 		recursive::proceed(pair.first, pair.second);
     }
