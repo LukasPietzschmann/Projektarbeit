@@ -12,7 +12,6 @@
 #define POPUP_HEIGHT 12
 
 #define COLOR_GREY 50
-#define COLOR_DARK_GREY 51
 #define COLOR_LIGHT_GREY 52
 
 #define STD_COLOR_PAIR 1

@@ -48,7 +48,6 @@ void setup_colors() {
 	start_color();
 	init_color(COLOR_LIGHT_GREY, 600, 600, 600);
 	init_color(COLOR_GREY, 400, 400, 400);
-	init_color(COLOR_DARK_GREY, 100, 100, 100);
 	init_pair(STD_COLOR_PAIR, COLOR_WHITE, COLOR_BLACK);
 	init_pair(FOOTER_COLOR_PAIR, COLOR_BLACK, COLOR_RED);
 	init_pair(HEADER_COLOR_PAIR, COLOR_WHITE, COLOR_GREY);
