@@ -39,12 +39,9 @@ void archive::render() {
 				wattron(**main_viewport, A_HIGHLIGHT);
 			if(repr.flags & expr_repr::f_is_ambiguous)
 				wattron(**main_viewport, A_AMBIGUOUS);
-			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start,
-					string(CH::A | CH::Z - repr.currpart_pos));
-			wattron(**main_viewport, A_MUTED);
-			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start + repr.currpart_pos,
-					string(CH::A + repr.currpart_pos | CH::Z));
-			wattroff(**main_viewport, A_MUTED);
+			// Ein vollständiger Ausdruck muss den Teil ab currpart nicht extra zeichnen, da dieser
+			// immer am Ende des Ausdrucks ist
+			mvsaddstr(main_viewport, i + m_y_start, m_divider_x_pos + 1 + m_x_start, string);
 			if(repr.flags & expr_repr::f_is_highlighted)
 				wattroff(**main_viewport, A_HIGHLIGHT);
 			if(repr.flags & expr_repr::f_is_ambiguous)
