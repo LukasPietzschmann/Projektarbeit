@@ -9,8 +9,6 @@ expr_repr::expr_repr(const Expr& expr, int flags) :
 }
 
 //FIXME: nicht gerade ideal hier currpart_pos zu setzten
-//		1: as_string kann dann nicht mehr const sein
-//		2: es fühlt sich einfach nicht richtig an :|
 CH::str expr_repr::as_string(int string_length_threshold) {
 	assert(string_length_threshold >= 0);
 
