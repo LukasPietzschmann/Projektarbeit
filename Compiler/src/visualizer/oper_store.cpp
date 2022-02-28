@@ -1,5 +1,10 @@
 #include "oper_store.hpp"
 
+oper_store& oper_store::the() {
+	static oper_store instance;
+	return instance;
+}
+
 bool oper_store::insert_if_prototyp(const Expr& expr) {
 	static int next_id_and_line = 0;
 

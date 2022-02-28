@@ -1,5 +1,10 @@
 #include "expr_queue.hpp"
 
+expr_queue& expr_queue::the() {
+	static expr_queue instance;
+	return instance;
+}
+
 void expr_queue::push_back(const Expr& expr, bool is_comp) {
 	auto er = expr_repr(expr, is_comp ? expr_repr::f_is_comp : 0);
 	CH::str expr_str = truncate_string_to_length(er.as_string(), QUEUE_WIDTH - 2);

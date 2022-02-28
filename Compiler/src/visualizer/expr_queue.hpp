@@ -16,10 +16,7 @@
 
 class expr_queue {
 public:
-	static expr_queue& the() {
-		static expr_queue instance;
-		return instance;
-	}
+	static expr_queue& the();
 
 	expr_queue(const expr_queue&) = delete;
 	expr_queue(expr_queue&&) noexcept = default;

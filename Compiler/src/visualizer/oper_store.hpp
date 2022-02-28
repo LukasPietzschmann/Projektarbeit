@@ -14,10 +14,7 @@
 
 class oper_store {
 public:
-	static oper_store& the() {
-		static oper_store instance;
-		return instance;
-	}
+	static oper_store& the();
 
 	oper_store(const oper_store&) = delete;
 	oper_store(oper_store&&) noexcept = default;
