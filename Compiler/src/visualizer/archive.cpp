@@ -1,12 +1,4 @@
 #include "archive.hpp"
-#include "layouter.hpp"
-
-archive::~archive() {
-	//FIXME: das ist eher eine schnelle nicht so schöne Lösung.
-	//       Der Layouter sollte explizit benachrichtigt werden, dass ein Archiv verschwunden ist
-	//       Aber diese Lösung funktioniert gut und ich muss dafür nichts mehr am Bericht ändern :)
-	layouter::the().notify_dimensions_changed(*this);
-}
 
 bool archive::intersects_with(const archive& other) const {
 	return intersects_with(rect(other));

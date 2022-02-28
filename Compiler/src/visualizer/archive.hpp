@@ -36,8 +36,6 @@ public:
 		invalidate();
 	}
 
-	~archive();
-
 	bool operator==(const archive& other) const;
 
 	bool intersects_with(const archive& other) const;
