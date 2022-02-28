@@ -16,18 +16,6 @@
 #include "scrollable.hpp"
 #include "utils.hpp"
 
-/*
-Bindestrich Fehler in der Arbeit
- -> Leerzeichen in Komposita Wikipedia
-Zeichesetzung (Kommata, ...)
-
-Davids Code übernehmen
-
-Vielleicht seitwärts scrollen
-
-Noch ein paar Kommentare
-*/
-
 using event_iterator = std::vector<event*>::iterator;
 
 enum input_state {
